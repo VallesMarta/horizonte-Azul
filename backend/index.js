@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 
 // Configs
 import connectDB from "./config/db.js";
-import authMiddleware from "./middlewares/auth.js";
 import corsMiddleware from "./middlewares/cors.js";
 
 // Rutas
@@ -36,12 +35,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-// Rutas públicas
+// Rutas 
 app.use("/register", register);
 app.use("/login", login);
 app.use("/logout", logout);
-
-// Rutas protegidas
 app.use("/viajes", viajes);
 app.use("/usuarios", usuarios);
 app.use("/reservas", reservas);
