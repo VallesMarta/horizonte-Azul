@@ -1,53 +1,55 @@
-// Librerías externas
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
-dotenv.config();
-import cors from "cors";
+import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Enrutadores
+// Configs
+import connectDB from "./config/db.js";
+import authMiddleware from "./middlewares/auth.js";
+import corsMiddleware from "./middlewares/cors.js";
+
+// Rutas
 import usuarios from "./routes/usuarios.js";
 import viajes from "./routes/viajes.js";
 import reservas from "./routes/reservas.js";
 import servicios from "./routes/servicios.js";
-import login from "./routes/login.js"
-import register from "./routes/register.js"
-import logout from "./routes/logout.js"
+import login from "./routes/login.js";
+import register from "./routes/register.js";
+import logout from "./routes/logout.js";
+import wishlist from "./routes/wishlist.js";
 
-// Creamos instancia de expres
-let app = express();
+dotenv.config();
+const app = express();
 
-// ruta a imagenes publicas
+// Paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 app.use("/public", express.static(path.join(__dirname, "../public")));
 
-// Conexión con la BD
-mongoose
-  .connect("mongodb://localhost:27017/horizonteAzul")
-  .then(() => console.log(" Conectado a MongoDB"))
-  .catch((err) => console.error(" Error al conectar MongoDB:", err));
+// Conexión DB
+connectDB();
 
-// Permitir CORS desde cualquier origen (temporal)
-// Permetre CORS només des del frontend
-app.use(cors());
-
-// Carga de middleware
+// Middlewares
+app.use(corsMiddleware);
 app.use(express.json());
+app.use(cookieParser());
 
-// Carga de enrutadores
-app.use("/usuarios", usuarios);
-app.use("/viajes", viajes);
-app.use("/reservas", reservas);
-app.use("/servicios", servicios);
-app.use("/login", login);
+
+// Rutas públicas
 app.use("/register", register);
+app.use("/login", login);
 app.use("/logout", logout);
 
-// Puesta en marcha del servidor
-app.listen(3000, () => {
-  console.log(`🚀 Servidor escuchando en http://localhost:3000`);
+// Rutas protegidas
+app.use("/viajes", viajes);
+app.use("/usuarios", usuarios);
+app.use("/reservas", reservas);
+app.use("/servicios", servicios);
+app.use("/wishlist", wishlist);
+
+// Servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });

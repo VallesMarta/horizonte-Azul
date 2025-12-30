@@ -1,18 +1,8 @@
 import express from "express";
+import { loginUser } from "../controllers/authController.js";
 
-import { UserRepository } from "../user-repository.js";
+const router = express.Router();
 
-let router = express.Router();
-
-// Servicio de listado
-router.post("/", async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const user = await UserRepository.login({ username, password });
-    res.send({ user });
-  } catch (error) {
-    res.status(401).send(error.message);
-  }
-});
+router.post("/", loginUser);
 
 export default router;
