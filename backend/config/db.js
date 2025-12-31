@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/horizonteAzul";
+const MONGODB_URI = process.env.MONGO_URI_HORIZONTE_AZUL || "mongodb://localhost:27017/horizonteAzul";
 
 const connectDB = async () => {
   try {
