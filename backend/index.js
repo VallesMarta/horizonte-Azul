@@ -1,5 +1,7 @@
+import "dotenv/config";
+
 import express from "express";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -18,7 +20,7 @@ import register from "./routes/register.js";
 import logout from "./routes/logout.js";
 import wishlist from "./routes/wishlist.js";
 
-dotenv.config();
+// dotenv.config();
 const app = express();
 
 // Paths
