@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primario: #5271ff;
+  --color-secundario: #3147cc;
+  --color-texto: #1f2937;
+  --color-fondo: #f4f5fa;
+  --color-iconos: #fde047;
+  --color-acento: #aab8ff;
+  --color-otro: #4dd2ff;
+  --color-rojo: #D13264;
+  --color-verde: #3BA054;
+  --color-naranja: #D58D44;
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/fonts/PlayfairDisplay-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/fonts/PlayfairDisplay-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+body {
+  font-family: "playfair-display", serif;
+}
+
+
+/* @import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
