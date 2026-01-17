@@ -12,15 +12,26 @@ lerna-debug.log*
 # ================================
 # Dependencias y builds generados
 # ================================
-node_modules
-dist
-dist-ssr
+# Node_modules solo en frontend o backend
+frontend/node_modules/
+backend/node_modules/
+
+# Builds de frontend y backend
+frontend/.next/
+frontend/out/
+frontend/build/
+backend/dist/
+backend/dist-ssr/
+
+# Otros builds o archivos locales
 *.local
 
 # ================================
 # Variables de entorno
 # ================================
 .env
+frontend/.env*
+backend/.env*
 
 # ================================
 # Configuración de editores y SO
@@ -44,3 +55,10 @@ dist-ssr
 
 # Archivos temporales
 *.sw?
+*.pem
+
+# ================================
+# TypeScript
+# ================================
+*.tsbuildinfo
+frontend/next-env.d.ts
