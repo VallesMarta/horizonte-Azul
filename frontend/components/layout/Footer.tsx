@@ -1,10 +1,6 @@
 'use client'
 
-interface FooterProps {
-  urlAPI: string
-}
-
-export default function Footer({ urlAPI }: FooterProps) {
+export default function Footer() {
   return (
     <footer className="bg-secundario p-7 text-fondo grid grid-cols-5 gap-5 relative bottom-0 w-full">
       {/* Columna 1: Logo + descripción */}
@@ -22,25 +18,25 @@ export default function Footer({ urlAPI }: FooterProps) {
       {/* Columna 2: Servicios */}
       <div className="flex flex-col gap-2 border-l border-fondo/30 pl-5">
         <h2 className="font-bold underline underline-offset-3 text-xl">Servicios</h2>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Reservas de vuelos</a>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Gestión de reservas</a>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Consultas de vuelos</a>
+        <a href="reserva-vuelos" className="hover:text-primario transition-colors duration-200">Reservas de vuelos</a>
+        <a href="gestion-reservas" className="hover:text-primario transition-colors duration-200">Gestión de reservas</a>
+        <a href="consulta-vuelos" className="hover:text-primario transition-colors duration-200">Consultas de vuelos</a>
       </div>
 
       {/* Columna 3: Legal */}
       <div className="flex flex-col gap-2 border-l border-fondo/30 pl-5">
         <h2 className="font-bold underline underline-offset-3 text-xl">Legal</h2>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Política de privacidad</a>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Términos y condiciones</a>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Aviso legal</a>
+        <a href="politica-privacidad" className="hover:text-primario transition-colors duration-200">Política de privacidad</a>
+        <a href="terminos-condiciones" className="hover:text-primario transition-colors duration-200">Términos y condiciones</a>
+        <a href="aviso-legal" className="hover:text-primario transition-colors duration-200">Aviso legal</a>
       </div>
 
       {/* Columna 4: Redes sociales */}
       <div className="flex flex-col gap-2 border-l border-fondo/30 pl-5">
         <h2 className="font-bold underline underline-offset-3 text-xl">Redes sociales</h2>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Facebook</a>
-        <a href="#" className="hover:text-primario transition-colors duration-200">Instagram</a>
-        <a href="#" className="hover:text-primario transition-colors duration-200">X</a>
+        <a href="https://www.instagram.com/horizonteazul02/" target="_blank" className="hover:text-primario transition-colors duration-200">Instagram</a>
+        <a href="facebook" className="hover:text-primario transition-colors duration-200">Facebook</a>
+        <a href="x" className="hover:text-primario transition-colors duration-200">X</a>
       </div>
 
       {/* Fila inferior: Separador horizontal */}
