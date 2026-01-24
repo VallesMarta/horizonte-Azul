@@ -14,11 +14,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
      <body className="flex flex-col min-h-screen bg-white text-gray-800">
-        <Header urlAPI=""/>
+        <Header />
         <main className="flex-1">          
           {children}
         </main>
-        <Footer urlAPI=""/>
+        <Footer />
       </body>
     </html>
   );
