@@ -2,10 +2,43 @@
 
 import { FaUser, FaKey, FaEnvelope, FaIdBadge } from "react-icons/fa";
 
+interface UsuarioNuevo {
+  username: string;
+  password: string;
+  nombre: string;
+  email: string;
+}
+
 export default function FormRegistro() {
-  
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const guardarUsuario = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();  
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const usuarioNuevo: UsuarioNuevo = {
+      username: String(formData.get("username")).trim(),
+      password: String(formData.get("password")).trim(),
+      nombre: String(formData.get("nombre")).trim(),
+      email: String(formData.get("email")).trim(),
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/usuarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(usuarioNuevo),
+      });
+
+      if (!res.ok) throw new Error("Error al registrar");
+
+      e.currentTarget.reset();
+      alert("Usuario registrado correctamente");
+    } catch (error) {
+      console.error(error);
+      alert("Error al registrar usuario");
+    }
   };
 
   return (
