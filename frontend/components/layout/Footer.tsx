@@ -1,51 +1,82 @@
-'use client'
+"use client";
+
+import Link from "next/link";
+import { FaInstagram, FaFacebook, FaTwitter, FaPlane, FaShieldAlt, FaInfoCircle } from "react-icons/fa";
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-secundario p-7 text-fondo grid grid-cols-5 gap-5 relative bottom-0 w-full">
-      {/* Columna 1: Logo + descripción */}
-      <div className="col-span-2 flex gap-3 text-justify">
-        <img
-          src="/media/img/logo_empresa_header.png"
-          alt="Logo de Horizonte Azul"
-          className="h-20"
-        />
-        <p className="text-sm leading-relaxed">
-          Aplicación web intuitiva para gestionar vuelos y pasajeros. Consulta viajes disponibles, realiza reservas seguras y administra toda la información de manera eficiente.
-        </p>
-      </div>
+    <footer className="bg-secundario text-fondo w-full">
+      <div className="max-w-7xl mx-auto px-6 py-12">        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 text-center lg:text-left">          
+          {/* Columna 1: Logo + Descripción */}
+          <div className="lg:col-span-2 flex flex-col items-center lg:items-start space-y-4">
+            <Link href="/">
+              <img
+                src="/media/img/logo_empresa_header.png"
+                alt="Logo de Horizonte Azul"
+                className="h-16 w-auto"
+              />
+            </Link>
+            <p className="text-sm leading-relaxed text-fondo/80 max-w-sm">
+              Tu puerta de entrada al mundo. Gestiona tus vuelos con la confianza de  
+              <strong> Horizonte Azul</strong>. Seguridad, rapidez y eficiencia en cada reserva.
+            </p>
+          </div>
 
-      {/* Columna 2: Servicios */}
-      <div className="flex flex-col gap-2 border-l border-fondo/30 pl-5">
-        <h2 className="font-bold underline underline-offset-3 text-xl">Servicios</h2>
-        <a href="reserva-vuelos" className="hover:text-primario transition-colors duration-200">Reservas de vuelos</a>
-        <a href="gestion-reservas" className="hover:text-primario transition-colors duration-200">Gestión de reservas</a>
-        <a href="consulta-vuelos" className="hover:text-primario transition-colors duration-200">Consultas de vuelos</a>
-      </div>
+          {/* Columna 2: Servicios */}
+          <div className="flex flex-col items-center lg:items-start space-y-4">
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              <FaPlane className="text-iconos" /> Servicios
+            </h2>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li><Link href="/reserva-vuelos" className="hover:text-primario transition-all inline-block">Reservas de vuelos</Link></li>
+              <li><Link href="/gestion-reservas" className="hover:text-primario transition-all inline-block">Gestión de reservas</Link></li>
+              <li><Link href="/consulta-vuelos" className="hover:text-primario transition-all inline-block">Consultas de vuelos</Link></li>
+            </ul>
+          </div>
 
-      {/* Columna 3: Legal */}
-      <div className="flex flex-col gap-2 border-l border-fondo/30 pl-5">
-        <h2 className="font-bold underline underline-offset-3 text-xl">Legal</h2>
-        <a href="politica-privacidad" className="hover:text-primario transition-colors duration-200">Política de privacidad</a>
-        <a href="terminos-condiciones" className="hover:text-primario transition-colors duration-200">Términos y condiciones</a>
-        <a href="aviso-legal" className="hover:text-primario transition-colors duration-200">Aviso legal</a>
-      </div>
+          {/* Columna 3: Legal */}
+          <div className="flex flex-col items-center lg:items-start space-y-4">
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              <FaShieldAlt className="text-iconos" /> Legal
+            </h2>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li><Link href="/politica-privacidad" className="hover:text-primario transition-all inline-block">Privacidad</Link></li>
+              <li><Link href="/terminos-condiciones" className="hover:text-primario transition-all inline-block">Términos</Link></li>
+              <li><Link href="/aviso-legal" className="hover:text-primario transition-all inline-block">Aviso Legal</Link></li>
+            </ul>
+          </div>
 
-      {/* Columna 4: Redes sociales */}
-      <div className="flex flex-col gap-2 border-l border-fondo/30 pl-5">
-        <h2 className="font-bold underline underline-offset-3 text-xl">Redes sociales</h2>
-        <a href="https://www.instagram.com/horizonteazul02/" target="_blank" className="hover:text-primario transition-colors duration-200">Instagram</a>
-        <a href="facebook" className="hover:text-primario transition-colors duration-200">Facebook</a>
-        <a href="x" className="hover:text-primario transition-colors duration-200">X</a>
-      </div>
+          {/* Columna 4: Redes */}
+          <div className="flex flex-col items-center lg:items-start space-y-4">
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              <FaInfoCircle className="text-iconos" /> Síguenos
+            </h2>
+            <div className="flex gap-4">
+              <a href="https://www.instagram.com/horizonteazul02/" target="_blank" className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all">
+                <FaInstagram size={20} />
+              </a>
+              <a href="https://facebook.com" target="_blank" className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all">
+                <FaFacebook size={20} />
+              </a>
+              <a href="https://twitter.com" target="_blank" className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all">
+                <FaTwitter size={20} />
+              </a>
+            </div>
+          </div>
 
-      {/* Fila inferior: Separador horizontal */}
-      <hr className="border-fondo/50 col-span-5 my-4" />
+        </div>
 
-      {/* Fila inferior: Copyright */}
-      <div className="col-span-5 text-center text-sm">
-        <p>© {new Date().getFullYear()} Horizonte Azul. Todos los derechos reservados.</p>
+        {/* Separador y Copyright */}
+        <div className="mt-12 pt-8 border-t border-fondo/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-center md:text-left">
+          <p>© {currentYear} Horizonte Azul S.L. Todos los derechos reservados.</p>
+          <div className="flex gap-6">
+            <span>Hecho con ❤️ para viajeros</span>
+          </div>
+        </div>
       </div>
     </footer>
-  )
+  );
 }
