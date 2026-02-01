@@ -6,8 +6,7 @@ export async function GET() {
   try {
     const sql = 'SELECT * FROM viajes ORDER BY created_at DESC';
     const rows = await query(sql) as any[];
-
-    // Limpiamos los datos: convertimos el precio de string a número
+    
     const viajes = rows.map(viaje => ({
       ...viaje,
       precio: parseFloat(viaje.precio)
@@ -24,36 +23,25 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { 
-      origen, 
-      origenAeropuerto, 
-      destino, 
-      destinoAeropuerto, 
-      precio, 
-      img, 
-      descripcion 
+      paisOrigen, aeropuertoOrigen, horaSalida,
+      paisDestino, aeropuertoDestino, horaLlegada,
+      precio, img, descripcion 
     } = body;
 
+    // Ahora tenemos 9 columnas y 9 valores
     const sql = `
-      INSERT INTO viajes (origen, origenAeropuerto, destino, destinoAeropuerto, precio, img, descripcion) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO viajes (paisOrigen, aeropuertoOrigen, horaSalida, paisDestino, aeropuertoDestino, horaLlegada, precio, img, descripcion) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const result: any = await query(sql, [
-      origen, 
-      origenAeropuerto, 
-      destino, 
-      destinoAeropuerto, 
-      precio, 
-      img, 
-      descripcion
+      paisOrigen, aeropuertoOrigen, horaSalida, 
+      paisDestino, aeropuertoDestino, horaLlegada, 
+      precio, img, descripcion
     ]);
 
-    return NextResponse.json({ 
-      ok: true, 
-      id: result.insertId,
-      mensaje: "Viaje creado correctamente" 
-    });
+    return NextResponse.json({ ok: true, id: result.insertId });
   } catch (err) {
-    return NextResponse.json({ ok: false, error: "Error al crear el viaje" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Error al insertar" }, { status: 400 });
   }
 }
