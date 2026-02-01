@@ -13,17 +13,19 @@ export async function GET() {
   }
 }
 
-// POST: Crear un nuevo tipo de servicio (ej: 'WiFi', 'Desayuno')
+// POST: Creación de un servicio 
 export async function POST(request: Request) {
   try {
-    const { nombre } = await request.json();
+    const { nombre, tipo_control } = await request.json();
 
     if (!nombre) {
       return NextResponse.json({ ok: false, error: "El nombre es obligatorio" }, { status: 400 });
     }
 
-    const sql = 'INSERT INTO servicios (nombre) VALUES (?)';
-    const result: any = await query(sql, [nombre]);
+    // Si por alguna razón no llega el tipo, le asignamos 'texto' por defecto
+    const valorTipoControl = tipo_control || 'texto';
+    const sql = 'INSERT INTO servicios (nombre, tipo_control) VALUES (?, ?)';
+    const result: any = await query(sql, [nombre, valorTipoControl]);
 
     return NextResponse.json({ 
       ok: true, 
@@ -34,6 +36,7 @@ export async function POST(request: Request) {
     if (err.code === 'ER_DUP_ENTRY') {
       return NextResponse.json({ ok: false, error: "Este servicio ya existe" }, { status: 400 });
     }
+    console.error("Error en DB:", err);
     return NextResponse.json({ ok: false, error: "Error en el servidor" }, { status: 500 });
   }
 }
