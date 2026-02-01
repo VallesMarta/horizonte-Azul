@@ -7,16 +7,17 @@ export default function Inicio() {
     "/media/img/banner2.png",
     "/media/img/banner3.png",
   ];
+
   return (
     <div className="flex flex-col items-center pt-6">
-      {/* Banner */}
-      <div className="relative w-full h-72 md:h-96 mb-6 overflow-hidden">
+      {/* Contenedor del Banner:
+         - Usamos aspect-[5/1] para mantener la proporción de 1920x384px.
+         - En móviles muy pequeños, esto hará que el banner sea bajito pero completo.
+      */}
+      <div className="relative w-full aspect-[5/1] mb-10 overflow-hidden shadow-sm">
         <Banner images={images} />
-      </div>
-      <h1 className="text-secundario mb-6 text-center text-4xl font-bold">
-        Decide tu próximo destino...
-      </h1>
-      <GridDestinos urlAPI="" />
+      </div>      
+      <GridDestinos />
     </div>
   );
 }

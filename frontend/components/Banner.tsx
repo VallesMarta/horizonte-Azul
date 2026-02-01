@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -25,7 +25,8 @@ const Banner: React.FC<BannerProps> = ({ images }) => {
           src={src}
           alt={`Banner ${index + 1}`}
           fill
-          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority={index === 0} 
+          style={{ objectFit: "contain" }} 
           className={`transition-opacity duration-1000 ${
             index === current ? "opacity-100" : "opacity-0"
           }`}
