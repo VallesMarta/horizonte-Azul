@@ -1,25 +1,35 @@
-'use client'
+"use client";
 
-import { FaUserCircle } from 'react-icons/fa'
-import useAuth from '@/hooks/useAuth'
+import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import useAuth from "@/hooks/useAuth";
 
 interface NavPerfilProps {
-  username: string
+  username: string;
 }
 
 export default function NavPerfil({ username }: NavPerfilProps) {
-  const { logout } = useAuth() // Hook para cerrar sesión
+  const { logout } = useAuth();
 
   return (
-    <div className="flex flex-row items-center gap-3 bg-secundario/20 p-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer">
-      <FaUserCircle className="text-4xl" />
-      <span>{username}</span>
+    <div className="flex items-center gap-4 pl-4 border-l border-white/20">
+      <div className="flex flex-col items-end">
+        <span className="text-[10px] uppercase tracking-widest text-white/50">
+          Usuario
+        </span>
+        <span className="text-sm font-bold text-white">{username}</span>
+      </div>
+
+      <FaUserCircle className="text-4xl text-white/80" />
+
+      {/* Botón de Logout */}
       <button
-        onClick={logout} // Cierra sesión desde useAuth
-        className="cursor-pointer bg-[#D13264] rounded-xl p-2 text-white hover:opacity-80 transition"
+        onClick={logout}
+        title="Cerrar Sesión"
+        className="flex items-center gap-2 bg-rojo hover:bg-rojo/80 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-lg shadow-rojo/20"
       >
-        Cerrar Sesión
+        <FaSignOutAlt />
+        <span className="hidden lg:block">Salir</span>
       </button>
     </div>
-  )
+  );
 }
