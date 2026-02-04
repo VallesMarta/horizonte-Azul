@@ -1,16 +1,17 @@
 "use client";
 
 import { FaUser, FaKey } from "react-icons/fa";
+import { API_URL } from "@/lib/api";
+import { useRouter } from "next/navigation"; 
 
 interface FormLoginProps {
-  cambiarPagina: (pagina: string) => void;
-  setUsuarioLoggeado: (username: string) => void;
-  urlAPI: string;
+  setUsuarioLoggeado?: (username: string) => void; 
 }
 
-export default function FormLogin({ cambiarPagina, setUsuarioLoggeado, urlAPI }: FormLoginProps) {
+export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
+  const router = useRouter(); // Necesario para router.push -> Navega a otra ruta sin recargar la página
   
-  const comprobarCredenciales = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     const formData = new FormData(e.currentTarget);
@@ -18,76 +19,94 @@ export default function FormLogin({ cambiarPagina, setUsuarioLoggeado, urlAPI }:
     const password = formData.get("password")?.toString().trim();
 
     try {
-      const respuesta = await fetch(`${urlAPI}/usuarios`);
-      if (respuesta.ok) {
-        const data = await respuesta.json();
-        
-        // Buscamos al usuario en el resultado
-        const usuarioEncontrado = data.resultado?.find(
-          (u: any) => u.username === username && u.password === password
-        );
+      const respuesta = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-        if (usuarioEncontrado) {
-          // Guardamos datos en el navegador
-          localStorage.setItem("username", usuarioEncontrado.username);
-          localStorage.setItem("username_id", usuarioEncontrado._id);
-          localStorage.setItem("nombreCompleto", usuarioEncontrado.nombre);
+      const data = await respuesta.json();
+
+      if (respuesta.ok && data.token) {
+        // Guardar datos en el navegador
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.usuario.username);
+        localStorage.setItem("username_id", data.usuario.id); 
+        localStorage.setItem("nombre", data.usuario.nombre);
+        localStorage.setItem("isAdmin", data.usuario.isAdmin ? "true" : "false");
+
+          if (setUsuarioLoggeado) {
+            setUsuarioLoggeado(data.usuario.username);
+          }
+
+          // En lugar de router.push, usamos esto para asegurar que el Header se resetee
+          window.location.href = "/";
           
-          setUsuarioLoggeado(usuarioEncontrado.username);
-          cambiarPagina('inicio');
-        } else {
-          alert("Credenciales incorrectas");
-        }
+      } else {
+        alert(data.message || "Credenciales incorrectas");
       }
     } catch (error) {
-      console.error("Error en la petición:", error);
+      console.error("Error en el login:", error);
+      alert("Error al conectar con el servidor");
     }
   };
 
   return (
-    <div className="flex flex-row justify-center items-center gap-80 mx-60 p-4 rounded-3xl">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-10 lg:gap-40 p-4">
       {/* Imagen */}
-      <div>
+      <div className="hidden md:block">
         <img
           src="/media/img/imf-login.png"
-          alt="Imagen registro"
-          className="rounded-3xl h-[420px] object-cover"
+          alt="Login"
+          className="rounded-3xl h-[420px] object-cover shadow-2xl"
         />
       </div>
 
       {/* Formulario */}
       <form
-        onSubmit={comprobarCredenciales}
-        className="flex flex-col gap-4 bg-secundario p-10 rounded-3xl w-[350px]"
+        onSubmit={handleLogin}
+        className="flex flex-col gap-6 bg-secundario p-10 rounded-3xl w-full max-w-[400px] shadow-xl"
       >
-        <div className="flex items-center">
-          <FaUser className="mr-2 text-otro text-3xl" />
+        <h2 className="text-fondo text-2xl font-bold text-center mb-4">Bienvenido de nuevo</h2>
+        
+        <div className="flex items-center bg-fondo rounded-lg p-1">
+          <FaUser className="mx-3 text-secundario text-xl" />
           <input
             name="username"
             type="text"
-            placeholder="Username"
+            placeholder="Usuario"
             required
-            className="bg-fondo rounded-lg p-3 w-full text-secundario focus:ring-2 focus:ring-otro"
+            className="bg-transparent p-3 w-full text-secundario outline-none"
           />
         </div>
 
-        <div className="flex items-center">
-          <FaKey className="mr-2 text-otro text-3xl" />
+        <div className="flex items-center bg-fondo rounded-lg p-1">
+          <FaKey className="mx-3 text-secundario text-xl" />
           <input
             type="password"
             name="password"
             placeholder="Contraseña"
             required
-            className="bg-fondo rounded-lg p-3 w-full text-secundario focus:ring-2 focus:ring-otro"
+            className="bg-transparent p-3 w-full text-secundario outline-none"
           />
         </div>
         
         <button
           type="submit"
-          className="bg-otro text-secundario font-bold rounded-2xl p-3 transition-all duration-300 hover:bg-iconos hover:text-textoPrincipal hover:scale-105"
+          className="bg-otro text-secundario font-extrabold rounded-2xl p-4 mt-4 transition-all hover:brightness-110 hover:scale-[1.02] active:scale-95 shadow-lg"
         >
-          Acceder
+          INICIAR SESIÓN
         </button>
+        <p className="text-fondo text-center text-sm mt-2">
+          ¿No tienes una cuenta?{" "}
+          <button 
+            type="button" 
+            onClick={() => router.push('/registro')} 
+            className="underline font-bold"
+          >
+            Crear cuenta
+          </button>
+        </p>
       </form>
     </div>
   );

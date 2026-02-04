@@ -1,109 +1,126 @@
 "use client";
 
 import { FaUser, FaKey, FaEnvelope, FaIdBadge } from "react-icons/fa";
-
-interface UsuarioNuevo {
-  username: string;
-  password: string;
-  nombre: string;
-  email: string;
-}
+import { API_URL } from "@/lib/api"; 
+import { useRouter } from "next/navigation";
 
 export default function FormRegistro() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const router = useRouter();
 
   const guardarUsuario = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-
-    const usuarioNuevo: UsuarioNuevo = {
+    const usuarioNuevo = {
       username: String(formData.get("username")).trim(),
       password: String(formData.get("password")).trim(),
-      nombre: String(formData.get("nombre")).trim(),
+      nombre: String(formData.get("nombre")).trim(), 
       email: String(formData.get("email")).trim(),
     };
 
     try {
-      const res = await fetch(`${API_URL}/usuarios`, {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioNuevo),
       });
 
-      if (!res.ok) throw new Error("Error al registrar");
+      const data = await res.json();
 
-      e.currentTarget.reset();
-      alert("Usuario registrado correctamente");
-    } catch (error) {
+      if (!res.ok) {
+        throw new Error(data.message || "Error al registrar");
+      }
+
+      alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+      router.push("/login"); 
+      
+    } catch (error: any) {
       console.error(error);
-      alert("Error al registrar usuario");
+      alert(error.message || "Error al registrar usuario");
     }
   };
 
   return (
-    <div className="flex flex-row justify-center items-center gap-80 mx-60 p-4 rounded-3xl">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-10 lg:gap-40 p-4">
       {/* Imagen */}
-      <div>
+      <div className="hidden md:block">
         <img
           src="/media/img/logo_empresa.jpg"
-          alt="Imagen registro"
-          className="rounded-3xl h-[420px] object-cover"
+          alt="Registro"
+          className="rounded-3xl h-[420px] w-[400px] object-cover shadow-2xl"
         />
       </div>
 
       {/* Formulario */}
       <form
         onSubmit={guardarUsuario}
-        className="flex flex-col gap-4 bg-secundario p-10 rounded-3xl w-[350px]"
+        className="flex flex-col gap-4 bg-secundario p-10 rounded-3xl w-full max-w-[400px] shadow-xl"
       >
-        <div className="flex items-center">
-          <FaUser className="mr-2 text-otro text-3xl" />
+        <h2 className="text-fondo text-2xl font-bold text-center mb-2">Crea tu cuenta</h2>
+        
+        {/* Username */}
+        <div className="flex items-center bg-fondo rounded-lg p-1">
+          <FaUser className="mx-3 text-secundario text-xl" />
           <input
             name="username"
-            placeholder="Username"
+            placeholder="Usuario"
             required
-            className="bg-fondo rounded-lg p-3 w-full text-secundario focus:ring-2 focus:ring-otro"
+            className="bg-transparent p-3 w-full text-secundario outline-none"
           />
         </div>
 
-        <div className="flex items-center">
-          <FaKey className="mr-2 text-otro text-3xl" />
+        {/* Password */}
+        <div className="flex items-center bg-fondo rounded-lg p-1">
+          <FaKey className="mx-3 text-secundario text-xl" />
           <input
             type="password"
             name="password"
             placeholder="Contraseña"
             required
-            className="bg-fondo rounded-lg p-3 w-full text-secundario focus:ring-2 focus:ring-otro"
+            className="bg-transparent p-3 w-full text-secundario outline-none"
           />
         </div>
 
-        <div className="flex items-center">
-          <FaIdBadge className="mr-2 text-otro text-3xl" />
+        {/* Nombre Completo */}
+        <div className="flex items-center bg-fondo rounded-lg p-1">
+          <FaIdBadge className="mx-3 text-secundario text-xl" />
           <input
             name="nombre"
             placeholder="Nombre completo"
-            className="bg-fondo rounded-lg p-3 w-full text-secundario focus:ring-2 focus:ring-otro"
+            required
+            className="bg-transparent p-3 w-full text-secundario outline-none"
           />
         </div>
 
-        <div className="flex items-center">
-          <FaEnvelope className="mr-2 text-otro text-3xl" />
+        {/* Email */}
+        <div className="flex items-center bg-fondo rounded-lg p-1">
+          <FaEnvelope className="mx-3 text-secundario text-xl" />
           <input
             type="email"
             name="email"
             placeholder="Correo electrónico"
             required
-            className="bg-fondo rounded-lg p-3 w-full text-secundario focus:ring-2 focus:ring-otro"
+            className="bg-transparent p-3 w-full text-secundario outline-none"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-otro text-secundario font-bold rounded-2xl p-3 transition-all duration-300 hover:bg-iconos hover:text-textoPrincipal hover:scale-105"
+          className="bg-otro text-secundario font-extrabold rounded-2xl p-4 mt-4 transition-all hover:brightness-110 hover:scale-[1.02] shadow-lg"
         >
-          Registrarse
+          REGISTRARSE
         </button>
+        
+        <p className="text-fondo text-center text-sm mt-2">
+          ¿Ya tienes cuenta?{" "}
+          <button 
+            type="button" 
+            onClick={() => router.push('/login')} 
+            className="underline font-bold"
+          >
+            Inicia sesión
+          </button>
+        </p>
       </form>
     </div>
   );
