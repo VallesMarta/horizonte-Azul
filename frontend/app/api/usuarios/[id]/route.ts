@@ -26,23 +26,28 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 }
 
-// 2. PUT: Actualizar usuario (maneja contraseña y booleano)
+// 2. PUT: Actualizar usuario
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
     const body = await request.json();
-    const { username, nombre, email, isAdmin, password } = body;
-
-    // Buscamos si el usuario existe
-    const userExists = await query('SELECT password FROM usuarios WHERE id = ?', [id]) as any[];
-    if (userExists.length === 0) {
+    
+    // 1. Buscamos los datos actuales para no perder lo que no se envía
+    const rows = await query('SELECT * FROM usuarios WHERE id = ?', [id]) as any[];
+    if (rows.length === 0) {
       return NextResponse.json({ ok: false, error: "Usuario no existe" }, { status: 404 });
     }
+    const usuarioActual = rows[0];
 
-    // Si viene una password nueva, la hasheamos; si no, dejamos la que está
-    let finalPassword = userExists[0].password;
-    if (password && password.length > 0) {      
-      finalPassword = await bcrypt.hash(password, 10);
+    // 2. Usar el dato que viene en el body o mantener el que ya está en la DB
+    const username = body.username ?? usuarioActual.username;
+    const nombre = body.nombre ?? usuarioActual.nombre;
+    const email = body.email ?? usuarioActual.email;
+    const isAdmin = body.isAdmin !== undefined ? body.isAdmin : usuarioActual.isAdmin;
+    
+    let finalPassword = usuarioActual.password;
+    if (body.password && body.password.length > 0) {      
+      finalPassword = await bcrypt.hash(body.password, 10);
     }
 
     const sql = `
@@ -55,14 +60,15 @@ export async function PUT(request: Request, { params }: RouteParams) {
       username, 
       nombre, 
       email, 
-      isAdmin === true ? 1 : 0, // Conversión a TINYINT(1)
+      isAdmin ? 1 : 0, 
       finalPassword,
       id
     ]);
 
-    return NextResponse.json({ ok: true, mensaje: "Usuario actualizado" });
+    return NextResponse.json({ ok: true, mensaje: "Usuario actualizado correctamente" });
   } catch (err) {
-    return NextResponse.json({ ok: false, error: "Error al actualizar" }, { status: 400 });
+    console.error("Error API PUT:", err);
+    return NextResponse.json({ ok: false, error: "Error al actualizar los datos" }, { status: 400 });
   }
 }
 
