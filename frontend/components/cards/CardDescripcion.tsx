@@ -9,21 +9,27 @@ interface CardDescripcionProps {
 export default function CardDescripcion({ descripcion }: CardDescripcionProps) {
   const [mostrarMas, setMostrarMas] = useState(false);
 
+  // Umbral de caracteres para decidir si mostrar el botón 
+  const esLarga = descripcion.length > 150;
+
   return (
-    <>
+    <div className="flex flex-col">
       <p
-        className={`text-sm text-texto text-justify mb-3 leading-relaxed ${
-          !mostrarMas ? "line-clamp-3" : ""
+        className={`text-sm text-texto text-justify leading-relaxed transition-all duration-500 ease-in-out ${
+          !mostrarMas ? "line-clamp-3" : "line-clamp-none"
         }`}
       >
         {descripcion}
       </p>
-      <span
-        className="text-texto font-semibold text-xs cursor-pointer"
-        onClick={() => setMostrarMas(!mostrarMas)}
-      >
-        {mostrarMas ? "Mostrar menos" : "Mostrar más"}
-      </span>
-    </>
+      
+      {esLarga && (
+        <button
+          onClick={() => setMostrarMas(!mostrarMas)}
+          className="mt-2 text-primario font-bold text-xs w-fit hover:underline transition-all active:scale-95"
+        >
+          {mostrarMas ? "Ver menos ▲" : "Ver más ▼"}
+        </button>
+      )}
+    </div>
   );
 }
