@@ -1,232 +1,156 @@
+"use client";
+
 import { useState, useEffect, FormEvent } from "react";
-import { FaPlaneDeparture, FaPlaneArrival } from "react-icons/fa";
-import { RiMoneyEuroCircleFill } from "react-icons/ri";
-import { AiOutlinePicture } from "react-icons/ai";
-
-interface ViajeType {
-  _id?: string;
-  origen: string;
-  origenAeropuerto: string;
-  destino: string;
-  destinoAeropuerto: string;
-  precio: number;
-  descripcion?: string;
-  img?: string;
-  servicios?: string[]; // IDs de servicios
-}
-
-interface ServicioType {
-  _id: string;
-  nombre: string;
-}
+import { FaPlaneDeparture, FaPlaneArrival, FaClock, FaImage, FaEuroSign } from "react-icons/fa";
+import { API_URL } from "@/lib/api";
+import { Viaje, Servicio } from "@/models/types"; 
 
 interface FormCrearViajeProps {
-  viaje?: ViajeType | null;
+  viaje?: Viaje | null;
   setMostrarModal: (mostrar: boolean) => void;
   refrescarViajes: () => void;
-  urlAPI: string;
 }
 
 export default function FormCrearViaje({
   viaje = null,
   setMostrarModal,
   refrescarViajes,
-  urlAPI,
 }: FormCrearViajeProps) {
   const esEditar = !!viaje;
 
-  const [origen, setOrigen] = useState(viaje?.origen || "");
-  const [origenAeropuerto, setOrigenAeropuerto] = useState(viaje?.origenAeropuerto || "");
-  const [destino, setDestino] = useState(viaje?.destino || "");
-  const [destinoAeropuerto, setDestinoAeropuerto] = useState(viaje?.destinoAeropuerto || "");
+  // Estados basados estrictamente en tu Interface Viaje
+  const [paisOrigen, setPaisOrigen] = useState(viaje?.paisOrigen || "");
+  const [aeropuertoOrigen, setAeropuertoOrigen] = useState(viaje?.aeropuertoOrigen || "");
+  const [horaSalida, setHoraSalida] = useState(viaje?.horaSalida || "");
+  
+  const [paisDestino, setPaisDestino] = useState(viaje?.paisDestino || "");
+  const [aeropuertoDestino, setAeropuertoDestino] = useState(viaje?.aeropuertoDestino || "");
+  const [horaLlegada, setHoraLlegada] = useState(viaje?.horaLlegada || "");
+  
   const [precio, setPrecio] = useState<number>(viaje?.precio || 0);
-  const [descripcion, setDescripcion] = useState(viaje?.descripcion || "UPS. No hay ninguna descripción actualmente");
-  const [img, setImg] = useState(viaje?.img || `${urlAPI}/public/media/img/img-inicio-destino-por-defecto.png`);
-  const [servicios, setServicios] = useState<string[]>(viaje?.servicios || []);
-  const [listaServicios, setListaServicios] = useState<ServicioType[]>([]);
+  const [descripcion, setDescripcion] = useState(viaje?.descripcion || "");
+  const [img, setImg] = useState(viaje?.img || "");
+  
+  const [listaServicios, setListaServicios] = useState<Servicio[]>([]);
+  const [serviciosSeleccionados, setServiciosSeleccionados] = useState<number[]>([]);
 
   useEffect(() => {
-    fetch(`${urlAPI}/servicios`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) setListaServicios(data.resultado);
-      });
-  }, [urlAPI]);
+    fetch(`${API_URL}/servicios`)
+      .then((res) => res.json())
+      .then((data) => setListaServicios(data.resultado || data))
+      .catch((err) => console.error("Error servicios:", err));
+  }, []);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
 
-    const datosViaje: ViajeType = {
-      origen,
-      origenAeropuerto,
-      destino,
-      destinoAeropuerto,
-      precio,
-      descripcion,
-      img,
-      servicios,
+    const datosViaje = {
+      paisOrigen, aeropuertoOrigen, horaSalida,
+      paisDestino, aeropuertoDestino, horaLlegada,
+      precio, descripcion, img,
+      servicios: serviciosSeleccionados,
     };
 
-    const url = esEditar ? `${urlAPI}/viajes/${viaje!._id}` : `${urlAPI}/viajes`;
-    const method = esEditar ? "PUT" : "POST";
-
-    fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datosViaje),
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
-          alert(`Viaje ${esEditar ? "actualizado" : "creado"} correctamente`);
-          setMostrarModal(false);
-          refrescarViajes();
-        } else {
-          alert("Error guardando el viaje");
-        }
+    const url = esEditar ? `${API_URL}/viajes/${viaje.id}` : `${API_URL}/viajes`;
+    try {
+      const res = await fetch(url, {
+        method: esEditar ? "PUT" : "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` 
+        },
+        body: JSON.stringify(datosViaje),
       });
+
+      if (res.ok) {
+        setMostrarModal(false);
+        refrescarViajes();
+      }
+    } catch (err) {
+      alert("Error de conexión");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4 w-full">
-      <h2 className="text-fondo font-bold text-xl underline bg-secundario rounded-xl p-2 text-center">
-        {esEditar ? "Editar Viaje" : "Crear Viaje"}
-      </h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8 p-2">
+      <div className="text-center mb-4">
+        <h2 className="text-3xl font-black text-secundario uppercase tracking-tighter">
+          {esEditar ? "Editar Destino" : "Nuevo Destino"}
+        </h2>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Panel de Gestión de Vuelos</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         {/* ORIGEN */}
-        <div className="flex flex-col gap-1">
-          <label className="flex items-center gap-2 font-bold text-texto">
-            <FaPlaneDeparture className="text-xl" /> Origen
-          </label>
-          <input
-            type="text"
-            value={origen}
-            onChange={(e) => setOrigen(e.target.value)}
-            required
-            className="bg-fondo rounded-md p-2"
-            placeholder="Ej: España"
-          />
+        <div className="space-y-4 bg-gray-50/50 p-5 rounded-[2rem] border border-gray-100">
+          <p className="text-[10px] font-black text-primario uppercase tracking-widest ml-2">Salida</p>
+          <InputLabel label="País Origen" icon={<FaPlaneDeparture />} value={paisOrigen} onChange={setPaisOrigen} placeholder="Ej: España" />
+          <InputLabel label="Aeropuerto" icon={<FaPlaneDeparture />} value={aeropuertoOrigen} onChange={setAeropuertoOrigen} placeholder="Ej: Madrid (MAD)" />
+          <InputLabel label="Hora Salida" type="time" icon={<FaClock />} value={horaSalida} onChange={setHoraSalida} />
         </div>
+
         {/* DESTINO */}
-        <div className="flex flex-col gap-1">
-          <label className="flex items-center gap-2 font-bold text-texto">
-            <FaPlaneArrival className="text-xl" /> Destino
-          </label>
-          <input
-            type="text"
-            value={destino}
-            onChange={(e) => setDestino(e.target.value)}
-            required
-            className="bg-fondo rounded-md p-2"
-            placeholder="Ej: Irlanda"
-          />
-        </div>
-        {/* ORIGEN AEROPUERTO */}
-        <div className="flex flex-col gap-1">
-          <label className="flex items-center gap-2 font-bold text-texto">
-            <FaPlaneDeparture className="text-xl" /> Salida de
-          </label>
-          <input
-            type="text"
-            value={origenAeropuerto}
-            onChange={(e) => setOrigenAeropuerto(e.target.value)}
-            required
-            className="bg-fondo rounded-md p-2"
-            placeholder="Ej: Valencia"
-          />
-        </div>
-        {/* DESTINO AEROPUERTO */}
-        <div className="flex flex-col gap-1">
-          <label className="flex items-center gap-2 font-bold text-texto">
-            <FaPlaneArrival className="text-xl" /> Llegada en
-          </label>
-          <input
-            type="text"
-            value={destinoAeropuerto}
-            onChange={(e) => setDestinoAeropuerto(e.target.value)}
-            required
-            className="bg-fondo rounded-md p-2"
-            placeholder="Ej: Dublín"
-          />
+        <div className="space-y-4 bg-gray-50/50 p-5 rounded-[2rem] border border-gray-100">
+          <p className="text-[10px] font-black text-secundario uppercase tracking-widest ml-2">Llegada</p>
+          <InputLabel label="País Destino" icon={<FaPlaneArrival />} value={paisDestino} onChange={setPaisDestino} placeholder="Ej: Irlanda" />
+          <InputLabel label="Aeropuerto" icon={<FaPlaneArrival />} value={aeropuertoDestino} onChange={setAeropuertoDestino} placeholder="Ej: Dublín (DUB)" />
+          <InputLabel label="Hora Llegada" type="time" icon={<FaClock />} value={horaLlegada} onChange={setHoraLlegada} />
         </div>
       </div>
 
-      {/* PRECIO */}
-      <div className="flex flex-col gap-1 w-full md:w-1/3">
-        <label className="flex items-center gap-2 font-bold text-texto">
-          <RiMoneyEuroCircleFill className="text-xl" /> Precio
-        </label>
-        <input
-          type="number"
-          value={precio}
-          onChange={(e) => setPrecio(parseFloat(e.target.value))}
-          min={0}
-          step={0.01}
-          required
-          className="bg-fondo rounded-md p-2"
-        />
-      </div>
-
-      {/* IMAGEN */}
-      <div className="flex flex-col gap-1 w-full">
-        <label className="flex items-center gap-2 font-bold text-texto">
-          <AiOutlinePicture className="text-xl" /> Imagen a mostrar
-        </label>
-        <input
-          type="text"
-          value={img}
-          onChange={(e) => setImg(e.target.value)}
-          className="bg-fondo rounded-md p-2"
-          placeholder="INFO: Solo URLs de imágenes de Internet"
-        />
+      {/* PRECIO E IMAGEN */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
+        <InputLabel label="Precio (EUR)" type="number" icon={<FaEuroSign />} value={precio} onChange={(v: any) => setPrecio(parseFloat(v))} />
+        <InputLabel label="URL Imagen" icon={<FaImage />} value={img} onChange={setImg} placeholder="https://images.unsplash.com/..." />
       </div>
 
       {/* DESCRIPCIÓN */}
-      <div className="flex flex-col gap-1 w-full">
-        <label className="font-bold text-texto">Descripción del viaje</label>
-        <textarea
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          rows={3}
-          className="bg-fondo rounded-md p-2 resize-none"
+      <div className="flex flex-col gap-2 px-2">
+        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Descripción del viaje</label>
+        <textarea 
+          value={descripcion} 
+          onChange={(e) => setDescripcion(e.target.value)} 
+          rows={3} 
+          className="w-full bg-gray-50 border-2 border-transparent focus:border-primario/10 focus:bg-white rounded-3xl py-4 px-6 font-bold text-secundario transition-all outline-none resize-none"
+          placeholder="Escribe los detalles del destino..." 
         />
       </div>
 
-      {/* SERVICIOS */}
-      <div className="flex flex-col gap-2">
-        <label className="font-bold text-texto">Servicios disponibles</label>
-        {listaServicios.map((serv) => (
-          <div
-            key={serv._id}
-            className="flex items-center gap-2 cursor-pointer hover:bg-texto hover:text-fondo hover:font-bold p-1 rounded"
-            onClick={() =>
-              setServicios(
-                servicios.includes(serv._id)
-                  ? servicios.filter((id) => id !== serv._id)
-                  : [...servicios, serv._id]
-              )
-            }
-          >
-            <input type="checkbox" checked={servicios.includes(serv._id)} readOnly className="cursor-pointer" />
-            <span>{serv.nombre}</span>
-          </div>
-        ))}
-      </div>
-
       {/* BOTONES */}
-      <div className="flex flex-row gap-4 justify-end items-center">
-        <button
-          type="button"
-          onClick={() => setMostrarModal(false)}
-          className="bg-[#D13264] p-3 rounded-xl text-fondo font-bold"
+      <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
+        <button 
+          type="button" 
+          onClick={() => setMostrarModal(false)} 
+          className="px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-400 hover:text-red-500 transition-colors"
         >
           Cancelar
         </button>
-        <button type="submit" className="bg-[#3BA054] p-3 rounded-xl text-fondo font-bold">
-          Guardar
+        <button 
+          type="submit" 
+          className="bg-secundario text-white px-10 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-secundario/20 hover:bg-primario transition-all active:scale-95"
+        >
+          {esEditar ? "Actualizar Vuelo" : "Publicar Vuelo"}
         </button>
       </div>
     </form>
+  );
+}
+
+function InputLabel({ label, icon, value, onChange, placeholder, type = "text" }: any) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">
+        {icon} {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        className="w-full bg-white border-2 border-transparent shadow-sm focus:border-primario/20 rounded-2xl py-3 px-5 font-bold text-secundario transition-all outline-none"
+        placeholder={placeholder}
+      />
+    </div>
   );
 }
