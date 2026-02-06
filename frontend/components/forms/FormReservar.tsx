@@ -1,150 +1,146 @@
-"use client"; // importante para componentes que usan useState o useEffect
+"use client";
 
-import { useState } from "react";
+import { API_URL } from "@/lib/api";
+import { useState, useEffect } from "react";
 import { FaUser, FaEnvelope, FaRegCalendarAlt } from "react-icons/fa";
 import { RiUserAddLine } from "react-icons/ri";
-
-interface Viaje {
-  _id: string;
-  destino: string;
-}
+import { Viaje } from "@/models/types"; 
 
 interface FormReservarProps {
   viaje: Viaje;
-  urlAPI: string;
   setMostrarModal: (mostrar: boolean) => void;
 }
 
-export default function FormReservar({
-  viaje,
-  urlAPI,
-  setMostrarModal,
-}: FormReservarProps) {
-  const usuario_id = typeof window !== "undefined" ? localStorage.getItem("username_id") : null;
-  const nombre = typeof window !== "undefined" ? localStorage.getItem("nombreCompleto") || "" : "";
-
+export default function FormReservar({ viaje, setMostrarModal }: FormReservarProps) {
+  // 1. Usamos useEffect para cargar datos del localStorage de forma segura en Next.js
+  const [usuario, setUsuario] = useState({ id: "", nombre: "" });
   const [email, setEmail] = useState("");
   const [fechaSalida, setFechaSalida] = useState("");
   const [pasajeros, setPasajeros] = useState(1);
 
+  useEffect(() => {
+    setUsuario({
+      id: localStorage.getItem("username_id") || "",
+      nombre: localStorage.getItem("nombreCompleto") || ""
+    });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!usuario_id) {
+    const token = localStorage.getItem("token"); // Recuperamos el TOKEN
+
+    if (!token || !usuario.id) {
       alert("Debes iniciar sesión para reservar");
       return;
     }
 
-    if (!fechaSalida) {
-      alert("Selecciona una fecha de salida");
-      return;
-    }
-
     const datosReserva = {
-      usuario: usuario_id,
-      viaje: viaje._id,
-      nombre: nombre,
-      fecSalida: fechaSalida,
+      usuario_id: usuario.id, // Asegúrate que el backend espera 'usuario_id'
+      viaje_id: viaje.id,
+      fecha_salida: fechaSalida,
       pasajeros,
-      estado: "pendiente",
     };
 
     try {
-      const res = await fetch(`${urlAPI}/reservas`, {
+      const res = await fetch(`${API_URL}/reservas`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // Enviamos el token
+        },
         body: JSON.stringify(datosReserva),
       });
 
-      const data = await res.json();
-      if (data.ok) {
-        alert("Reserva creada correctamente");
+      if (res.ok) {
+        alert("¡Reserva creada con éxito!");
         setMostrarModal(false);
       } else {
-        alert("Error al crear la reserva");
+        const errorData = await res.json();
+        alert(errorData.message || "Error al crear la reserva");
       }
     } catch (err) {
-      console.error(err);
       alert("Error de conexión con el servidor");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6 w-full">
-      <h2 className="text-fondo font-bold text-xl underline bg-secundario rounded-xl p-2 text-center">
-        Reserva para viajar a {viaje.destino}
+      <h2 className="text-fondo font-bold text-xl bg-secundario rounded-xl p-2 text-center">
+        Reserva para: {viaje.paisDestino}
       </h2>
 
-      {/* Nombre */}
+      {/* Nombre (Solo lectura) */}
       <div className="flex flex-col gap-1">
-        <label className="flex items-center gap-2 text-texto font-bold">
-          <FaUser /> Nombre
+        <label className="flex items-center gap-2 text-texto font-bold text-sm">
+          <FaUser /> Nombre del Titular
         </label>
         <input
           type="text"
-          value={nombre}
-          className="bg-fondo rounded-md p-2 text-secundario focus:outline-none focus:ring-2 focus:ring-otro cursor-not-allowed"
+          value={usuario.nombre}
           readOnly
+          className="bg-gray-100 rounded-md p-2 text-gray-500 cursor-not-allowed border border-gray-300"
         />
       </div>
 
       {/* Email */}
       <div className="flex flex-col gap-1">
-        <label className="flex items-center gap-2 text-texto font-bold">
-          <FaEnvelope /> Correo
+        <label className="flex items-center gap-2 text-texto font-bold text-sm">
+          <FaEnvelope /> Correo de contacto
         </label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Tu correo"
           required
-          className="bg-fondo rounded-md p-2 text-secundario focus:outline-none focus:ring-2 focus:ring-otro"
+          className="bg-fondo border border-secundario/20 rounded-md p-2 text-secundario focus:ring-2 focus:ring-secundario outline-none"
         />
       </div>
 
-      {/* Fecha de salida */}
-      <div className="flex flex-col gap-1">
-        <label className="flex items-center gap-2 text-texto font-bold">
-          <FaRegCalendarAlt /> Fecha de salida
-        </label>
-        <input
-          type="date"
-          value={fechaSalida}
-          onChange={(e) => setFechaSalida(e.target.value)}
-          className="bg-fondo rounded-md p-2 text-secundario focus:outline-none focus:ring-2 focus:ring-otro"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        {/* Fecha */}
+        <div className="flex flex-col gap-1">
+          <label className="flex items-center gap-2 text-texto font-bold text-sm">
+            <FaRegCalendarAlt /> Fecha
+          </label>
+          <input
+            type="date"
+            required
+            value={fechaSalida}
+            min={new Date().toISOString().split("T")[0]} // No permite fechas pasadas
+            onChange={(e) => setFechaSalida(e.target.value)}
+            className="bg-fondo border border-secundario/20 rounded-md p-2 text-secundario focus:ring-2 focus:ring-secundario outline-none"
+          />
+        </div>
+
+        {/* Pasajeros */}
+        <div className="flex flex-col gap-1">
+          <label className="flex items-center gap-2 text-texto font-bold text-sm">
+            <RiUserAddLine /> Pasajeros
+          </label>
+          <input
+            type="number"
+            value={pasajeros}
+            onChange={(e) => setPasajeros(Math.max(1, parseInt(e.target.value) || 1))}
+            min={1}
+            className="bg-fondo border border-secundario/20 rounded-md p-2 text-secundario focus:ring-2 focus:ring-secundario outline-none"
+          />
+        </div>
       </div>
 
-      {/* Pasajeros */}
-      <div className="flex flex-col gap-1">
-        <label className="flex items-center gap-2 text-texto font-bold">
-          <RiUserAddLine /> Nº Pasajeros
-        </label>
-        <input
-          type="number"
-          value={pasajeros}
-          onChange={(e) => setPasajeros(Math.max(1, parseInt(e.target.value)))}
-          min={1}
-          required
-          className="bg-fondo rounded-md p-2 text-secundario focus:outline-none focus:ring-2 focus:ring-otro"
-        />
-      </div>
-
-      {/* Botones */}
-      <div className="flex justify-end gap-4 mt-4">
+      <div className="flex justify-end gap-3 mt-6">
         <button
           type="button"
           onClick={() => setMostrarModal(false)}
-          className="bg-rojo p-3 rounded-xl text-fondo font-bold"
+          className="px-4 py-2 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-colors"
         >
           Cancelar
         </button>
         <button
           type="submit"
-          className="bg-verde p-3 rounded-xl text-fondo font-bold"
+          className="bg-secundario px-6 py-2 rounded-lg text-fondo font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all"
         >
-          Confirmar
+          Confirmar Reserva
         </button>
       </div>
     </form>
