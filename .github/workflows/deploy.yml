@@ -1,0 +1,28 @@
+name: Build and Push to ACR
+
+# Esto hace que el proceso empiece cada vez que haces "git push"
+on:
+  push:
+    branches: [ "main" ] # Asegúrate de que tu rama se llame main o cámbialo a master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Descarga tu código en la máquina de GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Inicia sesión en tu Azure Container Registry usando tus Secrets
+      - name: Azure Container Registry Login
+        uses: Azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # 3. Construye la imagen Docker y la sube al ACR
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/horizonte-azul:latest -f docker/Dockerfile .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/horizonte-azul:latest
