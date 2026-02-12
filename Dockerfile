@@ -8,7 +8,9 @@ RUN npm install
 
 COPY . .
 
+RUN npm run build
+
 EXPOSE 3000
 
 # Comando para iniciar la aplicación (asegúrate de que sea el correcto)
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
