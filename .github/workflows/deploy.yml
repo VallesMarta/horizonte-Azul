@@ -24,5 +24,5 @@ jobs:
       # 3. Construye la imagen Docker y la sube al ACR
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/horizonte-azul:latest -f docker/Dockerfile .
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/horizonte-azul:latest -f Dockerfile .
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/horizonte-azul:latest
