@@ -1,19 +1,19 @@
 name: Build and Push to ACR
 
-# Esto hace que el proceso empiece cada vez que haces "git push"
+# Esto hace que el proceso empiece cada vez que hacemos "git push"
 on:
   push:
-    branches: [ "main" ] # Asegúrate de que tu rama se llame main o cámbialo a master
+    branches: [ "main" ]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      # 1. Descarga tu código en la máquina de GitHub
+      # 1. Descarga nuestro código en la máquina de GitHub
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Inicia sesión en tu Azure Container Registry usando tus Secrets
+      # 2. Inicia sesión en el Azure Container Registry usando los Secrets
       - name: Azure Container Registry Login
         uses: Azure/docker-login@v1
         with:
