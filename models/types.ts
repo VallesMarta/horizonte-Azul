@@ -44,6 +44,30 @@ export interface Reserva {
   estado: 'pendiente' | 'confirmada' | 'realizada' | 'cancelada';
   fecCompra?: string;
 }
+export interface ReservaDetallada {
+  reserva_id: number;
+  paisOrigen: string;      
+  paisDestino: string;
+  aeropuertoOrigen: string;
+  aeropuertoDestino: string;
+  img: string;
+  estado: string;
+  total_pagado: number;
+  fecSalida: string;
+  pasajeros: number;
+  tipo_tarjeta: string;
+}
+
+export interface DetalleViajeCompleto {
+  origen: string;
+  destino: string;
+  fechaSalida: string;
+  horaSalida: string;
+  fechaLlegada: string;
+  horaLlegada: string;
+  duracion: string;
+  servicios: ViajeServicio[];
+}
 
 export interface Wishlist {
   usuario_id: number;
