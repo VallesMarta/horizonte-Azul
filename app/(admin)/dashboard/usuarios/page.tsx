@@ -2,22 +2,20 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { API_URL } from "@/lib/api";
-import { 
-  FaTrash, 
-  FaSearch, 
-  FaUser, 
-  FaSuitcase, 
-  FaEdit, 
-  FaCheck, 
-  FaTimes, 
-  FaShieldAlt 
+import {
+  FaTrash,
+  FaSearch,
+  FaSuitcase,
+  FaEdit,
+  FaCheck,
+  FaTimes,
 } from "react-icons/fa";
 
 export default function GestionUsuarios() {
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
-  
+
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [tempUser, setTempUser] = useState<any>(null);
 
@@ -25,7 +23,9 @@ export default function GestionUsuarios() {
     try {
       const res = await fetch(`${API_URL}/usuarios`);
       const data = await res.json();
-      setUsuarios(data.resultado || data);
+      if (data.ok) {
+        setUsuarios(data.resultado);
+      }
     } catch (error) {
       console.error("Error al cargar usuarios:", error);
     } finally {
@@ -40,7 +40,9 @@ export default function GestionUsuarios() {
   const eliminarUsuario = async (id: number) => {
     if (!confirm("¿Eliminar este usuario permanentemente?")) return;
     try {
-      const res = await fetch(`${API_URL}/usuarios/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_URL}/usuarios/${id}`, {
+        method: "DELETE",
+      });
       if (res.ok) fetchUsuarios();
     } catch (error) {
       alert("Error al eliminar");
@@ -55,8 +57,8 @@ export default function GestionUsuarios() {
         body: JSON.stringify({
           username: tempUser.username,
           email: tempUser.email,
-          isAdmin: tempUser.isAdmin
-        })
+          isAdmin: tempUser.isAdmin,
+        }),
       });
       if (res.ok) {
         setEditandoId(null);
@@ -67,25 +69,28 @@ export default function GestionUsuarios() {
     }
   };
 
-  const usuariosFiltrados = usuarios.filter(u => 
-    u.username?.toLowerCase().includes(busqueda.toLowerCase()) ||
-    u.email?.toLowerCase().includes(busqueda.toLowerCase())
+  const usuariosFiltrados = usuarios.filter(
+    (u) =>
+      u.username?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      u.email?.toLowerCase().includes(busqueda.toLowerCase()),
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">      
-      {/* Header Panel */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
-        <div>
-          <h1 className="text-3xl font-black text-secundario uppercase tracking-tighter">Panel de Usuarios</h1>
-          <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mt-1">
-            Total: {usuariosFiltrados.length} miembros registrados
+    <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500">
+      {/* Header del Panel */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
+        <div className="text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-black text-secundario uppercase tracking-tighter">
+            Panel de Usuarios
+          </h1>
+          <p className="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase mt-1">
+            {usuariosFiltrados.length} usuarios registrados
           </p>
-        </div>        
+        </div>
         <div className="flex items-center gap-3">
           <div className="relative group">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primario transition-colors" />
-            <input 
+            <input
               type="text"
               placeholder="Buscar por username o email"
               value={busqueda}
@@ -94,7 +99,7 @@ export default function GestionUsuarios() {
             />
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Tabla Principal */}
       <div className="bg-white rounded-[2rem] shadow-xl shadow-secundario/5 border border-gray-100 overflow-hidden">
@@ -103,108 +108,119 @@ export default function GestionUsuarios() {
             <thead>
               <tr className="bg-gray-50/50 text-secundario/40 text-[10px] uppercase tracking-[0.25em] border-b border-gray-100 font-black">
                 <th className="w-24 py-5 text-center">Avatar</th>
-                <th className="py-5 text-center">Datos Usuario</th>
+                <th className="py-5 text-center">Username</th>
                 <th className="py-5 text-center">Email</th>
-                <th className="w-32 py-5 text-center">Reservas</th>
+                <th className="w-40 py-5 text-center">Nº Reservas</th>
                 <th className="w-32 py-5 text-center">Rol</th>
-                <th className="w-40 py-5 text-center">Gestión</th>
+                <th className="w-40 py-5 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {usuariosFiltrados.map((u) => {
                 const estaEditando = editandoId === u.id;
-                const numReservas = u.reservas?.length || 0;
                 const esAdmin = estaEditando ? tempUser.isAdmin : u.isAdmin;
+                const num = u.total_reservas || 0;
+
                 return (
-                  <tr 
-                    key={u.id} 
-                    className={`transition-all duration-300 ${esAdmin ? 'bg-primario/5' : 'hover:bg-gray-50/40'}`}
-                  >                    
-                    {/* AVATAR CENTRADO */}
-                    <td className="py-4 align-middle">
-                      <div className="flex justify-center items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] border shadow-sm transition-all ${esAdmin ? 'bg-primario border-primario text-white' : 'bg-gray-50 border-gray-200 text-secundario'}`}>
-                          {u.username?.substring(0, 2).toUpperCase() || <FaUser size={12}/>}
-                        </div>
+                  <tr
+                    key={u.id}
+                    className={`transition-all duration-300 ${esAdmin ? "bg-primario/5" : "hover:bg-gray-50/40"}`}
+                  >
+                    {/* AVATAR */ }
+                    <td className="py-4 align-middle flex justify-center">
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] border shadow-sm transition-all ${esAdmin ? "bg-primario border-primario text-white" : "bg-gray-50 border-gray-200 text-secundario"}`}
+                      >
+                        {u.username?.substring(0, 2).toUpperCase()}
                       </div>
                     </td>
                     {/* USERNAME */}
                     <td className="py-4 align-middle text-center">
                       {estaEditando ? (
-                        <input 
+                        <input
                           className="w-4/5 text-center text-xs font-black uppercase border-b-2 border-primario bg-transparent py-1 outline-none text-secundario"
                           value={tempUser.username}
-                          onChange={(e) => setTempUser({...tempUser, username: e.target.value})}
+                          onChange={(e) =>
+                            setTempUser({
+                              ...tempUser,
+                              username: e.target.value,
+                            })
+                          }
                         />
                       ) : (
-                        <div className="flex flex-col items-center">
-                           <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-0.5">Username</span>
-                           <span className={`font-black text-xs uppercase tracking-tight ${esAdmin ? 'text-primario' : 'text-secundario'}`}>{u.username}</span>
-                        </div>
+                        <span
+                          className={`font-black text-xs uppercase tracking-tight ${esAdmin ? "text-primario" : "text-secundario"}`}
+                        >
+                          {u.username}
+                        </span>
                       )}
                     </td>
                     {/* EMAIL */}
                     <td className="py-4 align-middle text-center">
                       {estaEditando ? (
-                        <input 
+                        <input
                           className="w-4/5 text-center text-xs font-bold border-b-2 border-primario bg-transparent py-1 outline-none text-gray-500"
                           value={tempUser.email}
-                          onChange={(e) => setTempUser({...tempUser, email: e.target.value})}
+                          onChange={(e) =>
+                            setTempUser({ ...tempUser, email: e.target.value })
+                          }
                         />
                       ) : (
-                        <div className="flex flex-col items-center">
-                          <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-0.5">Correo</span>
-                          <span className="font-bold text-gray-400 text-xs lowercase">{u.email}</span>
-                        </div>
+                        <span className="font-bold text-gray-400 text-xs lowercase">
+                          {u.email}
+                        </span>
                       )}
                     </td>
                     {/* RESERVAS */}
-                    <td className="py-4 align-middle text-center">
-                      <div className="flex flex-col items-center" title={`${numReservas} reservas totales`}>
-                        <FaSuitcase 
-                          size={14} 
-                          className={`transition-colors duration-300 ${numReservas > 0 ? 'text-primario' : 'text-gray-200'}`} 
+                    <td className="py-4 align-middle">
+                      <div className="flex items-center justify-center gap-2">
+                        <FaSuitcase
+                          className={`transition-colors duration-300 ${num > 0 ? "text-primario" : "text-gray-300"}`}
+                          size={14}
                         />
-                        <span className={`text-xs font-black mt-1 ${numReservas > 0 ? 'text-secundario' : 'text-gray-300'}`}>
-                          {numReservas}
+                        <span
+                          className={`text-xs font-black italic ${num > 0 ? "text-secundario" : "text-gray-300"}`}
+                        >
+                          {num} {num === 1 ? "Reserva" : "Reservas"}
                         </span>
                       </div>
                     </td>
                     {/* ROL / ADMIN */}
                     <td className="py-4 align-middle text-center">
-                      <div className="flex justify-center">
-                        {estaEditando ? (
-                          <button 
-                            onClick={() => setTempUser({...tempUser, isAdmin: !tempUser.isAdmin})}
-                            className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase transition-all shadow-md ${tempUser.isAdmin ? 'bg-secundario text-white' : 'bg-gray-100 text-gray-400'}`}
-                          >
-                            {tempUser.isAdmin ? "Es Admin" : "Hacer Admin"}
-                          </button>
-                        ) : (
-                          u.isAdmin ? (
-                            <span className="flex items-center gap-1.5 text-[9px] font-black text-primario uppercase bg-primario/10 px-2.5 py-1 rounded-full border border-primario/20">
-                              <FaShieldAlt size={10}/> Admin
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1.5 text-[9px] font-black text-gris uppercase px-2.5 py-1 rounded-full border border-primario/20">
-                              <FaUser size={10}/> User</span>
-                          )
-                        )}
-                      </div>
+                      {estaEditando ? (
+                        <button
+                          onClick={() =>
+                            setTempUser({
+                              ...tempUser,
+                              isAdmin: !tempUser.isAdmin,
+                            })
+                          }
+                          className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase transition-all shadow-md ${tempUser.isAdmin ? "bg-secundario text-white" : "bg-gray-100 text-gray-400"}`}
+                        >
+                          {tempUser.isAdmin ? "Es Admin" : "Hacer Admin"}
+                        </button>
+                      ) : (
+                        <span
+                          className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full border ${u.isAdmin ? "text-primario border-primario/20 bg-primario/10" : "text-gray-400 border-gray-100"}`}
+                        >
+                          {u.isAdmin ? "Admin" : "User"}
+                        </span>
+                      )}
                     </td>
+
                     {/* ACCIONES */}
                     <td className="py-4 align-middle text-center">
                       <div className="flex justify-center gap-2">
                         {estaEditando ? (
                           <>
-                            <button 
-                              onClick={guardarCambios} 
+                            <button
+                              onClick={guardarCambios}
                               className="w-9 h-9 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 shadow-lg shadow-green-100 transition-all active:scale-90"
                             >
                               <FaCheck size={12}/>
                             </button>
-                            <button 
-                              onClick={() => setEditandoId(null)} 
+                            <button
+                              onClick={() => setEditandoId(null)}
                               className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-400 rounded-xl hover:bg-gray-200 transition-all active:scale-90"
                             >
                               <FaTimes size={12}/>
@@ -212,14 +228,17 @@ export default function GestionUsuarios() {
                           </>
                         ) : (
                           <>
-                            <button 
-                              onClick={() => { setEditandoId(u.id); setTempUser({...u}); }} 
+                            <button
+                              onClick={() => {
+                                setEditandoId(u.id);
+                                setTempUser({ ...u });
+                              }}
                               className="flex items-center justify-center w-10 h-10 bg-white text-gray-400 border border-gray-100 rounded-xl hover:bg-naranja hover:text-white hover:border-naranja hover:shadow-lg hover:shadow-primario/20 transition-all duration-300 active:scale-90"
                             >
                               <FaEdit size={12}/>
                             </button>
-                            <button 
-                              onClick={() => eliminarUsuario(u.id)} 
+                            <button
+                              onClick={() => eliminarUsuario(u.id)}
                               className="flex items-center justify-center w-10 h-10 bg-white text-gray-400 border border-gray-100 rounded-xl hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-lg hover:shadow-red-500/20 transition-all duration-300 active:scale-90"
                             >
                               <FaTrash size={12}/>

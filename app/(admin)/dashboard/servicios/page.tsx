@@ -102,10 +102,10 @@ export default function GestionServicios() {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
         <div className="text-center md:text-left">
           <h1 className="text-3xl md:text-4xl font-black text-secundario uppercase tracking-tighter">
-            Servicios
+            Panel de Servicios
           </h1>
           <p className="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase mt-1">
-            {servicios.length} servicios activos en catálogo
+            {servicios.length} servicios activos
           </p>
         </div>
       </header>
@@ -165,7 +165,7 @@ export default function GestionServicios() {
       <section className="space-y-4">
         <div className="flex items-center gap-3 px-2">
           <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
-            Catálogo disponible
+            Servicios disponibles
           </h2>
           <div className="h-px bg-gray-100 flex-1"></div>
         </div>
