@@ -4,38 +4,28 @@ const globalForDb = global as unknown as { pool: Pool };
 
 export const connectDB = async (): Promise<Pool> => {
   if (!globalForDb.pool) {
-    let dbConfig;
-    let isUrl = false;
+    const dbConfig = {
+      host: process.env.MYSQL_HOST,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE || "horizonteAzul",
+      port: parseInt(process.env.MYSQL_PORT || "3306"),
+      // Activar SSL solo si no estamos en el contenedor local
+      ssl:
+        process.env.MYSQL_HOST !== "mysql" &&
+        process.env.MYSQL_HOST !== "localhost"
+          ? { rejectUnauthorized: true }
+          : undefined,
+    };
 
-    if (process.env.DATABASE_URL) {
-      dbConfig = process.env.DATABASE_URL;
-      isUrl = true;
-    } else {
-      dbConfig = {
-        host: process.env.MYSQL_HOST,
-        user: process.env.MYSQL_USER,
-        password: process.env.MYSQL_PASSWORD,
-        database: process.env.MYSQL_DATABASE || "horizonteAzul",
-        port: 3306,
-        // IMPORTANTE: Azure requiere SSL
-        ssl: {
-          rejectUnauthorized: true,
-        },
-      };
-      isUrl = false;
-    }
+    globalForDb.pool = mysql.createPool({
+      ...dbConfig,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    });
 
-    if (isUrl) {
-      globalForDb.pool = mysql.createPool(dbConfig as string);
-    } else {
-      globalForDb.pool = mysql.createPool({
-        ...(dbConfig as object),
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0,
-      });
-    }
-    console.log("✅ Pool de MySQL creado");
+    console.log(`✅ Pool de MySQL creado para el host: ${dbConfig.host}`);
   }
   return globalForDb.pool;
 };
@@ -49,6 +39,7 @@ export const getPool = (): Pool => {
 
 export const query = async (sql: string, params?: any[]) => {
   const pool = await connectDB();
-  const [rows] = await pool.execute(sql, params);
+  // Cambiamos execute por query para soportar transacciones (reservas)
+  const [rows] = await pool.query(sql, params);
   return rows;
 };
