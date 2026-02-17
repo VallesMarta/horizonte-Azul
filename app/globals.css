@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Tailwind detectará estos colores y creará clases como text-primario, bg-primario, etc. */
+  /* Colores */
   --color-primario: #5271ff;
   --color-secundario: #3147cc;
   --color-texto: #1f2937;
@@ -12,9 +12,9 @@
   --color-rojo: #d13264;
   --color-verde: #3ba054;
   --color-naranja: #ed6b53;
-  --color-gris: #9ca3af;
+  --color-gris: #9ca3af; /* Añadido aquí para que funcione */
 
-  /* Definir la fuente dentro del tema para usar font-playfair */
+  /* Fuentes */
   --font-lato: "Lato", sans-serif;
 }
 
@@ -47,4 +47,11 @@ body {
   font-family: "Lato", sans-serif;
   background-color: var(--color-fondo);
   color: var(--color-texto);
+}
+
+/* Quitar flechas en Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
