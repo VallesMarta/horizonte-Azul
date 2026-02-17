@@ -30,8 +30,8 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
       if (respuesta.ok && data.token) {
         // Guardar datos en el navegador
         localStorage.setItem("token", data.token);
-        localStorage.setItem("username", data.usuario.username);
-        localStorage.setItem("username_id", data.usuario.id); 
+        localStorage.setItem("username", data.usuario.username);        
+        localStorage.setItem("userId", String(data.usuario.id)); 
         localStorage.setItem("nombre", data.usuario.nombre);
         localStorage.setItem("isAdmin", data.usuario.isAdmin ? "true" : "false");
 

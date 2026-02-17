@@ -86,7 +86,7 @@ export default function Header() {
                     icono="FaPlaneDeparture"
                   />
                 )}
-                <NavPerfil username={usuarioLoggeado} />
+                <NavPerfil username={usuarioLoggeado?.username} />
               </>
             )}
           </ul>
@@ -133,7 +133,7 @@ export default function Header() {
               <div className="w-full flex flex-col items-center pb-8 border-b border-white/10">
                 {usuarioLoggeado ? (
                   <div className="flex flex-col items-center gap-2">
-                    <NavPerfil username={usuarioLoggeado} />
+                    <NavPerfil username={usuarioLoggeado?.username} />
                   </div>
                 ) : (
                   <div
