@@ -74,7 +74,7 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
           <input
             name="username"
             type="text"
-            placeholder="Usuario"
+            placeholder="Username"
             required
             className="bg-transparent p-3 w-full text-secundario outline-none"
           />

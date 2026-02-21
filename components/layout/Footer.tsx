@@ -1,15 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { FaInstagram, FaFacebook, FaTwitter, FaPlane, FaShieldAlt, FaInfoCircle } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaFacebook,
+  FaTwitter,
+  FaPlane,
+  FaShieldAlt,
+  FaInfoCircle,
+} from "react-icons/fa";
+import { BsTwitterX } from "react-icons/bs";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-secundario text-fondo w-full">
-      <div className="max-w-7xl mx-auto px-6 py-12">        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 text-center lg:text-left">          
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 text-center lg:text-left">
           {/* Columna 1: Logo + Descripción */}
           <div className="lg:col-span-2 flex flex-col items-center lg:items-start space-y-4">
             <Link href="/">
@@ -20,8 +28,10 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm leading-relaxed text-fondo/80 max-w-sm">
-              Tu puerta de entrada al mundo. Gestiona tus vuelos con la confianza de  
-              <strong> Horizonte Azul</strong>. Seguridad, rapidez y eficiencia en cada reserva.
+              Tu puerta de entrada al mundo. Gestiona tus vuelos con la
+              confianza de
+              <strong> Horizonte Azul</strong>. Seguridad, rapidez y eficiencia
+              en cada reserva.
             </p>
           </div>
 
@@ -31,9 +41,30 @@ export default function Footer() {
               <FaPlane className="text-iconos" /> Servicios
             </h2>
             <ul className="flex flex-col gap-2 text-sm">
-              <li><Link href="/reserva-vuelos" className="hover:text-primario transition-all inline-block">Reservas de vuelos</Link></li>
-              <li><Link href="/gestion-reservas" className="hover:text-primario transition-all inline-block">Gestión de reservas</Link></li>
-              <li><Link href="/consulta-vuelos" className="hover:text-primario transition-all inline-block">Consultas de vuelos</Link></li>
+              <li>
+                <Link
+                  href="/reserva-vuelos"
+                  className="hover:text-primario transition-all inline-block"
+                >
+                  Reservas de vuelos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/gestion-reservas"
+                  className="hover:text-primario transition-all inline-block"
+                >
+                  Gestión de reservas
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/consulta-vuelos"
+                  className="hover:text-primario transition-all inline-block"
+                >
+                  Consultas de vuelos
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -43,9 +74,30 @@ export default function Footer() {
               <FaShieldAlt className="text-iconos" /> Legal
             </h2>
             <ul className="flex flex-col gap-2 text-sm">
-              <li><Link href="/politica-privacidad" className="hover:text-primario transition-all inline-block">Privacidad</Link></li>
-              <li><Link href="/terminos-condiciones" className="hover:text-primario transition-all inline-block">Términos</Link></li>
-              <li><Link href="/aviso-legal" className="hover:text-primario transition-all inline-block">Aviso Legal</Link></li>
+              <li>
+                <Link
+                  href="/politica-privacidad"
+                  className="hover:text-primario transition-all inline-block"
+                >
+                  Privacidad
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terminos-condiciones"
+                  className="hover:text-primario transition-all inline-block"
+                >
+                  Términos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/aviso-legal"
+                  className="hover:text-primario transition-all inline-block"
+                >
+                  Aviso Legal
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -55,23 +107,36 @@ export default function Footer() {
               <FaInfoCircle className="text-iconos" /> Síguenos
             </h2>
             <div className="flex gap-4">
-              <a href="https://www.instagram.com/horizonteazul02/" target="_blank" className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all">
+              <a
+                href="https://www.instagram.com/horizonteazul02/"
+                target="_blank"
+                className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all"
+              >
                 <FaInstagram size={20} />
               </a>
-              <a href="https://facebook.com" target="_blank" className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all"
+              >
                 <FaFacebook size={20} />
               </a>
-              <a href="https://twitter.com" target="_blank" className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all">
-                <FaTwitter size={20} />
+              <a
+                href="https://x.com"
+                target="_blank"
+                className="bg-fondo/10 p-2 rounded-full hover:bg-primario hover:text-secundario transition-all"
+              >
+                <BsTwitterX size={20} />
               </a>
             </div>
           </div>
-
         </div>
 
         {/* Separador y Copyright */}
         <div className="mt-12 pt-8 border-t border-fondo/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-center md:text-left">
-          <p>© {currentYear} Horizonte Azul S.L. Todos los derechos reservados.</p>
+          <p>
+            © {currentYear} Horizonte Azul S.L. Todos los derechos reservados.
+          </p>
           <div className="flex gap-6">
             <span>Hecho con ❤️ para viajeros</span>
           </div>

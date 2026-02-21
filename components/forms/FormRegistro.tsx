@@ -63,7 +63,7 @@ export default function FormRegistro() {
           <FaUser className="mx-3 text-secundario text-xl" />
           <input
             name="username"
-            placeholder="Usuario"
+            placeholder="Username"
             required
             className="bg-transparent p-3 w-full text-secundario outline-none"
           />
