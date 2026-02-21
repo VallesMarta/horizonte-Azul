@@ -9,7 +9,7 @@ interface FormLoginProps {
 }
 
 export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
-  const router = useRouter(); // Necesario para router.push -> Navega a otra ruta sin recargar la página
+  const router = useRouter();
   
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,19 +28,18 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
       const data = await respuesta.json();
 
       if (respuesta.ok && data.token) {
-        // Guardar datos en el navegador
+        // --- GUARDADO DE DATOS ---
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.usuario.username);        
         localStorage.setItem("userId", String(data.usuario.id)); 
-        localStorage.setItem("nombre", data.usuario.nombre);
         localStorage.setItem("isAdmin", data.usuario.isAdmin ? "true" : "false");
 
-          if (setUsuarioLoggeado) {
-            setUsuarioLoggeado(data.usuario.username);
-          }
+        if (setUsuarioLoggeado) {
+          setUsuarioLoggeado(data.usuario.username);
+        }
 
-          // En lugar de router.push, usamos esto para asegurar que el Header se resetee
-          window.location.href = "/";
+        // Redirección limpia para que useAuth refresque los datos
+        window.location.href = "/";
           
       } else {
         alert(data.message || "Credenciales incorrectas");
@@ -69,7 +68,6 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
       >
         <h2 className="text-blanco-fijo text-2xl font-bold text-center mb-4">Bienvenido de nuevo</h2>
         
-        {/* Los inputs siguen usando bg-fondo para adaptarse al tema */}
         <div className="flex items-center bg-fondo rounded-lg p-1">
           <FaUser className="mx-3 text-secundario text-xl" />
           <input

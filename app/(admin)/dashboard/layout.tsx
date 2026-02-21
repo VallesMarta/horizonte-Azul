@@ -16,37 +16,43 @@ export default function DashboardLayout({
   const [verificando, setVerificando] = useState(true);
 
   useEffect(() => {
-    // Si usuarioLoggeado sigue siendo null, useAuth aún está cargando
-    if (usuarioLoggeado === null) return;
+    // Esperamos a que useAuth determine si hay sesión o no
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
 
-    // Comprobamos si el usuario logeado es administrador
-    if (!isAdmin) {
-      // Si no es admin, lo redirigimos
-      router.replace("/");
-    } else {
-      // Si es admin, dejamos de mostrar el spinner
-      setVerificando(false);
+    if (usuarioLoggeado !== null) {
+// Comprobamos si el usuario logeado es administrador
+     if (!isAdmin) {
+        router.replace("/");
+      } else {
+        // Si es admin, dejamos de mostrar el spinner
+        setVerificando(false);
+      }
     }
   }, [isAdmin, usuarioLoggeado, router]);
 
-  // Pantalla de carga mientras useAuth lee el localStorage
   if (verificando) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-secundario">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-fondo">
         <FaSpinner className="animate-spin text-primario text-4xl mb-4" />
-        <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
-          Verificando credenciales
+        <p className="text-titulo-resaltado text-[10px] font-black uppercase tracking-[0.3em]">
+          Acceso Restringido
         </p>
       </div>
     );
   }
 
-  // Si llegamos aquí, es que isAdmin es true
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-fondo">
       <AdminSidebar />
       <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">{children}</div>
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -1,14 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import useAuth from "@/hooks/useAuth";
 
-interface NavPerfilProps {
-  username: string;
-}
+export default function NavPerfil() {
+  const { logout, usuarioLoggeado } = useAuth();
+  const [username, setUsername] = useState("");
 
-export default function NavPerfil({ username }: NavPerfilProps) {
-  const { logout } = useAuth();
+  useEffect(() => {
+    // 1. Intentamos sacarlo del hook
+    if (usuarioLoggeado?.username) {
+      setUsername(usuarioLoggeado.username);
+    } 
+    // 2. Si el hook aún no ha cargado, lo buscamos directamente en el localStorage
+    else {
+      const storedName = localStorage.getItem("username");
+      if (storedName) setUsername(storedName);
+    }
+  }, [usuarioLoggeado]);
 
   return (
     <div className="flex items-center gap-4 pl-4 border-l border-white/20">
@@ -16,7 +26,9 @@ export default function NavPerfil({ username }: NavPerfilProps) {
         <span className="text-[10px] uppercase tracking-widest text-white/50">
           Usuario
         </span>
-        <span className="text-sm font-bold text-white">{username}</span>
+        <span className="text-sm font-bold text-white uppercase">
+          {username || "Cargando..."}
+        </span>
       </div>
 
       <FaUserCircle className="text-4xl text-white/80" />

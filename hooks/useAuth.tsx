@@ -1,6 +1,7 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 
-// Definimos la interfaz para tener autocompletado y evitar errores de tipos
 interface Usuario {
   id: number;
   username: string;
@@ -12,16 +13,30 @@ export default function useAuth() {
 
   const cargarDatos = useCallback(() => {
     if (typeof window !== "undefined") {
-      const id = localStorage.getItem("userId");
-      const username = localStorage.getItem("username");
-      
-      if (id && username) {
-        setUsuarioLoggeado({ id: Number(id), username });
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        try {
+          const base64Url = token.split(".")[1];
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+          const payload = JSON.parse(window.atob(base64));
+
+          // Extraemos todo del token directamente
+          setUsuarioLoggeado({
+            id: Number(payload.id),
+            username: payload.username,
+          });
+
+          setIsAdmin(payload.isAdmin === true || payload.role === "admin");
+        } catch (error) {
+          console.error("Token inválido o corrupto:", error);
+          setUsuarioLoggeado(null);
+          setIsAdmin(false);
+        }
       } else {
         setUsuarioLoggeado(null);
+        setIsAdmin(false);
       }
-      
-      setIsAdmin(localStorage.getItem("isAdmin") === "true");
     }
   }, []);
 

@@ -87,16 +87,14 @@ export default function Header() {
                     icono="GrConfigure"
                   />
                 ) : (
-                  <>
-                    <NavEnlace
-                      irA="/mis-reservas"
-                      textoAMostrar="Mis Reservas"
-                      icono="FaPlaneDeparture"
-                    />
-                  </>
+                  <NavEnlace
+                    irA="/mis-reservas"
+                    textoAMostrar="Mis Reservas"
+                    icono="FaPlaneDeparture"
+                  />
                 )}
                 <ThemeToggle />
-                <NavPerfil username={usuarioLoggeado?.username} />
+                <NavPerfil /> 
               </>
             )}
           </ul>
@@ -125,7 +123,6 @@ export default function Header() {
           }`}
         >
           <div className="flex flex-col h-full p-6">
-            {/* Header del Sidebar */}
             <div className="flex items-center justify-between mb-8">
               <span className="font-black text-xl tracking-tighter uppercase text-white">
                 Menú
@@ -139,18 +136,16 @@ export default function Header() {
             </div>
 
             <nav className="flex flex-col items-center w-full">
-              {/* --- BLOQUE SUPERIOR: PERFIL O ACCESO (CENTRADO) --- */}
               <div className="w-full flex flex-col items-center pb-8 border-b border-white/10">
                 {usuarioLoggeado ? (
                   <div className="flex flex-col items-center gap-2">
-                    <NavPerfil username={usuarioLoggeado?.username} />
+                    <NavPerfil />
                   </div>
                 ) : (
                   <div
                     className="flex flex-col items-center gap-4 w-full px-4"
                     onClick={() => setMenuAbierto(false)}
                   >
-                    {/* Botones de acceso centrados */}
                     <NavButton
                       irA="/login"
                       textoAMostrar="Iniciar Sesión"
@@ -165,7 +160,6 @@ export default function Header() {
                 )}
               </div>
 
-              {/* --- BLOQUE INFERIOR: ENLACES FILTRADOS (CENTRADO) --- */}
               <div
                 className="flex flex-col items-center gap-8 w-full mt-10"
                 onClick={() => setMenuAbierto(false)}
@@ -185,22 +179,17 @@ export default function Header() {
                       icono="ImHeart"
                     />
                     {isAdmin ? (
-                      <>
-                        <NavEnlace
-                          irA="/dashboard"
-                          textoAMostrar="Dashboard"
-                          icono="GrConfigure"
-                        />
-                        <ThemeToggle />
-                      </>
+                      <NavEnlace
+                        irA="/dashboard"
+                        textoAMostrar="Dashboard"
+                        icono="GrConfigure"
+                      />
                     ) : (
-                      <>
-                        <NavEnlace
-                          irA="/mis-reservas"
-                          textoAMostrar="Mis Reservas"
-                          icono="FaPlaneDeparture"
-                        />
-                      </>
+                      <NavEnlace
+                        irA="/mis-reservas"
+                        textoAMostrar="Mis Reservas"
+                        icono="FaPlaneDeparture"
+                      />
                     )}
                     <ThemeToggle />
                   </div>
