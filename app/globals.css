@@ -7,15 +7,40 @@
   --color-texto: #1f2937;
   --color-fondo: #f4f5fa;
   --color-iconos: #fde047;
-  --color-acento: #aab8ff;
+  --color-acento: #1f2937;
   --color-otro: #4dd2ff;
   --color-rojo: #d13264;
   --color-verde: #3ba054;
   --color-naranja: #ed6b53;
-  --color-gris: #9ca3af; /* Añadido aquí para que funcione */
+  --color-gris: #9ca3af;
+  --color-gris-clarito: #f9fafb;
+  --color-gris-borde-suave: #f3f4f6;
+  --color-nav-boton: #1f2937;
+  --color-negro-fijo: #1f2937;
+  --color-blanco-fijo: #ffffff;
+  --color-titulo-resaltado: var(--color-secundario);
 
   /* Fuentes */
   --font-lato: "Lato", sans-serif;
+}
+/* --- MODO OSCURO --- */
+@layer base {
+  /* Si el HTML tiene la clase dark, aplica estos colores */
+  html.dark {
+    --color-fondo: #1f2937;
+    --color-texto: #f4f5fa;
+
+    --color-gris-clarito: #374151;
+    --color-gris-borde-suave: #4b5563;
+    --color-nav-boton: #111827;
+    --color-titulo-resaltado: var(--color-blanco-fijo);
+    --color-titulo-resaltado: var(--color-blanco-fijo) !important;
+  }
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
 }
 
 @font-face {
@@ -54,4 +79,13 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.footer-fijo {
+  color: var(--color-blanco-fijo) !important;
+  background-color: var(--color-secundario) !important;
+}
+
+.footer-fijo a, .footer-fijo p, .footer-fijo h2, .footer-fijo strong {
+  color: var(--color-blanco-fijo) !important;
 }

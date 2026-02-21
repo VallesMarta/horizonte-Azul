@@ -34,14 +34,14 @@ export default function ServiciosViaje({ viajeId }: { viajeId: number | string }
           return (
             <div 
               key={s.relacion_id} 
-              className="bg-gray-100 border border-gray-200 px-4 py-2 rounded-xl"
+              className="bg-fondo border border-gris-borde-suave px-4 py-2 rounded-xl shadow-sm transition-all hover:border-primario/30"
             >
               <div className="flex flex-col text-center">
-                <span className="text-[10px] font-bold text-secundario uppercase leading-tight">
+                <span className="text-[10px] font-bold text-texto uppercase leading-tight">
                   {s.nombre}
                 </span>
                 {s.valor && (
-                  <span className="text-[9px] font-medium text-gray-500 uppercase mt-0.5">
+                  <span className="text-[9px] font-medium text-texto/50 uppercase mt-0.5">
                     {s.valor}
                   </span>
                 )}

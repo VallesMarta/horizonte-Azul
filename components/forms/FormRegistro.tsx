@@ -41,7 +41,7 @@ export default function FormRegistro() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center gap-10 lg:gap-40 p-4">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-10 lg:gap-40 p-4 min-h-[70vh] bg-fondo">
       {/* Imagen */}
       <div className="hidden md:block">
         <img
@@ -56,8 +56,7 @@ export default function FormRegistro() {
         onSubmit={guardarUsuario}
         className="flex flex-col gap-4 bg-secundario p-10 rounded-3xl w-full max-w-[400px] shadow-xl"
       >
-        <h2 className="text-fondo text-2xl font-bold text-center mb-2">Crea tu cuenta</h2>
-        
+        <h2 className="text-blanco-fijo text-2xl font-bold text-center mb-4">Crea tu cuenta</h2>
         {/* Username */}
         <div className="flex items-center bg-fondo rounded-lg p-1">
           <FaUser className="mx-3 text-secundario text-xl" />
@@ -65,7 +64,7 @@ export default function FormRegistro() {
             name="username"
             placeholder="Username"
             required
-            className="bg-transparent p-3 w-full text-secundario outline-none"
+            className="bg-transparent p-3 w-full text-titulo-resaltado outline-none font-bold"
           />
         </div>
 
@@ -77,10 +76,9 @@ export default function FormRegistro() {
             name="password"
             placeholder="Contraseña"
             required
-            className="bg-transparent p-3 w-full text-secundario outline-none"
+            className="bg-transparent p-3 w-full text-titulo-resaltado outline-none font-bold"
           />
         </div>
-
         {/* Nombre Completo */}
         <div className="flex items-center bg-fondo rounded-lg p-1">
           <FaIdBadge className="mx-3 text-secundario text-xl" />
@@ -88,10 +86,9 @@ export default function FormRegistro() {
             name="nombre"
             placeholder="Nombre completo"
             required
-            className="bg-transparent p-3 w-full text-secundario outline-none"
+            className="bg-transparent p-3 w-full text-titulo-resaltado outline-none font-bold"
           />
         </div>
-
         {/* Email */}
         <div className="flex items-center bg-fondo rounded-lg p-1">
           <FaEnvelope className="mx-3 text-secundario text-xl" />
@@ -100,18 +97,18 @@ export default function FormRegistro() {
             name="email"
             placeholder="Correo electrónico"
             required
-            className="bg-transparent p-3 w-full text-secundario outline-none"
+            className="bg-transparent p-3 w-full text-titulo-resaltado outline-none font-bold"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-otro text-secundario font-extrabold rounded-2xl p-4 mt-4 transition-all hover:brightness-110 hover:scale-[1.02] shadow-lg"
+          className="bg-otro text-secundario font-extrabold rounded-2xl p-4 mt-4 transition-all hover:brightness-110 hover:scale-[1.02] shadow-lg active:scale-95"
         >
           REGISTRARSE
         </button>
         
-        <p className="text-fondo text-center text-sm mt-2">
+        <p className="text-blanco-fijo text-center text-sm mt-2">
           ¿Ya tienes cuenta?{" "}
           <button 
             type="button" 

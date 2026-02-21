@@ -136,15 +136,14 @@ export default function IconosResumen() {
       ],
     },
   ];
-
-  return (
-    <div className="min-h-screen bg-white p-8 md:p-16">
+ return (
+    <div className="min-h-screen bg-fondo p-8 md:p-16 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         <header className="mb-16">
           <h1 className="text-5xl font-black text-secundario uppercase tracking-tighter">
             Iconos HA
           </h1>
-          <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.3em] mt-4">
+          <p className="text-gris font-bold uppercase text-xs tracking-[0.3em] mt-4">
             Catálogo completo de iconos
           </p>
         </header>
@@ -159,10 +158,10 @@ export default function IconosResumen() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
                 {cat.icons.map((icon, idx) => (
                   <div key={idx} className="group flex flex-col items-center">
-                    <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center group-hover:bg-primario/10 group-hover:scale-110 transition-all duration-300 border border-gray-100">
+                    <div className="w-20 h-20 bg-gris-clarito rounded-[2rem] flex items-center justify-center group-hover:bg-primario/10 group-hover:scale-110 transition-all duration-300 border border-gris-borde-suave shadow-sm">
                       <icon.I className="text-primario" size={28} />
                     </div>
-                    <span className="mt-4 text-[10px] font-black text-secundario uppercase tracking-tighter opacity-60 group-hover:opacity-100">
+                    <span className="mt-4 text-[10px] font-black text-secundario uppercase tracking-tighter opacity-60 group-hover:opacity-100 transition-opacity">
                       {icon.n}
                     </span>
                   </div>

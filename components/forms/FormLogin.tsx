@@ -52,7 +52,7 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center gap-10 lg:gap-40 p-4">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-10 lg:gap-40 p-4 min-h-[70vh] bg-fondo">
       {/* Imagen */}
       <div className="hidden md:block">
         <img
@@ -67,8 +67,9 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
         onSubmit={handleLogin}
         className="flex flex-col gap-6 bg-secundario p-10 rounded-3xl w-full max-w-[400px] shadow-xl"
       >
-        <h2 className="text-fondo text-2xl font-bold text-center mb-4">Bienvenido de nuevo</h2>
+        <h2 className="text-blanco-fijo text-2xl font-bold text-center mb-4">Bienvenido de nuevo</h2>
         
+        {/* Los inputs siguen usando bg-fondo para adaptarse al tema */}
         <div className="flex items-center bg-fondo rounded-lg p-1">
           <FaUser className="mx-3 text-secundario text-xl" />
           <input
@@ -76,7 +77,7 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
             type="text"
             placeholder="Username"
             required
-            className="bg-transparent p-3 w-full text-secundario outline-none"
+            className="bg-transparent p-3 w-full text-titulo-resaltado outline-none font-bold"
           />
         </div>
 
@@ -87,7 +88,7 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
             name="password"
             placeholder="Contraseña"
             required
-            className="bg-transparent p-3 w-full text-secundario outline-none"
+            className="bg-transparent p-3 w-full text-titulo-resaltado outline-none font-bold"
           />
         </div>
         
@@ -97,7 +98,8 @@ export default function FormLogin({ setUsuarioLoggeado }: FormLoginProps) {
         >
           INICIAR SESIÓN
         </button>
-        <p className="text-fondo text-center text-sm mt-2">
+        
+        <p className="text-blanco-fijo text-center text-sm mt-2">
           ¿No tienes una cuenta?{" "}
           <button 
             type="button" 

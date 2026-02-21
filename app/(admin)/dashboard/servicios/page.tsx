@@ -26,19 +26,19 @@ export default function GestionServicios() {
       icono: <FaFont />,
       label: "Texto",
       colorClass: "text-blue-500",
-      bgClass: "bg-blue-50",
+      bgClass: "bg-blue-500/10",
     },
     numero: {
       icono: <FaHashtag />,
       label: "Numérico",
-      colorClass: "text-green-500",
-      bgClass: "bg-green-50",
+      colorClass: "text-verde",
+      bgClass: "bg-verde/10",
     },
     booleano: {
       icono: <FaToggleOn />,
       label: "Booleano",
       colorClass: "text-orange-500",
-      bgClass: "bg-orange-50",
+      bgClass: "bg-orange-500/10",
     },
   };
 
@@ -97,21 +97,21 @@ export default function GestionServicios() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500">
+    <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500 pb-20">
       {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-4xl font-black text-secundario uppercase tracking-tighter">
+          <h1 className="text-3xl md:text-4xl font-black text-titulo-resaltado uppercase tracking-tighter">
             Panel de Servicios
           </h1>
-          <p className="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase mt-1">
+          <p className="text-[10px] md:text-xs font-bold text-gris dark:text-texto/40 tracking-widest uppercase mt-1">
             {servicios.length} servicios activos
           </p>
         </div>
       </header>
 
       {/* FORMULARIO */}
-      <section className="bg-white p-4 md:p-3 rounded-[2rem] shadow-xl shadow-secundario/5 border border-gray-100">
+      <section className="bg-blanco-fijo dark:bg-gris-clarito p-4 md:p-3 rounded-[2rem] shadow-xl shadow-secundario/5 border border-gris-borde-suave">
         <form
           onSubmit={handleSubmit}
           className="flex flex-col lg:flex-row items-center gap-4"
@@ -125,12 +125,12 @@ export default function GestionServicios() {
               onChange={(e) => setNombre(e.target.value)}
               required
               placeholder="Ej: WiFi, Maleta Extra..."
-              className="w-full bg-gray-50 border-2 border-transparent focus:border-primario/20 focus:bg-white rounded-[1.5rem] py-4 pl-12 pr-4 font-bold text-secundario transition-all outline-none text-sm md:text-base"
+              className="w-full bg-gris-clarito dark:bg-fondo border-2 border-transparent focus:border-primario/20 rounded-[1.5rem] py-4 pl-12 pr-4 font-bold text-secundario dark:text-titulo-resaltado transition-all outline-none text-sm md:text-base"
             />
           </div>
 
-          {/* Selector de Tipo (Scroll horizontal en móviles pequeños si fuera necesario) */}
-          <div className="flex w-full lg:w-auto justify-center gap-2 bg-gray-100 p-1.5 rounded-[1.5rem]">
+          {/* Selector de Tipo */}
+          <div className="flex w-full lg:w-auto justify-center gap-2 bg-gris-clarito dark:bg-fondo p-1.5 rounded-[1.5rem] border border-gris-borde-suave">
             {Object.keys(configTipos).map((tipo) => (
               <button
                 key={tipo}
@@ -140,8 +140,8 @@ export default function GestionServicios() {
                   flex-1 lg:flex-none w-12 h-12 md:w-14 md:h-12 rounded-xl flex items-center justify-center transition-all duration-300
                   ${
                     tipoControl === tipo
-                      ? `bg-white ${configTipos[tipo].colorClass} shadow-md scale-105`
-                      : "text-gray-400 hover:bg-gray-200/50"
+                      ? `bg-blanco-fijo dark:bg-gris-clarito ${configTipos[tipo].colorClass} shadow-md scale-105 border border-gris-borde-suave`
+                      : "text-gris hover:bg-gris-borde-suave/50"
                   }
                 `}
               >
@@ -153,7 +153,7 @@ export default function GestionServicios() {
           {/* Botón de envío */}
           <button
             type="submit"
-            className="w-full lg:w-auto bg-secundario text-white h-14 px-8 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-primario transition-all shadow-lg shadow-secundario/10 flex items-center justify-center gap-2 shrink-0 group"
+            className="w-full lg:w-auto bg-secundario text-blanco-fijo h-14 px-8 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-primario transition-all shadow-lg shadow-secundario/10 flex items-center justify-center gap-2 shrink-0 group"
           >
             <FaPlus className="group-hover:rotate-90 transition-transform" />
             <span>Añadir</span>
@@ -164,10 +164,10 @@ export default function GestionServicios() {
       {/* LISTADO DE SERVICIOS */}
       <section className="space-y-4">
         <div className="flex items-center gap-3 px-2">
-          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+          <h2 className="text-[10px] font-black text-gris dark:text-texto/40 uppercase tracking-[0.3em]">
             Servicios disponibles
           </h2>
-          <div className="h-px bg-gray-100 flex-1"></div>
+          <div className="h-px bg-gris-borde-suave dark:bg-gris-borde-suave/20 flex-1"></div>
         </div>
 
         {cargando ? (
@@ -181,7 +181,7 @@ export default function GestionServicios() {
               return (
                 <div
                   key={s.id}
-                  className="bg-white p-5 rounded-[2rem] border border-gray-100 hover:border-primario/30 transition-all group relative overflow-hidden shadow-sm hover:shadow-md"
+                  className="bg-blanco-fijo dark:bg-gris-clarito p-5 rounded-[2rem] border border-gris-borde-suave hover:border-primario/30 transition-all group relative overflow-hidden shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-center gap-4">
                     <div
@@ -191,17 +191,19 @@ export default function GestionServicios() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-secundario uppercase text-xs truncate mb-0.5">
+                      <h4 className="font-bold text-secundario dark:text-titulo-resaltado uppercase text-xs truncate mb-0.5">
                         {s.nombre}
                       </h4>
-                      <p className={`text-[9px] font-black uppercase tracking-widest ${config.colorClass}`}>
+                      <p
+                        className={`text-[9px] font-black uppercase tracking-widest ${config.colorClass}`}
+                      >
                         {config.label}
                       </p>
                     </div>
 
                     <button
                       onClick={() => handleDelete(s.id)}
-                      className="w-9 h-9 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                      className="w-9 h-9 flex items-center justify-center text-gris dark:text-texto/20 hover:text-rojo hover:bg-rojo/10 rounded-xl transition-all"
                     >
                       <FaTrash size={14} />
                     </button>
@@ -211,14 +213,14 @@ export default function GestionServicios() {
             })}
           </div>
         ) : (
-          <div className="bg-gray-50/50 border-2 border-dashed border-gray-100 rounded-[2.5rem] py-16 px-6 flex flex-col items-center justify-center text-center">
-            <div className="bg-white p-5 rounded-3xl shadow-sm mb-4">
-              <FaConciergeBell className="text-gray-200 size-10" />
+          <div className="bg-blanco-fijo dark:bg-gris-clarito border-2 border-dashed border-gris-borde-suave rounded-[2.5rem] py-16 px-6 flex flex-col items-center justify-center text-center">
+            <div className="bg-gris-clarito dark:bg-fondo p-5 rounded-3xl shadow-sm mb-4">
+              <FaConciergeBell className="text-gris/30 size-10" />
             </div>
-            <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">
+            <p className="text-gris font-bold text-sm uppercase tracking-widest">
               Sin servicios
             </p>
-            <p className="text-gray-300 text-xs mt-1">
+            <p className="text-gris/60 text-xs mt-1">
               Comienza agregando uno arriba.
             </p>
           </div>

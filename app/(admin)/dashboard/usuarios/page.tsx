@@ -76,37 +76,37 @@ export default function GestionUsuarios() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500">
+    <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500 pb-20">
       {/* Header del Panel */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-4xl font-black text-secundario uppercase tracking-tighter">
+          <h1 className="text-3xl md:text-4xl font-black text-titulo-resaltado uppercase tracking-tighter">
             Panel de Usuarios
           </h1>
-          <p className="text-[10px] md:text-xs font-bold text-gray-400 tracking-widest uppercase mt-1">
+          <p className="text-[10px] md:text-xs font-bold text-gris dark:text-texto/40 tracking-widest uppercase mt-1">
             {usuariosFiltrados.length} usuarios registrados
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative group">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primario transition-colors" />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gris group-focus-within:text-primario transition-colors" />
             <input
               type="text"
               placeholder="Buscar por username o email"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primario/20 focus:border-primario outline-none w-72 text-sm transition-all shadow-sm"
+              className="pl-10 pr-4 py-2 bg-blanco-fijo dark:bg-gris-clarito border border-gris-borde-suave rounded-xl focus:ring-2 focus:ring-primario/20 focus:border-primario outline-none w-72 text-sm transition-all shadow-sm text-secundario dark:text-titulo-resaltado"
             />
           </div>
         </div>
       </header>
 
       {/* Tabla Principal */}
-      <div className="bg-white rounded-[2rem] shadow-xl shadow-secundario/5 border border-gray-100 overflow-hidden">
+      <div className="bg-blanco-fijo dark:bg-gris-clarito rounded-[2rem] shadow-xl shadow-secundario/5 border border-gris-borde-suave overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse table-fixed min-w-[950px]">
             <thead>
-              <tr className="bg-gray-50/50 text-secundario/40 text-[10px] uppercase tracking-[0.25em] border-b border-gray-100 font-black">
+              <tr className="bg-gris-clarito/50 dark:bg-fondo text-secundario/40 dark:text-texto/40 text-[10px] uppercase tracking-[0.25em] border-b border-gris-borde-suave font-black">
                 <th className="w-24 py-5 text-center">Avatar</th>
                 <th className="py-5 text-center">Username</th>
                 <th className="py-5 text-center">Email</th>
@@ -115,7 +115,7 @@ export default function GestionUsuarios() {
                 <th className="w-40 py-5 text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gris-borde-suave/30">
               {usuariosFiltrados.map((u) => {
                 const estaEditando = editandoId === u.id;
                 const esAdmin = estaEditando ? tempUser.isAdmin : u.isAdmin;
@@ -124,21 +124,23 @@ export default function GestionUsuarios() {
                 return (
                   <tr
                     key={u.id}
-                    className={`transition-all duration-300 ${esAdmin ? "bg-primario/5" : "hover:bg-gray-50/40"}`}
+                    className={`transition-all duration-300 ${esAdmin ? "bg-primario/5" : "hover:bg-gris-clarito/20 dark:hover:bg-fondo/40"}`}
                   >
-                    {/* AVATAR */ }
-                    <td className="py-4 align-middle flex justify-center">
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] border shadow-sm transition-all ${esAdmin ? "bg-primario border-primario text-white" : "bg-gray-50 border-gray-200 text-secundario"}`}
-                      >
-                        {u.username?.substring(0, 2).toUpperCase()}
+                    {/* AVATAR */}
+                    <td className="py-4 align-middle">
+                      <div className="flex justify-center">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] border shadow-sm transition-all ${esAdmin ? "bg-primario border-primario text-blanco-fijo" : "bg-gris-clarito dark:bg-fondo border-gris-borde-suave text-secundario dark:text-titulo-resaltado"}`}
+                        >
+                          {u.username?.substring(0, 2).toUpperCase()}
+                        </div>
                       </div>
                     </td>
                     {/* USERNAME */}
                     <td className="py-4 align-middle text-center">
                       {estaEditando ? (
                         <input
-                          className="w-4/5 text-center text-xs font-black uppercase border-b-2 border-primario bg-transparent py-1 outline-none text-secundario"
+                          className="w-4/5 text-center text-xs font-black uppercase border-b-2 border-primario bg-transparent py-1 outline-none text-secundario dark:text-titulo-resaltado"
                           value={tempUser.username}
                           onChange={(e) =>
                             setTempUser({
@@ -149,7 +151,7 @@ export default function GestionUsuarios() {
                         />
                       ) : (
                         <span
-                          className={`font-black text-xs uppercase tracking-tight ${esAdmin ? "text-primario" : "text-secundario"}`}
+                          className={`font-black text-xs uppercase tracking-tight ${esAdmin ? "text-primario" : "text-secundario dark:text-titulo-resaltado"}`}
                         >
                           {u.username}
                         </span>
@@ -159,14 +161,14 @@ export default function GestionUsuarios() {
                     <td className="py-4 align-middle text-center">
                       {estaEditando ? (
                         <input
-                          className="w-4/5 text-center text-xs font-bold border-b-2 border-primario bg-transparent py-1 outline-none text-gray-500"
+                          className="w-4/5 text-center text-xs font-bold border-b-2 border-primario bg-transparent py-1 outline-none text-gris"
                           value={tempUser.email}
                           onChange={(e) =>
                             setTempUser({ ...tempUser, email: e.target.value })
                           }
                         />
                       ) : (
-                        <span className="font-bold text-gray-400 text-xs lowercase">
+                        <span className="font-bold text-gris dark:text-texto/40 text-xs lowercase">
                           {u.email}
                         </span>
                       )}
@@ -175,11 +177,11 @@ export default function GestionUsuarios() {
                     <td className="py-4 align-middle">
                       <div className="flex items-center justify-center gap-2">
                         <FaSuitcase
-                          className={`transition-colors duration-300 ${num > 0 ? "text-primario" : "text-gray-300"}`}
+                          className={`transition-colors duration-300 ${num > 0 ? "text-primario" : "text-gris/30"}`}
                           size={14}
                         />
                         <span
-                          className={`text-xs font-black italic ${num > 0 ? "text-secundario" : "text-gray-300"}`}
+                          className={`text-xs font-black italic ${num > 0 ? "text-secundario dark:text-titulo-resaltado" : "text-gris/30"}`}
                         >
                           {num} {num === 1 ? "Reserva" : "Reservas"}
                         </span>
@@ -195,13 +197,13 @@ export default function GestionUsuarios() {
                               isAdmin: !tempUser.isAdmin,
                             })
                           }
-                          className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase transition-all shadow-md ${tempUser.isAdmin ? "bg-secundario text-white" : "bg-gray-100 text-gray-400"}`}
+                          className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase transition-all shadow-md ${tempUser.isAdmin ? "bg-secundario text-blanco-fijo" : "bg-gris-clarito dark:bg-fondo text-gris"}`}
                         >
                           {tempUser.isAdmin ? "Es Admin" : "Hacer Admin"}
                         </button>
                       ) : (
                         <span
-                          className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full border ${u.isAdmin ? "text-primario border-primario/20 bg-primario/10" : "text-gray-400 border-gray-100"}`}
+                          className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full border ${u.isAdmin ? "text-primario border-primario/20 bg-primario/10" : "text-gris border-gris-borde-suave"}`}
                         >
                           {u.isAdmin ? "Admin" : "User"}
                         </span>
@@ -215,15 +217,15 @@ export default function GestionUsuarios() {
                           <>
                             <button
                               onClick={guardarCambios}
-                              className="w-9 h-9 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 shadow-lg shadow-green-100 transition-all active:scale-90"
+                              className="w-9 h-9 flex items-center justify-center bg-verde text-blanco-fijo rounded-xl hover:bg-verde/80 shadow-lg shadow-verde/10 transition-all active:scale-90"
                             >
-                              <FaCheck size={12}/>
+                              <FaCheck size={12} />
                             </button>
                             <button
                               onClick={() => setEditandoId(null)}
-                              className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-400 rounded-xl hover:bg-gray-200 transition-all active:scale-90"
+                              className="w-9 h-9 flex items-center justify-center bg-gris-clarito dark:bg-fondo text-gris rounded-xl hover:bg-gris-borde-suave transition-all active:scale-90"
                             >
-                              <FaTimes size={12}/>
+                              <FaTimes size={12} />
                             </button>
                           </>
                         ) : (
@@ -233,15 +235,15 @@ export default function GestionUsuarios() {
                                 setEditandoId(u.id);
                                 setTempUser({ ...u });
                               }}
-                              className="flex items-center justify-center w-10 h-10 bg-white text-gray-400 border border-gray-100 rounded-xl hover:bg-naranja hover:text-white hover:border-naranja hover:shadow-lg hover:shadow-primario/20 transition-all duration-300 active:scale-90"
+                              className="flex items-center justify-center w-10 h-10 bg-blanco-fijo dark:bg-fondo text-gris border border-gris-borde-suave rounded-xl hover:bg-naranja hover:text-blanco-fijo hover:border-naranja hover:shadow-lg hover:shadow-naranja/20 transition-all duration-300 active:scale-90"
                             >
-                              <FaEdit size={12}/>
+                              <FaEdit size={12} />
                             </button>
                             <button
                               onClick={() => eliminarUsuario(u.id)}
-                              className="flex items-center justify-center w-10 h-10 bg-white text-gray-400 border border-gray-100 rounded-xl hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-lg hover:shadow-red-500/20 transition-all duration-300 active:scale-90"
+                              className="flex items-center justify-center w-10 h-10 bg-blanco-fijo dark:bg-fondo text-gris border border-gris-borde-suave rounded-xl hover:bg-rojo hover:text-blanco-fijo hover:border-rojo hover:shadow-lg hover:shadow-rojo/20 transition-all duration-300 active:scale-90"
                             >
-                              <FaTrash size={12}/>
+                              <FaTrash size={12} />
                             </button>
                           </>
                         )}

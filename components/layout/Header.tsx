@@ -5,6 +5,7 @@ import Link from "next/link";
 import NavEnlace from "@/components/layout/NavBar/NavEnlace";
 import NavButton from "@/components/layout/NavBar/NavButton";
 import NavPerfil from "@/components/layout/NavBar/NavPerfil";
+import ThemeToggle from "@/components/ThemeToggle";
 import useAuth from "@/hooks/useAuth";
 import { FaBars, FaTimes } from "react-icons/fa";
 
@@ -70,6 +71,7 @@ export default function Header() {
                   textoAMostrar="Iniciar Sesión"
                   color="secundario"
                 />
+                <ThemeToggle />
               </>
             ) : (
               <>
@@ -85,12 +87,15 @@ export default function Header() {
                     icono="GrConfigure"
                   />
                 ) : (
-                  <NavEnlace
-                    irA="/mis-reservas"
-                    textoAMostrar="Mis Reservas"
-                    icono="FaPlaneDeparture"
-                  />
+                  <>
+                    <NavEnlace
+                      irA="/mis-reservas"
+                      textoAMostrar="Mis Reservas"
+                      icono="FaPlaneDeparture"
+                    />
+                  </>
                 )}
+                <ThemeToggle />
                 <NavPerfil username={usuarioLoggeado?.username} />
               </>
             )}
@@ -170,15 +175,24 @@ export default function Header() {
                     <NavEnlace irA="/" textoAMostrar="Inicio" />
                     <NavEnlace irA="/about" textoAMostrar="Nosotros" />
                     <NavEnlace irA="/contact" textoAMostrar="Contacto" />
+                    <ThemeToggle />
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-8">
+                    <NavEnlace
+                      irA="/favoritos"
+                      textoAMostrar="Favoritos"
+                      icono="ImHeart"
+                    />
                     {isAdmin ? (
-                      <NavEnlace
-                        irA="/dashboard"
-                        textoAMostrar="Dashboard"
-                        icono="GrConfigure"
-                      />
+                      <>
+                        <NavEnlace
+                          irA="/dashboard"
+                          textoAMostrar="Dashboard"
+                          icono="GrConfigure"
+                        />
+                        <ThemeToggle />
+                      </>
                     ) : (
                       <>
                         <NavEnlace
@@ -186,13 +200,9 @@ export default function Header() {
                           textoAMostrar="Mis Reservas"
                           icono="FaPlaneDeparture"
                         />
-                        <NavEnlace
-                          irA="/favoritos"
-                          textoAMostrar="Favoritos"
-                          icono="ImHeart"
-                        />
                       </>
                     )}
+                    <ThemeToggle />
                   </div>
                 )}
               </div>
