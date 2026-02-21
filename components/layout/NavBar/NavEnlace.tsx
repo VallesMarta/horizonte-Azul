@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { FaPlaneDeparture } from "react-icons/fa";
 import { GrConfigure } from "react-icons/gr";
+import { ImHeart } from "react-icons/im";
 
 interface NavEnlaceProps {
   irA: string;
   textoAMostrar: string;
-  icono?: "FaPlaneDeparture" | "GrConfigure";
+  icono?: "FaPlaneDeparture" | "GrConfigure" | "ImHeart";
 }
 
 export default function NavEnlace({
@@ -24,6 +25,8 @@ export default function NavEnlace({
         return <FaPlaneDeparture className="text-xl" />;
       case "GrConfigure":
         return <GrConfigure className="text-xl" />;
+      case "ImHeart":
+        return <ImHeart className="text-xl" />;
       default:
         return null;
     }

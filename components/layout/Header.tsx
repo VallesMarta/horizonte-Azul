@@ -73,6 +73,11 @@ export default function Header() {
               </>
             ) : (
               <>
+                <NavEnlace
+                  irA="/favoritos"
+                  textoAMostrar="Favoritos"
+                  icono="ImHeart"
+                />
                 {isAdmin ? (
                   <NavEnlace
                     irA="/dashboard"
@@ -175,11 +180,18 @@ export default function Header() {
                         icono="GrConfigure"
                       />
                     ) : (
-                      <NavEnlace
-                        irA="/mis-reservas"
-                        textoAMostrar="Mis Reservas"
-                        icono="FaPlaneDeparture"
-                      />
+                      <>
+                        <NavEnlace
+                          irA="/mis-reservas"
+                          textoAMostrar="Mis Reservas"
+                          icono="FaPlaneDeparture"
+                        />
+                        <NavEnlace
+                          irA="/favoritos"
+                          textoAMostrar="Favoritos"
+                          icono="ImHeart"
+                        />
+                      </>
                     )}
                   </div>
                 )}

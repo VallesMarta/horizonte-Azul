@@ -12,6 +12,7 @@ import {
 import CardDescripcion from "@/components/cards/CardDescripcion";
 import FormReservar from "@/components/forms/FormReservar";
 import ServiciosViaje from "@/components/cards/ServiciosViaje";
+import BotonWishlist from "@/components/BotonWishlist";
 import { Viaje } from "@/models/types";
 import useAuth from "@/hooks/useAuth";
 
@@ -45,7 +46,9 @@ export default function Destino({ viaje }: DestinoProps) {
   };
 
   const imgViaje = viaje.img || `/media/img/img-inicio-destino-por-defecto.png`;
-  const horaFormateada = viaje.horaSalida ? viaje.horaSalida.slice(0, 5) : "--:--";
+  const horaFormateada = viaje.horaSalida
+    ? viaje.horaSalida.slice(0, 5)
+    : "--:--";
 
   return (
     <>
@@ -71,23 +74,40 @@ export default function Destino({ viaje }: DestinoProps) {
         <div className="flex flex-col flex-grow space-y-4 px-1">
           <div className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl border border-gray-100">
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-primario uppercase tracking-tighter">Origen</span>
-              <p className="text-xs font-bold text-secundario">{viaje.paisOrigen}</p>
-              <p className="text-[10px] text-gray-500 italic">{viaje.aeropuertoOrigen}</p>
+              <span className="text-[9px] font-black text-primario uppercase tracking-tighter">
+                Origen
+              </span>
+              <p className="text-xs font-bold text-secundario">
+                {viaje.paisOrigen}
+              </p>
+              <p className="text-[10px] text-gray-500 italic">
+                {viaje.aeropuertoOrigen}
+              </p>
             </div>
             <FaArrowRight className="text-secundario/20" size={10} />
             <div className="flex flex-col text-right">
-              <span className="text-[9px] font-black text-primario uppercase tracking-tighter">Destino</span>
-              <p className="text-xs font-bold text-secundario">{viaje.paisDestino}</p>
-              <p className="text-[10px] text-gray-500 italic">{viaje.aeropuertoDestino}</p>
+              <span className="text-[9px] font-black text-primario uppercase tracking-tighter">
+                Destino
+              </span>
+              <p className="text-xs font-bold text-secundario">
+                {viaje.paisDestino}
+              </p>
+              <p className="text-[10px] text-gray-500 italic">
+                {viaje.aeropuertoDestino}
+              </p>
             </div>
           </div>
           <h3 className="text-3xl font-black text-secundario uppercase tracking-tighter leading-none group-hover:text-primario transition-colors">
             {viaje.paisDestino}
           </h3>
-          <div className="flex items-center gap-2 py-2 border-t border-dashed border-secundario/10">
-            <FaClock className="text-primario/60" size={12} />
-            <span className="text-xs font-black text-secundario/60 uppercase">Salida: {horaFormateada}h</span>
+          <div className="flex items-center justify-between gap-2 py-2 border-t border-dashed border-secundario/10">
+            <div className="flex items-center gap-2">
+              <FaClock className="text-primario/60" size={12} />
+              <span className="text-xs font-black text-secundario/60 uppercase">
+                Salida: {horaFormateada}h
+              </span>
+            </div>
+            <BotonWishlist viajeId={Number(viaje.id)} />
           </div>
           <button
             onClick={manejarIntentoReserva}
@@ -102,7 +122,6 @@ export default function Destino({ viaje }: DestinoProps) {
       {mostrarModalInfo && (
         <div className="fixed inset-0 bg-secundario/40 backdrop-blur-md flex justify-center items-center z-[210] p-4">
           <div className="bg-white rounded-[3rem] w-full max-w-[900px] max-h-[min(90vh,800px)] relative flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300 shadow-2xl">
-            
             <button
               onClick={() => setMostrarModalInfo(false)}
               className="absolute top-5 right-5 bg-black/10 hover:bg-primario text-white p-3 rounded-full backdrop-blur-md transition-all z-50"
@@ -112,51 +131,86 @@ export default function Destino({ viaje }: DestinoProps) {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               <div className="relative h-48 md:h-60 w-full">
-                <img src={imgViaje} className="w-full h-full object-cover" alt={viaje.paisDestino} />
+                <img
+                  src={imgViaje}
+                  className="w-full h-full object-cover"
+                  alt={viaje.paisDestino}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/30" />
               </div>
 
               <div className="px-6 md:px-10 py-6 -mt-10 relative bg-white rounded-t-[3rem]">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <p className="text-primario font-black uppercase text-[10px] tracking-[0.3em]">Ficha Técnica</p>
-                    <h2 className="text-3xl md:text-4xl font-black text-secundario uppercase tracking-tighter">{viaje.paisDestino}</h2>
+                    <p className="text-primario font-black uppercase text-[10px] tracking-[0.3em]">
+                      Ficha Técnica
+                    </p>
+                    <h2 className="text-3xl md:text-4xl font-black text-secundario uppercase tracking-tighter">
+                      {viaje.paisDestino}
+                    </h2>
                   </div>
                   <div className="bg-primario/10 px-6 py-2 rounded-2xl">
-                    <span className="text-2xl md:text-3xl font-black text-primario">{viaje.precio}€</span>
+                    <span className="text-2xl md:text-3xl font-black text-primario">
+                      {viaje.precio}€
+                    </span>
                   </div>
-                </div>      
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                   <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
-                    <div className="bg-primario/10 p-2 rounded-lg"><FaPlaneDeparture className="text-primario" size={18} /></div>
+                    <div className="bg-primario/10 p-2 rounded-lg">
+                      <FaPlaneDeparture className="text-primario" size={18} />
+                    </div>
                     <div>
-                      <p className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Origen: {viaje.paisOrigen}</p>
-                      <p className="font-bold text-secundario text-sm">{viaje.aeropuertoOrigen || "Aeropuerto no especificado"}</p>
+                      <p className="text-[8px] font-black uppercase text-gray-400 tracking-widest">
+                        Origen: {viaje.paisOrigen}
+                      </p>
+                      <p className="font-bold text-secundario text-sm">
+                        {viaje.aeropuertoOrigen || "Aeropuerto no especificado"}
+                      </p>
                     </div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
-                    <div className="bg-primario/10 p-2 rounded-lg"><FaPlaneArrival className="text-primario" size={18} /></div>
+                    <div className="bg-primario/10 p-2 rounded-lg">
+                      <FaPlaneArrival className="text-primario" size={18} />
+                    </div>
                     <div>
-                      <p className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Llegada: {viaje.paisDestino}</p>
-                      <p className="font-bold text-secundario text-sm">{viaje.aeropuertoDestino || "Aeropuerto no especificado"}</p>
+                      <p className="text-[8px] font-black uppercase text-gray-400 tracking-widest">
+                        Llegada: {viaje.paisDestino}
+                      </p>
+                      <p className="font-bold text-secundario text-sm">
+                        {viaje.aeropuertoDestino ||
+                          "Aeropuerto no especificado"}
+                      </p>
                     </div>
                   </div>
                   <div className="bg-secundario p-4 rounded-2xl flex items-center gap-4 text-white">
                     <FaClock className="text-primario" size={18} />
                     <div>
-                      <p className="text-[8px] font-black uppercase text-white/50">Hora Salida</p>
-                      <p className="font-black italic text-lg leading-none">{horaFormateada}h</p>
+                      <p className="text-[8px] font-black uppercase text-white/50">
+                        Hora Salida
+                      </p>
+                      <p className="font-black italic text-lg leading-none">
+                        {horaFormateada}h
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                   <div className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
-                    <p className="text-primario font-black uppercase text-[9px] tracking-[0.3em] mb-3">Descripción</p>
-                    <CardDescripcion descripcion={viaje.descripcion || "Detalles próximamente."} />
+                    <p className="text-primario font-black uppercase text-[9px] tracking-[0.3em] mb-3">
+                      Descripción
+                    </p>
+                    <CardDescripcion
+                      descripcion={
+                        viaje.descripcion || "Detalles próximamente."
+                      }
+                    />
                   </div>
                   <div className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
-                    <p className="text-primario font-black uppercase text-[9px] tracking-[0.3em] mb-3">Servicios Incluidos</p>
+                    <p className="text-primario font-black uppercase text-[9px] tracking-[0.3em] mb-3">
+                      Servicios Incluidos
+                    </p>
                     <ServiciosViaje viajeId={Number(viaje.id)} />
                   </div>
                 </div>
@@ -182,10 +236,15 @@ export default function Destino({ viaje }: DestinoProps) {
             <div className="p-8 md:p-10 flex-1 overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-black text-secundario uppercase tracking-tighter">Finalizar Reserva</h2>
+                  <h2 className="text-2xl md:text-3xl font-black text-secundario uppercase tracking-tighter">
+                    Finalizar Reserva
+                  </h2>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] mt-2">
-                    {viaje.paisOrigen} ({viaje.aeropuertoOrigen}) 
-                    <FaArrowRight className="inline mx-2 text-primario" size={8} /> 
+                    {viaje.paisOrigen} ({viaje.aeropuertoOrigen})
+                    <FaArrowRight
+                      className="inline mx-2 text-primario"
+                      size={8}
+                    />
                     {viaje.paisDestino} ({viaje.aeropuertoDestino})
                   </p>
                 </div>
@@ -196,7 +255,10 @@ export default function Destino({ viaje }: DestinoProps) {
                   <ImCross size={12} />
                 </button>
               </div>
-              <FormReservar viaje={viaje} setMostrarModal={setMostrarModalReserva} />
+              <FormReservar
+                viaje={viaje}
+                setMostrarModal={setMostrarModalReserva}
+              />
             </div>
           </div>
         </div>
