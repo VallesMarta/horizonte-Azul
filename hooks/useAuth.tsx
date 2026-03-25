@@ -46,12 +46,29 @@ export default function useAuth() {
     return () => window.removeEventListener("storage", cargarDatos);
   }, [cargarDatos]);
 
-  const logout = () => {
+  const logout = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    // 1. Avisamos al servidor
+    if (token) {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Error al cerrar sesión en el servidor:", error);
+  } finally {
+    // 2. Pase lo que pase, limpiamos el navegador y redirigimos
     localStorage.clear();
     setUsuarioLoggeado(null);
     setIsAdmin(false);
-    window.location.href = "/";
-  };
+    window.location.href = "/api/auth/login";
+  }
+};
 
   return { usuarioLoggeado, isAdmin, logout, cargarDatos };
 }

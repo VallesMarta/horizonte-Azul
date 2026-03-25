@@ -1,5 +1,5 @@
 import { AuthController } from "@/controllers/auth.controller";
 
 export async function POST(req: Request) {
-  return AuthController.login(req);
+  return AuthController.logout(req);
 }

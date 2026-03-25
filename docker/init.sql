@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS metodos_pago (
     token_simulado VARCHAR(255), 
     fecha_guardado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================
 -- Pagos (Vinculado a la Reserva y opcionalmente a la Tarjeta Guardada)
@@ -112,6 +112,18 @@ CREATE TABLE IF NOT EXISTS pagos (
     FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (metodo_pago_id) REFERENCES metodos_pago(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================
+-- Control de Sesiones (Tokens)
+-- ============================
+CREATE TABLE IF NOT EXISTS tokens_activos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    token TEXT NOT NULL,
+    expira_en DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================
