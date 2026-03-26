@@ -32,3 +32,27 @@ export async function validarAdmin(req: Request) {
     };
   }
 }
+
+// Esta función solo extrae los datos
+export async function obtenerSesion(req: Request) {
+  try {
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.split(" ")[1];
+
+    if (!token) return null;
+
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+
+    // Devolvemos un objeto limpio con lo que necesitamos
+    return {
+      id: String(decoded.id || decoded.sub),
+      isAdmin:
+        decoded.isAdmin === true ||
+        decoded.isAdmin === 1 ||
+        decoded.role === "admin",
+      username: decoded.username,
+    };
+  } catch (error) {
+    return null; // Si el token es falso o expiró, devolvemos null
+  }
+}
