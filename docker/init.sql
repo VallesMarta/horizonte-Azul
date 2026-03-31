@@ -5,6 +5,9 @@ USE horizonteAzul;
 -- Configurar la sesión para que el script se lea como UTF-8
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
+SET GLOBAL event_scheduler = ON;
+SET GLOBAL time_zone = 'Europe/Madrid';
+
 -- ============================
 -- Usuarios
 -- ============================
@@ -53,6 +56,7 @@ CREATE TABLE IF NOT EXISTS viaje_servicio (
     servicio_id INT NOT NULL,
     valor VARCHAR(255),
     precio_extra DECIMAL(10, 2) DEFAULT 0.00,
+    UNIQUE KEY unique_viaje_servicio (viaje_id, servicio_id),
     FOREIGN KEY (viaje_id) REFERENCES viajes(id) ON DELETE CASCADE,
     FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -125,6 +129,28 @@ CREATE TABLE IF NOT EXISTS tokens_activos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================
+-- Evento limpieza Tokens (Configuración Completa)
+-- ============================
+
+-- 1. Aseguramos que el motor de eventos esté encendido
+SET GLOBAL event_scheduler = ON;
+
+-- 2. Creamos el evento con la cláusula PRESERVE
+DELIMITER //
+
+CREATE EVENT IF NOT EXISTS limpiar_tokens_caducados
+ON SCHEDULE EVERY 1 HOUR
+ON COMPLETION PRESERVE
+COMMENT 'Limpia sesiones expiradas cada hora y se mantiene activo en el servidor'
+DO
+  BEGIN
+    DELETE FROM tokens_activos 
+    WHERE expira_en < NOW();
+  END //
+
+DELIMITER ;
 
 -- ============================
 -- Insertamos al admin para tener acceso de primeras a la web con ese usuario
