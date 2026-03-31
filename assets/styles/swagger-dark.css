@@ -1,0 +1,56 @@
+/* --- SWAGGER HORIZONTE AZUL MODO OSCURO --- */
+
+.dark #swagger-container .swagger-ui {
+  background-color: transparent !important;
+}
+
+.dark #swagger-container .swagger-ui .opblock-body,
+.dark #swagger-container .swagger-ui .opblock-section-header,
+.dark #swagger-container .swagger-ui .scheme-container,
+.dark #swagger-container .swagger-ui .table-container {
+  background-color: #111827 !important; /* Tu color oscuro */
+  color: #ffffff !important;
+}
+
+.dark #swagger-container .swagger-ui .info .title,
+.dark #swagger-container .swagger-ui .info p,
+.dark #swagger-container .swagger-ui .opblock-tag,
+.dark #swagger-container .swagger-ui .opblock .opblock-summary-path,
+.dark #swagger-container .swagger-ui .opblock .opblock-summary-description,
+.dark #swagger-container .swagger-ui .parameter__name,
+.dark #swagger-container .swagger-ui .parameter__type,
+.dark #swagger-container .swagger-ui .parameter__in,
+.dark #swagger-container .swagger-ui .response-col_status,
+.dark #swagger-container .swagger-ui .response-col_description {
+  color: #ffffff !important;
+}
+
+/* 3. El Pop-up (Authorize) */
+.dark #swagger-container .swagger-ui .dialog-ux .modal-ux {
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+}
+
+.dark #swagger-container .swagger-ui .dialog-ux .modal-ux-header h3,
+.dark #swagger-container .swagger-ui .dialog-ux .modal-ux-content h4,
+.dark #swagger-container .swagger-ui .dialog-ux .modal-ux-content label {
+  color: #ffffff !important;
+}
+
+.dark #swagger-container .swagger-ui input,
+.dark #swagger-container .swagger-ui textarea,
+.dark #swagger-container .swagger-ui select {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #5271ff !important;
+}
+
+.dark #swagger-container .swagger-ui .opblock .opblock-summary-method {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.dark #swagger-container .swagger-ui table thead th {
+  border-bottom: 1px solid #374151 !important;
+  color: #ffffff !important;
+}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../assets/styles/swagger-dark.css";
 
 @theme {
   /* Colores */
@@ -86,6 +87,9 @@ input::-webkit-inner-spin-button {
   background-color: var(--color-secundario) !important;
 }
 
-.footer-fijo a, .footer-fijo p, .footer-fijo h2, .footer-fijo strong {
+.footer-fijo a,
+.footer-fijo p,
+.footer-fijo h2,
+.footer-fijo strong {
   color: var(--color-blanco-fijo) !important;
 }
