@@ -1,46 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function NavPerfil() {
-  const { logout, usuarioLoggeado } = useAuth();
-  const [username, setUsername] = useState("");
-
-  useEffect(() => {
-    // 1. Intentamos sacarlo del hook
-    if (usuarioLoggeado?.username) {
-      setUsername(usuarioLoggeado.username);
-    } 
-    // 2. Si el hook aún no ha cargado, lo buscamos directamente en el localStorage
-    else {
-      const storedName = localStorage.getItem("username");
-      if (storedName) setUsername(storedName);
-    }
-  }, [usuarioLoggeado]);
+  // Extraemos 'user' y 'logout' directamente del contexto
+  const { user, logout } = useAuth();
 
   return (
     <div className="flex items-center gap-4 pl-4 border-l border-white/20">
-      <div className="flex flex-col items-end">
-        <span className="text-[10px] uppercase tracking-widest text-white/50">
-          Usuario
-        </span>
-        <span className="text-sm font-bold text-white uppercase">
-          {username || "Cargando..."}
-        </span>
-      </div>
+      <Link
+        href="/perfil"
+        className="flex items-center gap-4 group cursor-pointer transition-all active:scale-95"
+      >
+        {/* Información del Usuario */}
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] uppercase tracking-widest text-white/50">
+            Perfil
+          </span>
+          <span className="text-sm font-bold text-white uppercase">
+            {user?.username || "Usuario"}
+          </span>
+        </div>
 
-      <FaUserCircle className="text-4xl text-white/80" />
+        {/* Icono de Perfil */}
+        <FaUserCircle className="text-4xl text-white/80 transition-transform hover:scale-110 cursor-pointer" />
+      </Link>
 
       {/* Botón de Logout */}
       <button
         onClick={logout}
         title="Cerrar Sesión"
-        className="flex items-center gap-2 bg-rojo hover:bg-rojo/80 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-lg shadow-rojo/20"
+        className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-lg shadow-red-900/20"
       >
-        <FaSignOutAlt />
-        <span className="hidden lg:block">Salir</span>
+        <FaSignOutAlt className="text-lg" />
+        <span className="hidden lg:block">SALIR</span>
       </button>
     </div>
   );
