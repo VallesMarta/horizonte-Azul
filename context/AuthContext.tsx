@@ -13,12 +13,14 @@ interface User {
   username: string;
   id: number;
   isAdmin: boolean;
+  fotoperfil?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (token: string, userData: User) => void;
   logout: () => void;
+  updateUser: (newData: Partial<User>) => void; // Permite actualizar datos en tiempo real
   loading: boolean;
 }
 
@@ -28,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 1. Efecto de carga inicial: Recupera la sesión sin disparar redirecciones
+  // 1. Efecto de carga inicial: Recupera la sesión sin redireccionar
   useEffect(() => {
     const recuperarSesion = () => {
       try {
@@ -66,6 +68,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   /**
+   * Actualizar Datos del Usuario
+   * Sincroniza cambios entre componentes sin recargar
+   */
+  const updateUser = (newData: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...newData };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  /**
    * Iniciar Sesión
    * Guarda en LocalStorage (Cliente) y Cookies (Middleware)
    */
@@ -90,11 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {/* Importante: No ocultamos los hijos mientras carga (loading) 
-        para que Next.js pueda renderizar el esqueleto de la página (SSR/SSG).
-        Los componentes individuales (como el Header) manejarán su estado de carga.
-      */}
+    <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>      
       {children}
     </AuthContext.Provider>
   );

@@ -5,6 +5,8 @@ import { ReactNode } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "Horizonte Azul",
@@ -15,14 +17,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
-        {/* El ThemeProvider envuelve Header, Main y Footer */}
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
-          <Header />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </ThemeProvider>
+        {/* AuthProvider envuelve todo para que Header y las páginas sepan quién ha iniciado sesión */}
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={true}
+          >
+            <Toaster position="top-right" richColors />
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
