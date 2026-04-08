@@ -3,10 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   typescript: {
-    // !! ADVERTENCIA !!
-    // Esto permite que el build termine aunque haya errores de tipos.
     ignoreBuildErrors: true,
   },
+  images: {
+    unoptimized: true,
+  },
+  // Añadimos esto para que Next 16 no se queje del motor
+  turbopack: {},
 };
 
 export default nextConfig;
