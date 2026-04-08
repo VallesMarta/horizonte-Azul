@@ -13,7 +13,7 @@
   --color-rojo: #d13264;
   --color-verde: #3ba054;
   --color-naranja: #ed6b53;
-  --color-gris: #9ca3af;
+  --color-gris: #565a61;
   --color-gris-clarito: #f9fafb;
   --color-gris-borde-suave: #f3f4f6;
   --color-nav-boton: #1f2937;
@@ -21,6 +21,14 @@
   --color-blanco-fijo: #ffffff;
   --color-titulo-resaltado: var(--color-secundario);
 
+  /* Colores Pasaporte Digital */
+
+  --color-pasaporte-borde: #565a61;
+  --color-pasaporte-papel: #faf8f0;
+  --color-pasaporte-tinta: #f4f5fa;
+  --color-pasaporte-sello-oro: #d4af37;
+  --color-pasaporte-sello-plata: #a8a9ad;
+  --color-pasaporte-sello-bronce: #cd7f32;
   /* Fuentes */
   --font-lato: "Lato", sans-serif;
 }
@@ -31,11 +39,17 @@
     --color-fondo: #1f2937;
     --color-texto: #f4f5fa;
 
+    --color-gris: #9ca3af;
     --color-gris-clarito: #374151;
     --color-gris-borde-suave: #4b5563;
     --color-nav-boton: #111827;
-    --color-titulo-resaltado: var(--color-blanco-fijo);
+    --color-primario-brillante: #4dd2ff;
     --color-titulo-resaltado: var(--color-blanco-fijo) !important;
+
+    --color-pasaporte-papel: #2d3748;
+    --color-pasaporte-tinta: #f4f5fa;
+    --color-pasaporte-borde: #4a5568;
+    --color-gris-borde-suave: #rgb(59, 107, 202)
   }
 }
 
