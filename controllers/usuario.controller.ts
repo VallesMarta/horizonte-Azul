@@ -74,11 +74,11 @@ export const UsuarioController = {
         isAdmin: actual.isAdmin,
         password: actual.password,
         telefono: body.telefono ?? actual.telefono,
+        fecNacimiento: body.fecNacimiento ?? actual.fecNacimiento,
         tipoDocumento: body.tipoDocumento ?? actual.tipoDocumento,
         numDocumento: body.numDocumento ?? actual.numDocumento,
         paisEmision: body.paisEmision ?? actual.paisEmision,
-        fecCaducidadDocumento:
-          body.fecCaducidadDocumento ?? actual.fecCaducidadDocumento,
+        fecCaducidadDocumento: body.fecCaducidadDocumento ?? actual.fecCaducidadDocumento,
         fotoPerfil: body.fotoPerfil ?? actual.fotoPerfil,
       };
 

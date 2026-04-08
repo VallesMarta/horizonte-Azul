@@ -4,7 +4,7 @@ export const UsuarioModel = {
   async getAll() {
     const sql = `
         SELECT 
-            id, username, nombre, apellidos, email, "isAdmin", "fotoPerfil",
+            id, username, nombre, apellidos, email, "isAdmin", "fotoPerfil", "fecNacimiento",
             (SELECT COUNT(*) FROM reservas WHERE usuario_id = usuarios.id) AS total_reservas
         FROM usuarios
     `;
@@ -13,17 +13,30 @@ export const UsuarioModel = {
 
   async create(data: any) {
     const sqlInsert = `
-      INSERT INTO usuarios (username, password, nombre, apellidos, email, "isAdmin") 
-      VALUES (?, ?, ?, ?, ?, FALSE)
+      INSERT INTO usuarios (
+        username, password, nombre, apellidos, email, "isAdmin", 
+        telefono, "fecNacimiento", "tipoDocumento", "numDocumento", "paisEmision"
+      ) 
+      VALUES (?, ?, ?, ?, ?, FALSE, ?, ?, ?, ?, ?)
       RETURNING id, username, email, "isAdmin"
     `;
-    // Manejo de nulos para evitar errores en el registro básico
+
+    const nacimientoLimpio =
+      data.fecNacimiento && data.fecNacimiento !== ""
+        ? data.fecNacimiento
+        : null;
+
     const rows = await query(sqlInsert, [
       data.username,
       data.password,
-      data.nombre || data.username, // Fallback al username si no hay nombre
-      data.apellidos || "", // Opcional
+      data.nombre || data.username,
+      data.apellidos || "",
       data.email,
+      data.telefono || null,
+      nacimientoLimpio,
+      data.tipoDocumento || "DNI",
+      data.numDocumento || null,
+      data.paisEmision || null,
     ]);
     return rows[0];
   },
@@ -31,11 +44,20 @@ export const UsuarioModel = {
   async getById(id: string | number) {
     const sql = `
       SELECT 
-        id, username, nombre, apellidos, email, "isAdmin", password, 
-        telefono, "tipoDocumento", "numDocumento", "paisEmision", 
-        "fecCaducidadDocumento", "fotoPerfil",
-        (SELECT COUNT(*) FROM reservas WHERE usuario_id = usuarios.id) AS total_reservas,
-        created_at 
+        id, 
+        username, 
+        nombre, 
+        apellidos,
+        email, 
+        "isAdmin",
+        password,
+        telefono,
+        "fecNacimiento" AS "fecNacimiento",
+        "tipoDocumento" AS "tipoDocumento",
+        "numDocumento" AS "numDocumento",
+        "paisEmision" AS "paisEmision",
+        "fecCaducidadDocumento" AS "fecCaducidadDocumento",
+        "fotoPerfil" AS "fotoPerfil"
       FROM usuarios 
       WHERE id = ?
     `;
@@ -48,15 +70,19 @@ export const UsuarioModel = {
       UPDATE usuarios 
       SET 
         username = ?, nombre = ?, apellidos = ?, email = ?, "isAdmin" = ?, password = ?,
-        telefono = ?, "tipoDocumento" = ?, "numDocumento" = ?, "paisEmision" = ?, 
+        telefono = ?, "fecNacimiento" = ?, "tipoDocumento" = ?, "numDocumento" = ?, "paisEmision" = ?, 
         "fecCaducidadDocumento" = ?, "fotoPerfil" = ?
       WHERE id = ?
     `;
 
-    // Limpieza de fecha para evitar errores de PostgreSQL (Date vs String vacío)
     const fechaLimpia =
       data.fecCaducidadDocumento && data.fecCaducidadDocumento !== ""
         ? data.fecCaducidadDocumento
+        : null;
+
+    const nacimientoLimpio =
+      data.fecNacimiento && data.fecNacimiento !== ""
+        ? data.fecNacimiento
         : null;
 
     return await query(sql, [
@@ -67,6 +93,7 @@ export const UsuarioModel = {
       data.isAdmin === true,
       data.password,
       data.telefono,
+      nacimientoLimpio,
       data.tipoDocumento,
       data.numDocumento,
       data.paisEmision,
