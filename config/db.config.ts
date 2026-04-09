@@ -1,4 +1,13 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, neonConfig } from "@neondatabase/serverless";
+import { types } from 'pg';
+
+// 1. CONFIGURACIÓN DE TIPOS (Type Parser)
+// El ID 1700 corresponde al tipo NUMERIC/DECIMAL en PostgreSQL.
+// Esto hace que "150.00" (string en DB) llegue como 150.0 (number en JS).
+types.setTypeParser(1700, (val) => (val === null ? null : parseFloat(val)));
+
+// Opcional: Recomendado para despliegues en Vercel Edge
+neonConfig.fetchConnectionCache = true;
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -7,6 +16,8 @@ export const query = async <T = any>(
   params: any[] = []
 ): Promise<T[]> => {
   try {
+    // Nota: El driver serverless de Neon a veces devuelve directamente las filas
+    // o un objeto de resultado dependiendo de cómo se invoque.
     const result = await sql.query(queryText, params);
 
     /**

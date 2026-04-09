@@ -24,6 +24,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_control_enum') THEN
         CREATE TYPE tipo_control_enum AS ENUM ('numero', 'texto', 'booleano');
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_documento_enum') THEN
+        CREATE TYPE tipo_documento_enum AS ENUM ('DNI', 'NIE', 'NIF', 'Pasaporte');
+    END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'estado_reserva_enum') THEN
         CREATE TYPE estado_reserva_enum AS ENUM ('pendiente', 'confirmada', 'realizada', 'cancelada');
     END IF;
@@ -48,7 +51,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     "isAdmin" BOOLEAN DEFAULT FALSE,
     telefono VARCHAR(20),
     "fecNacimiento" DATE,
-    "tipoDocumento" VARCHAR(20) DEFAULT 'DNI',
+    "tipoDocumento" tipo_documento_enum DEFAULT 'DNI',
     "numDocumento" VARCHAR(25) UNIQUE,
     "paisEmision" VARCHAR(100),
     "fecCaducidadDocumento" DATE,
@@ -187,7 +190,7 @@ CREATE TABLE IF NOT EXISTS pasajeros (
     reserva_id INT NOT NULL REFERENCES reservas(id) ON DELETE CASCADE,
     nombre VARCHAR(100) NOT NULL,
     apellidos VARCHAR(100) NOT NULL,
-    "tipoDocumento" VARCHAR(20) DEFAULT 'DNI',
+    "tipoDocumento" tipo_documento_enum DEFAULT 'DNI',
     "numDocumento" VARCHAR(25),
     "esAdulto" BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
