@@ -1,65 +1,33 @@
-import { Pool, QueryResult } from "pg";
+import { neon } from "@neondatabase/serverless";
 
-const globalForDb = global as unknown as { pgPool: Pool };
-
-export const connectDB = async (): Promise<Pool> => {
-  if (!globalForDb.pgPool) {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString)
-      throw new Error("❌ DATABASE_URL no encontrada en .env");
-
-    globalForDb.pgPool = new Pool({
-      connectionString,
-      ssl: false,
-      max: 10,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
-
-    // Test de conexión rápido
-    globalForDb.pgPool.query("SELECT NOW()", (err) => {
-      if (err) {
-        console.error("❌ ERROR DE CONEXIÓN A POSTGRES:", err.message);
-      } else {
-        console.log("✅ CONEXIÓN EXITOSA AL SERVICIO 'postgres'");
-      }
-    });
-  }
-  return globalForDb.pgPool;
-};
+const sql = neon(process.env.DATABASE_URL!);
 
 export const query = async <T = any>(
-  sql: string,
-  params: any[] = [],
-): Promise<any> => {
-  const pool = await connectDB();
-
-  // Convertimos los "?" (MySQL) a "$1, $2..." (Postgres)
-  let pgSql = sql;
-  let count = 1;
-  while (pgSql.includes("?")) {
-    pgSql = pgSql.replace("?", `$${count}`);
-    count++;
-  }
-
+  queryText: string,
+  params: any[] = []
+): Promise<T[]> => {
   try {
-    const res: QueryResult = await pool.query(pgSql, params);
+    const result = await sql.query(queryText, params);
 
-    // Normalizamos para que los controladores (que esperan formato MySQL) funcionen:
-    const rows: any = res.rows;
-
-    // 1. Añadimos affectedRows para DELETE/UPDATE
-    rows.affectedRows = res.rowCount || 0;
-
-    // 2. Añadimos insertId si la query devuelve un ID (por el RETURNING id)
-    if (res.rows.length > 0 && res.rows[0].id) {
-      rows.insertId = res.rows[0].id;
+    /**
+     * BLINDAJE ANTI-ERROR:
+     * Si 'result' tiene una propiedad 'rows', devolvemos esa.
+     * Si 'result' ya es un array, lo devolvemos tal cual.
+     * Si no hay nada, devolvemos un array vacío.
+     */
+    if (result && (result as any).rows) {
+      return (result as any).rows as T[];
     }
 
-    return rows;
-  } catch (err: any) {
-    console.error("❌ Error en la Query SQL:", err.message);
-    console.error("SQL con error:", pgSql);
-    throw err;
+    if (Array.isArray(result)) {
+      return result as T[];
+    }
+
+    return [] as T[];
+    
+  } catch (error: any) {
+    console.error("❌ ERROR DB:", error.message);
+    console.error("SQL:", queryText);
+    throw error;
   }
 };

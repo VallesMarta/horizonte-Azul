@@ -8,7 +8,6 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================
 -- FUNCIÓN GENÉRICA PARA UPDATED_AT
 -- ============================
--- Esta función la usaremos en todas las tablas para no repetir código
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -20,7 +19,8 @@ $$ language 'plpgsql';
 -- ============================
 -- TIPOS ENUM
 -- ============================
-DO $$ BEGIN
+DO $$ 
+BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_control_enum') THEN
         CREATE TYPE tipo_control_enum AS ENUM ('numero', 'texto', 'booleano');
     END IF;
@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+DROP TRIGGER IF EXISTS tr_usuarios_updated_at ON usuarios;
 CREATE TRIGGER tr_usuarios_updated_at 
 BEFORE UPDATE ON usuarios 
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -78,6 +80,7 @@ CREATE TABLE IF NOT EXISTS viajes (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TRIGGER IF EXISTS tr_viajes_updated_at ON viajes;
 CREATE TRIGGER tr_viajes_updated_at 
 BEFORE UPDATE ON viajes 
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -96,11 +99,12 @@ CREATE TABLE IF NOT EXISTS vuelos (
     "plazasDisponibles" INT DEFAULT 150,
     precio_ajustado DECIMAL(10,2),
     tipo VARCHAR(10) DEFAULT 'ida',
-    estado VARCHAR(20) DEFAULT 'programado', -- programado, abordando, volando, cancelado
+    estado VARCHAR(20) DEFAULT 'programado',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TRIGGER IF EXISTS tr_vuelos_updated_at ON vuelos;
 CREATE TRIGGER tr_vuelos_updated_at 
 BEFORE UPDATE ON vuelos 
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -127,12 +131,12 @@ CREATE TABLE IF NOT EXISTS viaje_servicio (
 );
 
 -- ============================
--- TABLA: RESERVAS (Apunta a VUELO)
+-- TABLA: RESERVAS
 -- ============================
 CREATE TABLE IF NOT EXISTS reservas (
     id SERIAL PRIMARY KEY,
     usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-    vuelo_id INT NOT NULL REFERENCES vuelos(id) ON DELETE CASCADE, -- Cambiado de viaje_id a vuelo_id
+    vuelo_id INT NOT NULL REFERENCES vuelos(id) ON DELETE CASCADE,
     "fecCompra" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     pasajeros INT DEFAULT 1 CHECK (pasajeros >= 1),
     "precioTotal" DECIMAL(10,2),
@@ -175,6 +179,9 @@ CREATE TABLE IF NOT EXISTS pagos (
     fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ============================
+-- TABLA: PASAJEROS
+-- ============================
 CREATE TABLE IF NOT EXISTS pasajeros (
     id SERIAL PRIMARY KEY,
     reserva_id INT NOT NULL REFERENCES reservas(id) ON DELETE CASCADE,
@@ -182,11 +189,12 @@ CREATE TABLE IF NOT EXISTS pasajeros (
     apellidos VARCHAR(100) NOT NULL,
     "tipoDocumento" VARCHAR(20) DEFAULT 'DNI',
     "numDocumento" VARCHAR(25),
-    "esAdulto" BOOLEAN DEFAULT TRUE, -- Para diferenciar tarifas o permisos
+    "esAdulto" BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TRIGGER IF EXISTS tr_pasajeros_updated_at ON pasajeros;
 CREATE TRIGGER tr_pasajeros_updated_at 
 BEFORE UPDATE ON pasajeros 
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -210,8 +218,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_limpieza_tokens ON tokens_activos;
 CREATE TRIGGER trigger_limpieza_tokens
 AFTER INSERT ON tokens_activos
+FOR EACH STATEMENT
 EXECUTE FUNCTION limpiar_tokens_caducados();
 
 -- ============================
@@ -235,7 +245,7 @@ INSERT INTO servicios (id, nombre, tipo_control) VALUES
     (15, 'Alquiler de coche (Días)', 'numero'), (16, 'Parking en aeropuerto (Días)', 'numero'), 
     (17, 'Mascota en cabina', 'numero'), (18, 'Mascota en bodega', 'numero'),    
     (19, 'Wi-Fi alta velocidad', 'booleano'), (20, 'Puerto USB/Enchufe', 'booleano')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre;
 
 -- VIAJES
 INSERT INTO viajes (id, "paisOrigen", "aeropuertoOrigen", "iataOrigen", "paisDestino", "aeropuertoDestino", "iataDestino", precio_base, img, descripcion) VALUES
@@ -250,25 +260,23 @@ INSERT INTO viajes (id, "paisOrigen", "aeropuertoOrigen", "iataOrigen", "paisDes
 (9, 'España', 'Madrid', 'MAD', 'Japón', 'Tokio', 'NRT', 1100.00, 'https://estaticos-cdn.prensaiberica.es/clip/ec9e7d0a-b746-4ffb-b91e-140a4f1ed122_original-libre-aspect-ratio_default_0.jpg', 'Explora la tierra del sol naciente de Shinjuku a Kioto.')
 ON CONFLICT (id) DO NOTHING;
 
--- VUELOS (Múltiples fechas para cada viaje)
--- VUELOS (Idas y Vueltas programadas)
+-- Sincronizar el contador de la secuencia de ID de viajes (Importante después de insertar IDs manuales)
+SELECT setval('viajes_id_seq', (SELECT MAX(id) FROM viajes));
+
+-- VUELOS
 INSERT INTO vuelos (viaje_id, "fecSalida", "horaSalida", "fecLlegada", "horaLlegada", "plazasDisponibles", precio_ajustado, tipo) VALUES
--- VIAJE 1: GALWAY
 (1, '2026-05-10', '08:00:00', '2026-05-10', '10:45:00', 150, 160.89, 'ida'),
 (1, '2026-05-12', '08:00:00', '2026-05-12', '10:45:00', 150, 160.89, 'ida'),
 (1, '2026-05-15', '14:00:00', '2026-05-15', '16:45:00', 150, 140.00, 'vuelta'),
 (1, '2026-05-17', '14:00:00', '2026-05-17', '16:45:00', 150, 140.00, 'vuelta'),
-
--- VIAJE 2: ROMA
 (2, '2026-05-12', '10:00:00', '2026-05-12', '12:30:00', 180, 120.00, 'ida'),
 (2, '2026-05-14', '10:00:00', '2026-05-14', '12:30:00', 180, 120.00, 'ida'),
 (2, '2026-05-18', '20:00:00', '2026-05-18', '22:30:00', 180, 115.00, 'vuelta'),
 (2, '2026-05-20', '20:00:00', '2026-05-20', '22:30:00', 180, 115.00, 'vuelta')
 ON CONFLICT DO NOTHING;
 
--- 13.4 RELACIÓN VIAJE-SERVICIO
+-- RELACIÓN VIAJE-SERVICIO
 INSERT INTO viaje_servicio (viaje_id, servicio_id, valor, precio_extra) VALUES
--- Servicios para todos los viajes (Maletas y Wi-Fi)
 (1, 1, '1', 40.00), (1, 19, 'true', 10.00), (1, 11, 'true', 15.00),
 (2, 1, '1', 35.00), (2, 8, 'Menú Gourmet', 20.00), (2, 5, 'Ventanilla', 12.00),
 (3, 1, '1', 30.00), (3, 6, 'true', 25.00), (3, 14, 'true', 45.00),
@@ -276,6 +284,6 @@ INSERT INTO viaje_servicio (viaje_id, servicio_id, valor, precio_extra) VALUES
 (5, 1, '1', 25.00), (5, 9, 'true', 15.00), (5, 20, 'true', 0.00),
 (6, 1, '2', 80.00), (6, 5, 'Asiento XL', 60.00), (6, 12, 'true', 20.00),
 (7, 1, '2', 90.00), (7, 18, '1', 120.00), (7, 7, 'true', 15.00),
-(8, 1, '2', 0.00),  (8, 6, 'true', 0.00),  (8, 8, 'Pensión Completa', 0.00), -- Egipto suele ser pack cerrado
+(8, 1, '2', 0.00),  (8, 6, 'true', 0.00),  (8, 8, 'Pensión Completa', 0.00),
 (9, 1, '2', 100.00), (9, 5, 'Cama Business', 250.00), (9, 17, '1', 150.00), (9, 19, 'true', 0.00)
 ON CONFLICT (viaje_id, servicio_id) DO NOTHING;

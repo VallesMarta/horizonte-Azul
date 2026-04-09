@@ -15,7 +15,7 @@ export const UsuarioController = {
       return NextResponse.json({ ok: true, resultado: usuarios });
     } catch (err) {
       return NextResponse.json(
-        { ok: false, error: "Error al listar" },
+        { ok: false, error: "Error al listar usuarios" },
         { status: 500 },
       );
     }
@@ -44,11 +44,12 @@ export const UsuarioController = {
           { status: 404 },
         );
 
+      // Eliminamos el password antes de enviar la respuesta al cliente
       const { password, ...datosPublicos } = user;
       return NextResponse.json({ ok: true, resultado: datosPublicos });
     } catch (err) {
       return NextResponse.json(
-        { ok: false, error: "Error de servidor" },
+        { ok: false, error: "Error de servidor al obtener datos" },
         { status: 500 },
       );
     }
@@ -56,6 +57,14 @@ export const UsuarioController = {
 
   async actualizar(req: Request, id: string) {
     try {
+      const sesion = await obtenerSesion(req);
+      if (!sesion)
+        return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
+
+      const esElPropietario = String(sesion.id) === String(id);
+      if (!sesion.isAdmin && !esElPropietario)
+        return NextResponse.json({ ok: false, error: "No tienes permiso para actualizar este usuario" }, { status: 403 });
+
       const body = await req.json();
       const actual = await UsuarioModel.getById(id);
 
@@ -65,13 +74,13 @@ export const UsuarioController = {
           { status: 404 },
         );
 
-      // Lógica de fusión de datos
+      // Lógica de fusión de datos respetando el modelo de Postgres
       const dataUpdate = {
         username: body.username ?? actual.username,
         nombre: body.nombre ?? actual.nombre,
         apellidos: body.apellidos ?? actual.apellidos,
         email: body.email ?? actual.email,
-        isAdmin: actual.isAdmin,
+        isAdmin: actual.isAdmin, // Protegemos el campo isAdmin para que no se autopromuevan
         password: actual.password,
         telefono: body.telefono ?? actual.telefono,
         fecNacimiento: body.fecNacimiento ?? actual.fecNacimiento,
@@ -83,14 +92,15 @@ export const UsuarioController = {
       };
 
       await UsuarioModel.update(id, dataUpdate);
+      
       return NextResponse.json({
         ok: true,
-        mensaje: "Pasaporte actualizado correctamente",
+        mensaje: "Datos actualizados correctamente",
       });
     } catch (err) {
-      console.error("Error en Update:", err);
+      console.error("Error en Update Controller:", err);
       return NextResponse.json(
-        { ok: false, error: "Error al actualizar datos" },
+        { ok: false, error: "Error al procesar la actualización" },
         { status: 400 },
       );
     }
@@ -106,7 +116,7 @@ export const UsuarioController = {
     }
     try {
       await UsuarioModel.delete(id);
-      return NextResponse.json({ ok: true, mensaje: "Usuario eliminado" });
+      return NextResponse.json({ ok: true, mensaje: "Usuario eliminado correctamente" });
     } catch (err) {
       return NextResponse.json(
         { ok: false, error: "Error al eliminar" },

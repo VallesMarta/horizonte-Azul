@@ -36,6 +36,7 @@ export const AuthController = {
         mensaje: "Usuario creado con éxito.",
       });
     } catch (error: any) {
+      // Código de error 23505 es 'Unique Violation' en Postgres
       if (error.code === "23505") {
         return NextResponse.json(
           { ok: false, error: "Usuario o email ya existe" },
@@ -79,9 +80,11 @@ export const AuthController = {
           id: user.id,
           username: user.username,
           isAdmin: user.isAdmin,
+          fotoperfil: user.fotoPerfil,
         },
       });
     } catch (error: any) {
+      console.error("Login error:", error);
       return NextResponse.json(
         { ok: false, error: "Error en login" },
         { status: 500 },
@@ -125,6 +128,7 @@ export const AuthController = {
       return NextResponse.json({ activa: false }, { status: 500 });
     }
   },
+
   async cambiarPassword(req: Request) {
     try {
       const sesion = await obtenerSesion(req);
@@ -137,30 +141,32 @@ export const AuthController = {
 
       const { passwordActual, nuevaPassword } = await req.json();
       const user = await UsuarioModel.getById(sesion.id);
+      
       if (!user) {
         return NextResponse.json(
           { ok: false, error: "Usuario no encontrado" },
           { status: 404 },
         );
       }
+      
       const passwordCorrecta = await bcrypt.compare(
         passwordActual,
         user.password,
       );
+      
       if (!passwordCorrecta) {
         return NextResponse.json(
           { ok: false, error: "La contraseña actual es incorrecta" },
           { status: 400 },
         );
       }
+      
       const hashedNuevaPassword = await bcrypt.hash(nuevaPassword, 10);
 
-      const dataUpdate = {
+      await UsuarioModel.update(sesion.id, {
         ...user,
         password: hashedNuevaPassword,
-      };
-
-      await UsuarioModel.update(sesion.id, dataUpdate);
+      });
 
       return NextResponse.json({
         ok: true,

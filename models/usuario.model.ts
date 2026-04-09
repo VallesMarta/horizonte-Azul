@@ -17,7 +17,7 @@ export const UsuarioModel = {
         username, password, nombre, apellidos, email, "isAdmin", 
         telefono, "fecNacimiento", "tipoDocumento", "numDocumento", "paisEmision"
       ) 
-      VALUES (?, ?, ?, ?, ?, FALSE, ?, ?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4, $5, FALSE, $6, $7, $8, $9, $10)
       RETURNING id, username, email, "isAdmin"
     `;
 
@@ -52,14 +52,14 @@ export const UsuarioModel = {
         "isAdmin",
         password,
         telefono,
-        "fecNacimiento" AS "fecNacimiento",
-        "tipoDocumento" AS "tipoDocumento",
-        "numDocumento" AS "numDocumento",
-        "paisEmision" AS "paisEmision",
-        "fecCaducidadDocumento" AS "fecCaducidadDocumento",
-        "fotoPerfil" AS "fotoPerfil"
+        "fecNacimiento",
+        "tipoDocumento",
+        "numDocumento",
+        "paisEmision",
+        "fecCaducidadDocumento",
+        "fotoPerfil"
       FROM usuarios 
-      WHERE id = ?
+      WHERE id = $1
     `;
     const rows = await query(sql, [id]);
     return rows[0];
@@ -69,10 +69,10 @@ export const UsuarioModel = {
     const sql = `
       UPDATE usuarios 
       SET 
-        username = ?, nombre = ?, apellidos = ?, email = ?, "isAdmin" = ?, password = ?,
-        telefono = ?, "fecNacimiento" = ?, "tipoDocumento" = ?, "numDocumento" = ?, "paisEmision" = ?, 
-        "fecCaducidadDocumento" = ?, "fotoPerfil" = ?
-      WHERE id = ?
+        username = $1, nombre = $2, apellidos = $3, email = $4, "isAdmin" = $5, password = $6,
+        telefono = $7, "fecNacimiento" = $8, "tipoDocumento" = $9, "numDocumento" = $10, "paisEmision" = $11, 
+        "fecCaducidadDocumento" = $12, "fotoPerfil" = $13
+      WHERE id = $14
     `;
 
     const fechaLimpia =
@@ -104,12 +104,12 @@ export const UsuarioModel = {
   },
 
   async delete(id: string | number) {
-    const sql = "DELETE FROM usuarios WHERE id = ?";
+    const sql = "DELETE FROM usuarios WHERE id = $1";
     return await query(sql, [id]);
   },
 
   async getByUsername(username: string) {
-    const sql = "SELECT * FROM usuarios WHERE username = ?";
+    const sql = 'SELECT * FROM usuarios WHERE username = $1';
     const rows = await query(sql, [username]);
     return rows[0];
   },

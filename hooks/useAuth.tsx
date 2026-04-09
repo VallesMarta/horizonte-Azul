@@ -21,13 +21,13 @@ export default function useAuth() {
           const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
           const payload = JSON.parse(window.atob(base64));
 
-          // Extraemos todo del token directamente
+          // Extraemos los datos del payload del JWT
           setUsuarioLoggeado({
             id: Number(payload.id),
             username: payload.username,
           });
 
-          setIsAdmin(payload.isAdmin === true || payload.role === "admin");
+          setIsAdmin(payload.isAdmin === true);
         } catch (error) {
           console.error("Token inválido o corrupto:", error);
           setUsuarioLoggeado(null);
@@ -47,28 +47,34 @@ export default function useAuth() {
   }, [cargarDatos]);
 
   const logout = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    // 1. Avisamos al servidor
-    if (token) {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
+      // 1. Intentamos avisar al servidor para invalidar el token en 'tokens_activos'
+      if (token) {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error al cerrar sesión en el servidor:", error);
+    } finally {
+      // 2. Limpieza total de persistencia en el cliente
+      localStorage.clear();
+      
+      // Borramos también la cookie de sesión para el middleware
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
+      setUsuarioLoggeado(null);
+      setIsAdmin(false);
+
+      // Redirigimos a la PÁGINA de login, no al endpoint de la API
+      window.location.href = "/login";
     }
-  } catch (error) {
-    console.error("Error al cerrar sesión en el servidor:", error);
-  } finally {
-    // 2. Pase lo que pase, limpiamos el navegador y redirigimos
-    localStorage.clear();
-    setUsuarioLoggeado(null);
-    setIsAdmin(false);
-    window.location.href = "/api/auth/login";
-  }
-};
+  };
 
   return { usuarioLoggeado, isAdmin, logout, cargarDatos };
 }

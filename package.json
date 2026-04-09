@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "autoprefixer": "^10.4.23",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
