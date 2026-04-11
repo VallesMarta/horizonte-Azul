@@ -250,6 +250,8 @@ INSERT INTO servicios (id, nombre, tipo_control) VALUES
     (19, 'Wi-Fi alta velocidad', 'booleano'), (20, 'Puerto USB/Enchufe', 'booleano')
 ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre;
 
+SELECT setval('servicios_id_seq', (SELECT MAX(id) FROM servicios));
+
 -- VIAJES
 INSERT INTO viajes (id, "paisOrigen", "aeropuertoOrigen", "iataOrigen", "paisDestino", "aeropuertoDestino", "iataDestino", precio_base, img, descripcion) VALUES
 (1, 'España','Valencia','VLC','Irlanda','Galway','GWY',160.89,'https://images.ireland.com/thumbs/Images/galway/6fc964e86ea345409536504e19add100/standardlarge-desktop.jpg','Conecta con Galway y disfruta de sus calles coloridas.'),
@@ -278,6 +280,8 @@ INSERT INTO vuelos (viaje_id, "fecSalida", "horaSalida", "fecLlegada", "horaLleg
 (2, '2026-05-20', '20:00:00', '2026-05-20', '22:30:00', 180, 115.00, 'vuelta')
 ON CONFLICT DO NOTHING;
 
+SELECT setval('vuelos_id_seq', (SELECT MAX(id) FROM vuelos));
+
 -- RELACIÓN VIAJE-SERVICIO
 INSERT INTO viaje_servicio (viaje_id, servicio_id, valor, precio_extra) VALUES
 (1, 1, '1', 40.00), (1, 19, 'true', 10.00), (1, 11, 'true', 15.00),
@@ -290,3 +294,5 @@ INSERT INTO viaje_servicio (viaje_id, servicio_id, valor, precio_extra) VALUES
 (8, 1, '2', 0.00),  (8, 6, 'true', 0.00),  (8, 8, 'Pensión Completa', 0.00),
 (9, 1, '2', 100.00), (9, 5, 'Cama Business', 250.00), (9, 17, '1', 150.00), (9, 19, 'true', 0.00)
 ON CONFLICT (viaje_id, servicio_id) DO NOTHING;
+
+SELECT setval('viaje_servicio_id_seq', (SELECT MAX(id) FROM viaje_servicio));
