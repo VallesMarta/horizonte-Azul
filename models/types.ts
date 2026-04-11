@@ -144,5 +144,10 @@ export interface ViajeCompleto extends Viaje {
   fecLlegada: string;
   horaLlegada: string;
   plazasDisponibles: number;
-  precio_final: number; // precio_ajustado o precio_base
+  precio_final: number;
+}
+
+export interface ViajeGrid extends Viaje {
+  precio_oferta: number; 
+  tiene_vuelos: boolean;
 }
