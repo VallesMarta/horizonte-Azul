@@ -10,9 +10,12 @@
   --color-iconos: #fde047;
   --color-acento: #1f2937;
   --color-otro: #4dd2ff;
+
+  --color-azul: #2b7fff;
   --color-rojo: #d13264;
   --color-verde: #3ba054;
   --color-naranja: #ed6b53;
+
   --color-gris: #565a61;
   --color-gris-clarito: #f9fafb;
   --color-gris-borde-suave: #f3f4f6;
@@ -29,6 +32,17 @@
   --color-pasaporte-sello-oro: #d4af37;
   --color-pasaporte-sello-plata: #a8a9ad;
   --color-pasaporte-sello-bronce: #cd7f32;
+
+  /* Estilos de Input (Modo Claro) */
+  --color-bg: var(--color-gris-clarito);
+  --color-borde: var(--color-gris-borde-suave);
+  --color-texto: var(--color-texto);
+  --color-placeholder: #9ca3af;
+
+  /* Títulos y Headers */
+  --color-header-principal: var(--color-secundario);
+  --color-header-sub: var(--color-gris);
+
   /* Fuentes */
   --font-lato: "Lato", sans-serif;
 }
@@ -36,7 +50,6 @@
 @layer base {
   /* Si el HTML tiene la clase dark, aplica estos colores */
   html.dark {
-    --color-fondo: #1f2937;
     --color-texto: #f4f5fa;
 
     --color-gris: #9ca3af;
@@ -49,13 +62,20 @@
     --color-pasaporte-papel: #2d3748;
     --color-pasaporte-tinta: #f4f5fa;
     --color-pasaporte-borde: #4a5568;
-    --color-gris-borde-suave: #rgb(59, 107, 202)
-  }
-}
+    --color-gris-borde-suave: #rgb(59, 107, 202);
 
-body {
-  background-color: var(--color-fondo);
-  color: var(--color-texto);
+    /* Estilos de Input (Modo Oscuro) */
+    --color-fondo: #1f2937;
+    --color-bg: #222730;
+    --color-input-bg: #212a38;
+    --color-borde: #374151;
+    --color-texto: #f9fafb;
+    --color-placeholder: #6b7280;
+
+    /* Títulos y Headers */
+    --color-header-principal: var(--color-blanco-fijo);
+    --color-header-sub: #d1d5db;
+  }
 }
 
 @font-face {
@@ -83,6 +103,9 @@ body {
 }
 
 body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+
   /* Aplicamos Lato como fuente global */
   font-family: "Lato", sans-serif;
   background-color: var(--color-fondo);
