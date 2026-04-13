@@ -3,8 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { FaSpinner } from "react-icons/fa";
+
+import Sidebar from "@/components/ui/Sidebar/index";
+import {
+  FaChartPie,
+  FaGlobeAmericas,
+  FaConciergeBell,
+  FaPlane,
+  FaUsers,
+  FaCog,
+} from "react-icons/fa";
+import { MdViewCarousel } from "react-icons/md";
 
 export default function DashboardLayout({
   children,
@@ -18,15 +28,15 @@ export default function DashboardLayout({
   useEffect(() => {
     // Esperamos a que useAuth determine si hay sesión o no
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
       router.replace("/login");
       return;
     }
 
     if (usuarioLoggeado !== null) {
-// Comprobamos si el usuario logeado es administrador
-     if (!isAdmin) {
+      // Comprobamos si el usuario logeado es administrador
+      if (!isAdmin) {
         router.replace("/");
       } else {
         // Si es admin, dejamos de mostrar el spinner
@@ -45,15 +55,32 @@ export default function DashboardLayout({
       </div>
     );
   }
+  const adminMenu = [
+    { name: "Dashboard", icon: <FaChartPie />, path: "/dashboard" },
+    {
+      name: "Gestionar Viajes",
+      icon: <FaGlobeAmericas />,
+      path: "/dashboard/viajes",
+    },
+    {
+      name: "Servicios",
+      icon: <FaConciergeBell />,
+      path: "/dashboard/servicios",
+    },
+    { name: "Vuelos", icon: <FaPlane />, path: "/dashboard/vuelos" },
+    { name: "Usuarios", icon: <FaUsers />, path: "/dashboard/usuarios" },
+    { name: "Banners", icon: <MdViewCarousel />, path: "/dashboard/banners" },
+    { name: "Ajustes", icon: <FaCog />, path: "/dashboard/ajustes" },
+  ];
 
   return (
-    <div className="flex min-h-screen bg-fondo">
-      <AdminSidebar />
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
+    <div className="flex flex-col">
+      <div className="flex flex-1">
+        <Sidebar menuItems={adminMenu} tipo="admin" />
+        <main className="flex-1 bg-fondo p-4 m-6">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
