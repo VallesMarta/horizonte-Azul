@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 // Definimos qué rutas queremos proteger
 const rutasProtegidas = ["/dashboard", "/mis-reservas", "/favoritos", "/perfil"];
-const rutasSoloInvitados = ["/login", "/registro"];
+const rutasSoloInvitados = ["/login", "/registro", "/sobre-nosotros"];
 
 export function middleware(request: NextRequest) {
   // Buscamos el token en las cookies (que ahora guardamos con js-cookie)
