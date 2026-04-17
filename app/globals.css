@@ -2,82 +2,91 @@
 @import "../assets/styles/swagger-dark.css";
 
 @theme {
-  /* Colores */
-  --color-primario: #5271ff;
-  --color-secundario: #3147cc;
-  --color-texto: #1f2937;
-  --color-fondo: #f4f5fa;
-  --color-iconos: #fde047;
-  --color-acento: #1f2937;
-  --color-otro: #4dd2ff;
+  /* Colores principales */
+  --color-primario:          #5271ff;
+  --color-secundario:        #3147cc;
+  --color-texto:             #1f2937;
+  --color-fondo:             #f4f5fa;
+  --color-iconos:            #fde047;
+  --color-acento:            #1f2937;
+  --color-otro:              #4dd2ff;
+  --color-azul:              #2b7fff;
+  --color-rojo:              #d13264;
+  --color-verde:             #3ba054;
+  --color-naranja:           #ed6b53;
+  --color-gris:              #565a61;
+  --color-gris-clarito:      #676f7d;
+  --color-gris-borde-suave:  #f3f4f6;
+  --color-nav-boton:         #1f2937;
+  --color-negro-fijo:        #1f2937;
+  --color-blanco-fijo:       #ffffff;
+  --color-titulo-resaltado:  #3147cc;
 
-  --color-azul: #2b7fff;
-  --color-rojo: #d13264;
-  --color-verde: #3ba054;
-  --color-naranja: #ed6b53;
+  /* Escala de grises formales — tono frío azulado */
+  --color-bg:                #f8fbfd;  /* blanco frío, fondos de input */
+  --color-bg-suave:          #f0f4f8;  /* un paso más oscuro */
+  --color-borde-suave:       #dde3ec;  /* borde muy sutil */
+  --color-borde:             #b8c4d4;  /* borde estándar */
+  --color-borde-fuerte:      #8a9ab0;  /* borde con presencia */
+  --color-placeholder:       #7082a0;  /* texto placeholder */
+  --color-gris-claro:        #6b7a92;  /* texto secundario suave */
+  --color-gris:              #5e6a78;  /* texto secundario */
+  --color-gris-medio:        #4a5568;  /* texto con peso */
+  --color-card:              #ffffff;  /* fondo card modo claro */
+  --color-card-borde:        #dde3ec;  /* borde card modo claro */
 
-  --color-gris: #565a61;
-  --color-gris-clarito: #f9fafb;
-  --color-gris-borde-suave: #f3f4f6;
-  --color-nav-boton: #1f2937;
-  --color-negro-fijo: #1f2937;
-  --color-blanco-fijo: #ffffff;
-  --color-titulo-resaltado: var(--color-secundario);
-
-  /* Colores Pasaporte Digital */
-
-  --color-pasaporte-borde: #565a61;
-  --color-pasaporte-papel: #faf8f0;
-  --color-pasaporte-tinta: #f4f5fa;
-  --color-pasaporte-sello-oro: #d4af37;
-  --color-pasaporte-sello-plata: #a8a9ad;
+  /* Pasaporte */
+  --color-pasaporte-borde:        #565a61;
+  --color-pasaporte-papel:        #faf8f0;
+  --color-pasaporte-tinta:        #f4f5fa;
+  --color-pasaporte-sello-oro:    #d4af37;
+  --color-pasaporte-sello-plata:  #a8a9ad;
   --color-pasaporte-sello-bronce: #cd7f32;
 
-  /* Estilos de Input (Modo Claro) */
-  --color-bg: var(--color-gris-clarito);
-  --color-borde: var(--color-gris-borde-suave);
-  --color-texto: var(--color-texto);
-  --color-placeholder: #9ca3af;
-
-  /* Títulos y Headers */
-  --color-header-principal: var(--color-secundario);
-  --color-header-sub: var(--color-gris);
+  /* Headers */
+  --color-header-principal:  #3147cc;
+  --color-header-sub:        #565a61;
 
   /* Fuentes */
   --font-lato: "Lato", sans-serif;
 }
+
 /* --- MODO OSCURO --- */
 @layer base {
-  /* Si el HTML tiene la clase dark, aplica estos colores */
   html.dark {
-    --color-texto: #f4f5fa;
+    --color-texto:             #f4f5fa;
+    --color-fondo:             #1f2937;
+    --color-gris:              #9ca3af;
+    --color-gris-clarito:      #374151;
+    --color-gris-borde-suave:  #4b5563;
+    --color-nav-boton:         #111827;
+    --color-titulo-resaltado:  #ffffff;
 
-    --color-gris: #9ca3af;
-    --color-gris-clarito: #374151;
-    --color-gris-borde-suave: #4b5563;
-    --color-nav-boton: #111827;
-    --color-primario-brillante: #4dd2ff;
-    --color-titulo-resaltado: var(--color-blanco-fijo) !important;
+    /* Escala de grises formales — tono frío azulado */
+    --color-bg:                #1e2530;
+    --color-bg-suave:          #252e3d;
+    --color-borde-suave:       #2e3a4e;
+    --color-borde:             #3a4a60;
+    --color-borde-fuerte:      #4a5c78;
+    --color-placeholder:     #5a6a82;
+    --color-gris-claro:        #7a8fa8;
+    --color-gris:              #9aaabb;
+    --color-gris-medio:        #b8c8d8;
+    --color-card:              #232d3e;
+    --color-card-borde:        #2e3a4e;
 
-    --color-pasaporte-papel: #2d3748;
-    --color-pasaporte-tinta: #f4f5fa;
-    --color-pasaporte-borde: #4a5568;
-    --color-gris-borde-suave: #rgb(59, 107, 202);
+    /* Pasaporte */
+    --color-pasaporte-papel:   #2d3748;
+    --color-pasaporte-tinta:   #f4f5fa;
+    --color-pasaporte-borde:   #4a5568;
 
-    /* Estilos de Input (Modo Oscuro) */
-    --color-fondo: #1f2937;
-    --color-bg: #222730;
-    --color-input-bg: #212a38;
-    --color-borde: #374151;
-    --color-texto: #f9fafb;
-    --color-placeholder: #6b7280;
-
-    /* Títulos y Headers */
-    --color-header-principal: var(--color-blanco-fijo);
-    --color-header-sub: #d1d5db;
+    /* Headers */
+    --color-header-principal:  #ffffff;
+    --color-header-sub:        #d1d5db;
   }
 }
 
+/* Fuentes */
 @font-face {
   font-family: "Lato";
   src: url("/fonts/Lato-Regular.ttf") format("truetype");
@@ -85,7 +94,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Lato";
   src: url("/fonts/Lato-Bold.ttf") format("truetype");
@@ -93,7 +101,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Lato";
   src: url("/fonts/Lato-Black.ttf") format("truetype");
@@ -102,28 +109,24 @@
   font-display: swap;
 }
 
-body {
-  background-color: var(--color-fondo);
-  color: var(--color-texto);
+@layer base {
+  body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: "Lato", sans-serif;
+  }
 
-  /* Aplicamos Lato como fuente global */
-  font-family: "Lato", sans-serif;
-  background-color: var(--color-fondo);
-  color: var(--color-texto);
-}
-
-/* Quitar flechas en Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
 
 .footer-fijo {
   color: var(--color-blanco-fijo) !important;
   background-color: var(--color-secundario) !important;
 }
-
 .footer-fijo a,
 .footer-fijo p,
 .footer-fijo h2,
