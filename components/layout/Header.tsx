@@ -64,7 +64,7 @@ export default function Header() {
             {!user ? (
               <>
                 <NavEnlace irA="/" textoAMostrar="Inicio" />
-                <NavEnlace irA="/about" textoAMostrar="Nosotros" />
+                <NavEnlace irA="/sobre-nosotros" textoAMostrar="Conócenos" />
                 <NavEnlace irA="/contact" textoAMostrar="Contacto" />
                 <NavButton
                   irA="/registro"
@@ -168,20 +168,8 @@ export default function Header() {
                 <NavEnlace irA="/" textoAMostrar="Inicio" />
                 {!user ? (
                   <>
-                    <NavEnlace irA="/" textoAMostrar="Inicio" />
-                    <NavEnlace irA="/about" textoAMostrar="Nosotros" />
+                    <NavEnlace irA="/sobre-nosotros" textoAMostrar="Conócenos" />
                     <NavEnlace irA="/contact" textoAMostrar="Contacto" />
-                    <NavButton
-                      irA="/registro"
-                      textoAMostrar="Crear cuenta"
-                      color="primario"
-                    />
-                    <NavButton
-                      irA="/login"
-                      textoAMostrar="Iniciar Sesión"
-                      color="secundario"
-                    />
-                    <ThemeToggle />
                   </>
                 ) : (
                   <>
