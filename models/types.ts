@@ -1,13 +1,22 @@
 // ==========================================
 // 1. ENUMS (Tipos de Unión)
 // ==========================================
-export type TipoControl = 'numero' | 'texto' | 'booleano';
+export type TipoControl = "numero" | "texto" | "booleano";
 export type TipoDocumento = "DNI" | "NIE" | "NIF" | "Pasaporte";
-export type EstadoReserva = 'pendiente' | 'confirmada' | 'realizada' | 'cancelada';
-export type MetodoPago = 'tarjeta' | 'transferencia' | 'paypal';
-export type EstadoPago = 'exitoso' | 'fallido';
-export type TipoVuelo = 'ida' | 'vuelta';
-export type EstadoVuelo = 'programado' | 'abordando' | 'volando' | 'cancelado';
+export type EstadoReserva =
+  | "pendiente"
+  | "confirmada"
+  | "realizada"
+  | "cancelada";
+export type MetodoPago = "tarjeta" | "transferencia" | "paypal";
+export type EstadoPago = "exitoso" | "fallido";
+export type TipoVuelo = "ida" | "vuelta";
+export type EstadoVuelo =
+  | "programado"
+  | "abordando"
+  | "en_vuelo"
+  | "completado"
+  | "cancelado";
 
 // ==========================================
 // 2. ENTIDADES PRINCIPALES (Tablas SQL)
@@ -96,6 +105,8 @@ export interface ViajeServicio {
   servicio_id: number;
   valor: string;
   precio_extra: number;
+  incluido: boolean;
+  cantidad_incluida: number;
   nombre_servicio?: string;
 }
 
@@ -148,6 +159,6 @@ export interface ViajeCompleto extends Viaje {
 }
 
 export interface ViajeGrid extends Viaje {
-  precio_oferta: number; 
+  precio_oferta: number;
   tiene_vuelos: boolean;
 }
