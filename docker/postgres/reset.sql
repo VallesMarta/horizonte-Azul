@@ -4,6 +4,9 @@
 
 -- 1. Eliminar Triggers (opcional, ya que caen al borrar la tabla, pero por limpieza)
 DROP TRIGGER IF EXISTS trigger_limpieza_tokens ON tokens_activos;
+DROP TRIGGER IF EXISTS tr_reservas_insert ON reservas;
+DROP TRIGGER IF EXISTS tr_reservas_update ON reservas;
+DROP TRIGGER IF EXISTS tr_reservas_delete ON reservas;
 
 -- 2. Eliminar Tablas (en orden inverso de jerarquía para evitar errores de Foreign Key)
 DROP TABLE IF EXISTS tokens_activos CASCADE;
@@ -21,12 +24,14 @@ DROP TABLE IF EXISTS usuarios CASCADE;
 -- 3. Eliminar Funciones
 DROP FUNCTION IF EXISTS limpiar_tokens_caducados();
 DROP FUNCTION IF EXISTS update_updated_at_column();
+DROP FUNCTION IF EXISTS actualizar_plazas_disponibles();
 
 -- 4. Eliminar Tipos ENUM
 DROP TYPE IF EXISTS estado_pago_enum;
 DROP TYPE IF EXISTS metodo_enum;
 DROP TYPE IF EXISTS estado_reserva_enum;
 DROP TYPE IF EXISTS tipo_control_enum;
+DROP TYPE IF EXISTS estado_vuelo_enum;
 
 -- 5. Eliminar Extensiones (opcional, solo si quieres limpiar el DB al 100%)
 -- DROP EXTENSION IF EXISTS "uuid-ossp";

@@ -120,6 +120,47 @@ CREATE TRIGGER tr_vuelos_updated_at
 BEFORE UPDATE ON vuelos 
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE OR REPLACE FUNCTION actualizar_plazas_disponibles()
+RETURNS TRIGGER AS $$
+DECLARE
+    vuelo_id_afectado INT;
+BEGIN
+    -- Detectar vuelo afectado según operación
+    vuelo_id_afectado := COALESCE(NEW.vuelo_id, OLD.vuelo_id);
+
+    UPDATE vuelos
+    SET "plazasDisponibles" = "plazasTotales" - (
+        SELECT COALESCE(SUM(pasajeros), 0)
+        FROM reservas
+        WHERE vuelo_id = vuelo_id_afectado
+        AND estado != 'cancelada'
+    )
+    WHERE id = vuelo_id_afectado;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- TRIGGER: AUTO-COMPLETAR VUELOS PASADOS
+
+CREATE OR REPLACE FUNCTION marcar_vuelos_completados()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE vuelos
+  SET estado = 'completado'
+  WHERE "fecSalida" < CURRENT_DATE
+    AND estado NOT IN ('completado', 'cancelado');
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Se dispara cada vez que se consulta/inserta un vuelo
+DROP TRIGGER IF EXISTS tr_auto_completar_vuelos ON vuelos;
+CREATE TRIGGER tr_auto_completar_vuelos
+AFTER INSERT ON vuelos
+FOR EACH STATEMENT
+EXECUTE FUNCTION marcar_vuelos_completados();
+
 -- ============================
 -- TABLA: SERVICIOS
 -- ============================
@@ -154,6 +195,24 @@ CREATE TABLE IF NOT EXISTS reservas (
     "precioTotal" DECIMAL(10,2),
     estado estado_reserva_enum DEFAULT 'pendiente'
 );
+
+DROP TRIGGER IF EXISTS tr_reservas_insert ON reservas;
+CREATE TRIGGER tr_reservas_insert
+AFTER INSERT ON reservas
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_plazas_disponibles();
+
+DROP TRIGGER IF EXISTS tr_reservas_update ON reservas;
+CREATE TRIGGER tr_reservas_update
+AFTER UPDATE ON reservas
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_plazas_disponibles();
+
+DROP TRIGGER IF EXISTS tr_reservas_delete ON reservas;
+CREATE TRIGGER tr_reservas_delete
+AFTER DELETE ON reservas
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_plazas_disponibles();
 
 -- ============================
 -- TABLA: WISHLIST
@@ -290,40 +349,40 @@ SELECT setval('viajes_id_seq', (SELECT MAX(id) FROM viajes));
 -- Vuelos futuros → estado 'programado'
 INSERT INTO vuelos (viaje_id, "fecSalida", "horaSalida", "fecLlegada", "horaLlegada", "plazasTotales", "plazasDisponibles", precio_ajustado, tipo, estado) VALUES
 -- Viaje 1: Valencia → Galway
-(1, '2026-04-01', '08:00', '2026-04-01', '10:45', 150,   0, 160.89, 'ida',    'completado'),
-(1, '2026-04-05', '14:00', '2026-04-05', '16:45', 150,   0, 140.00, 'vuelta', 'completado'),
-(1, '2026-05-10', '08:00', '2026-05-10', '10:45', 150, 150, 160.89, 'ida',    'programado'),
-(1, '2026-05-12', '08:00', '2026-05-12', '10:45', 150, 142, 160.89, 'ida',    'programado'),
-(1, '2026-05-15', '14:00', '2026-05-15', '16:45', 150, 150, 140.00, 'vuelta', 'programado'),
-(1, '2026-05-17', '14:00', '2026-05-17', '16:45', 150, 138, 140.00, 'vuelta', 'programado'),
+(1, '2026-04-01', '08:00', '2026-04-01', '10:45', 150, 0, 160.89, 'ida',    'completado'),
+(1, '2026-04-05', '14:00', '2026-04-05', '16:45', 150, 0, 140.00, 'vuelta', 'completado'),
+(1, '2026-05-10', '08:00', '2026-05-10', '10:45', 150, 0, 160.89, 'ida',    'programado'),
+(1, '2026-05-12', '08:00', '2026-05-12', '10:45', 150, 0, 160.89, 'ida',    'programado'),
+(1, '2026-05-15', '14:00', '2026-05-15', '16:45', 150, 0, 140.00, 'vuelta', 'programado'),
+(1, '2026-05-17', '14:00', '2026-05-17', '16:45', 150, 0, 140.00, 'vuelta', 'programado'),
 -- Viaje 2: Madrid → Roma
-(2, '2026-03-20', '10:00', '2026-03-20', '12:30', 180,   0, 120.00, 'ida',    'completado'),
-(2, '2026-03-27', '20:00', '2026-03-27', '22:30', 180,   0, 115.00, 'vuelta', 'completado'),
-(2, '2026-05-12', '10:00', '2026-05-12', '12:30', 180, 180, 120.00, 'ida',    'programado'),
-(2, '2026-05-14', '10:00', '2026-05-14', '12:30', 180, 165, 120.00, 'ida',    'programado'),
-(2, '2026-05-18', '20:00', '2026-05-18', '22:30', 180, 180, 115.00, 'vuelta', 'programado'),
-(2, '2026-05-20', '20:00', '2026-05-20', '22:30', 180, 172, 115.00, 'vuelta', 'programado'),
+(2, '2026-03-20', '10:00', '2026-03-20', '12:30', 180, 0, 120.00, 'ida',    'completado'),
+(2, '2026-03-27', '20:00', '2026-03-27', '22:30', 180, 0, 115.00, 'vuelta', 'completado'),
+(2, '2026-05-12', '10:00', '2026-05-12', '12:30', 180, 0, 120.00, 'ida',    'programado'),
+(2, '2026-05-14', '10:00', '2026-05-14', '12:30', 180, 0, 120.00, 'ida',    'programado'),
+(2, '2026-05-18', '20:00', '2026-05-18', '22:30', 180, 0, 115.00, 'vuelta', 'programado'),
+(2, '2026-05-20', '20:00', '2026-05-20', '22:30', 180, 0, 115.00, 'vuelta', 'programado'),
 -- Viaje 3: Barcelona → París
-(3, '2026-06-01', '07:30', '2026-06-01', '09:45', 160, 160,  95.56, 'ida',    'programado'),
-(3, '2026-06-08', '18:00', '2026-06-08', '20:15', 160, 155,  90.00, 'vuelta', 'programado'),
+(3, '2026-06-01', '07:30', '2026-06-01', '09:45', 160, 0,  95.56, 'ida',    'programado'),
+(3, '2026-06-08', '18:00', '2026-06-08', '20:15', 160, 0,  90.00, 'vuelta', 'programado'),
 -- Viaje 4: Valencia → Berlín
-(4, '2026-06-10', '06:45', '2026-06-10', '10:00', 150, 150, 130.00, 'ida',    'programado'),
-(4, '2026-06-17', '19:00', '2026-06-17', '22:15', 150, 148, 125.00, 'vuelta', 'programado'),
+(4, '2026-06-10', '06:45', '2026-06-10', '10:00', 150, 0, 130.00, 'ida',    'programado'),
+(4, '2026-06-17', '19:00', '2026-06-17', '22:15', 150, 0, 125.00, 'vuelta', 'programado'),
 -- Viaje 5: Sevilla → Lisboa
-(5, '2026-05-20', '09:00', '2026-05-20', '10:15', 120, 120,  89.87, 'ida',    'programado'),
-(5, '2026-05-27', '17:00', '2026-05-27', '18:15', 120, 115,  85.00, 'vuelta', 'programado'),
+(5, '2026-05-20', '09:00', '2026-05-20', '10:15', 120, 0,  89.87, 'ida',    'programado'),
+(5, '2026-05-27', '17:00', '2026-05-27', '18:15', 120, 0,  85.00, 'vuelta', 'programado'),
 -- Viaje 6: Nueva York → Toronto
-(6, '2026-07-04', '11:00', '2026-07-04', '12:30', 200, 200, 220.00, 'ida',    'programado'),
-(6, '2026-07-11', '14:00', '2026-07-11', '15:30', 200, 198, 210.00, 'vuelta', 'programado'),
+(6, '2026-07-04', '11:00', '2026-07-04', '12:30', 200, 0, 220.00, 'ida',    'programado'),
+(6, '2026-07-11', '14:00', '2026-07-11', '15:30', 200, 0, 210.00, 'vuelta', 'programado'),
 -- Viaje 7: Berlín → Ciudad de México
-(7, '2026-08-01', '13:00', '2026-08-01', '22:00', 250, 250, 600.99, 'ida',    'programado'),
-(7, '2026-08-15', '00:30', '2026-08-15', '18:00', 250, 244, 580.00, 'vuelta', 'programado'),
+(7, '2026-08-01', '13:00', '2026-08-01', '22:00', 250, 0, 600.99, 'ida',    'programado'),
+(7, '2026-08-15', '00:30', '2026-08-15', '18:00', 250, 0, 580.00, 'vuelta', 'programado'),
 -- Viaje 8: Madrid → Cairo
-(8, '2026-09-10', '06:00', '2026-09-10', '11:30', 200, 200, 450.00, 'ida',    'programado'),
-(8, '2026-09-20', '13:00', '2026-09-20', '18:30', 200, 200, 430.00, 'vuelta', 'programado'),
+(8, '2026-09-10', '06:00', '2026-09-10', '11:30', 200, 0, 450.00, 'ida',    'programado'),
+(8, '2026-09-20', '13:00', '2026-09-20', '18:30', 200, 0, 430.00, 'vuelta', 'programado'),
 -- Viaje 9: Madrid → Tokio
-(9, '2026-10-01', '10:00', '2026-10-02', '06:00', 300, 300, 1100.00,'ida',    'programado'),
-(9, '2026-10-15', '08:00', '2026-10-15', '14:00', 300, 300, 1050.00,'vuelta', 'programado')
+(9, '2026-10-01', '10:00', '2026-10-02', '06:00', 300, 0, 1100.00,'ida',    'programado'),
+(9, '2026-10-15', '08:00', '2026-10-15', '14:00', 300, 0, 1050.00,'vuelta', 'programado')
 ON CONFLICT DO NOTHING;
 
 SELECT setval('vuelos_id_seq', (SELECT MAX(id) FROM vuelos));
@@ -388,6 +447,16 @@ INSERT INTO viaje_servicio (viaje_id, servicio_id, valor, precio_extra, incluido
 (9,  17, '1',             150.00, false, 0),
 (9,  19, 'true',            0.00, true,  0),
 (9,  6,  'true',            0.00, true,  0),
-(9,  7,  'true',            0.00, true,  0)
+(9,  7,  'true',            0.00, true,  0);
 
 SELECT setval('viaje_servicio_id_seq', (SELECT MAX(id) FROM viaje_servicio));
+
+-- Actualizamos las plazas disponibles de cada vuelo
+
+UPDATE vuelos v
+SET "plazasDisponibles" = "plazasTotales" - (
+    SELECT COALESCE(SUM(r.pasajeros), 0)
+    FROM reservas r
+    WHERE r.vuelo_id = v.id
+    AND r.estado != 'cancelada'
+);
