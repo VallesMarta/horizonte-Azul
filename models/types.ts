@@ -161,4 +161,19 @@ export interface ViajeCompleto extends Viaje {
 export interface ViajeGrid extends Viaje {
   precio_oferta: number;
   tiene_vuelos: boolean;
+  viaje_id?: number;
+}
+
+export interface WishlistViaje {
+  usuario_id: number;
+  viaje_id: number;
+  paisDestino: string;
+  aeropuertoDestino: string;
+  iataDestino?: string;
+  paisOrigen?: string;
+  aeropuertoOrigen?: string;
+  iataOrigen?: string;
+  img: string;
+  descripcion?: string;
+  precio_oferta: number;
 }

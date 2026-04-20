@@ -4,40 +4,38 @@ import { WishlistController } from "@/controllers/wishlist.controller";
  * @swagger
  * /api/wishlist:
  *   post:
- *     summary: Añadir a la wishlist
+ *     summary: Añadir viaje a favoritos
  *     tags: [Wishlist]
- *     security:
- *       - BearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [viaje_id]
  *             properties:
- *               viaje_id: { type: integer, example: 5 }
+ *               viaje_id: { type: integer }
  *     responses:
- *       200:
- *         description: Añadido correctamente.
- *       401:
- *         description: Inicia sesión primero.
- * 
+ *       200: { description: Añadido a favoritos }
+ *       401: { description: No autorizado }
+ *
  *   delete:
- *     summary: Quitar de la wishlist
+ *     summary: Quitar viaje de favoritos
  *     tags: [Wishlist]
- *     security:
- *       - BearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [viaje_id]
  *             properties:
- *               viaje_id: { type: integer, example: 5 }
+ *               viaje_id: { type: integer }
  *     responses:
- *       200:
- *         description: Eliminado correctamente.
+ *       200: { description: Eliminado de favoritos }
+ *       401: { description: No autorizado }
  */
 
 export async function POST(req: Request) {

@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "sonner";
 
 import Chatbot from "@/components/ui/ChatBot/Chatbot";
+import { WishlistProvider } from "@/context/WishlistContext";
 
 export const metadata = {
   title: "Horizonte Azul",
@@ -20,11 +21,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="es" suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
         <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={true}
+          >
             <Toaster position="top-right" richColors />
             <Header />
-            <main className="flex-1">{children}</main>
-            <Chatbot />            
+            <main className="flex-1">
+              <WishlistProvider>{children}</WishlistProvider>
+            </main>
+            <Chatbot />
             <Footer />
           </ThemeProvider>
         </AuthProvider>
