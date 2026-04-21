@@ -1,8 +1,14 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
 import useAuth from "@/hooks/useAuth";
-import Cookies from "js-cookie";
 
 interface WishlistContextType {
   wishlistIds: Set<number>;
@@ -25,22 +31,33 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       setWishlistIds(new Set());
       return;
     }
+
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+    if (!token) return;
+
     try {
-      const token = Cookies.get("token");
       const res = await fetch(`/api/wishlist/${usuarioLoggeado.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
+        },
       });
       const data = await res.json();
       if (data.ok) {
-        const ids = new Set<number>(
-          data.resultado.map((v: any) => Number(v.viaje_id))
+        setWishlistIds(
+          new Set<number>(data.resultado.map((v: any) => Number(v.viaje_id))),
         );
-        setWishlistIds(ids);
       }
-    } catch {}
+    } catch (error) {
+      console.error("Error cargando wishlist", error);
+    }
   }, [usuarioLoggeado?.id]);
 
-  useEffect(() => { cargarWishlist(); }, [cargarWishlist]);
+  useEffect(() => {
+    cargarWishlist();
+  }, [cargarWishlist]);
 
   const toggleWishlist = async (viajeId: number) => {
     if (!usuarioLoggeado) {
@@ -48,17 +65,17 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const token = localStorage.getItem("token");
     const yaEstaLiked = wishlistIds.has(viajeId);
 
-    setWishlistIds(prev => {
+    // Optimistic update
+    setWishlistIds((prev) => {
       const next = new Set(prev);
-      if (yaEstaLiked) next.delete(viajeId);
-      else next.add(viajeId);
+      yaEstaLiked ? next.delete(viajeId) : next.add(viajeId);
       return next;
     });
 
     try {
-      const token = Cookies.get("token");
       const res = await fetch("/api/wishlist", {
         method: yaEstaLiked ? "DELETE" : "POST",
         headers: {
@@ -70,28 +87,30 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
       if (!res.ok) {
         // Revertir si falla
-        setWishlistIds(prev => {
+        setWishlistIds((prev) => {
           const next = new Set(prev);
-          if (yaEstaLiked) next.add(viajeId);
-          else next.delete(viajeId);
+          yaEstaLiked ? next.add(viajeId) : next.delete(viajeId);
           return next;
         });
       }
     } catch {
-      // Revertir si error de red
-      setWishlistIds(prev => {
+      // Revertir
+      setWishlistIds((prev) => {
         const next = new Set(prev);
-        if (yaEstaLiked) next.add(viajeId);
-        else next.delete(viajeId);
+        yaEstaLiked ? next.add(viajeId) : next.delete(viajeId);
         return next;
       });
     }
   };
 
-  const isLiked = (viajeId: number) => wishlistIds.has(viajeId);
-
   return (
-    <WishlistContext.Provider value={{ wishlistIds, toggleWishlist, isLiked }}>
+    <WishlistContext.Provider
+      value={{
+        wishlistIds,
+        toggleWishlist,
+        isLiked: (id) => wishlistIds.has(id),
+      }}
+    >
       {children}
     </WishlistContext.Provider>
   );

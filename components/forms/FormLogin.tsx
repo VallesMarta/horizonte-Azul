@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { InputAuth } from "@/components/ui/InputAuth"; 
+import { InputAuth } from "@/components/ui/InputAuth";
 
 export default function FormLogin() {
   const router = useRouter();
@@ -34,8 +34,7 @@ export default function FormLogin() {
       if (respuesta.ok && data.token) {
         login(data.token, data.usuario);
         toast.success(`¡Bienvenido de nuevo, ${data.usuario.username}!`);
-        router.push("/");
-        router.refresh();
+        window.location.href = "/";
       } else {
         toast.error(data.message || "Credenciales incorrectas");
       }
@@ -65,8 +64,8 @@ export default function FormLogin() {
       >
         <h2 className="text-blanco-fijo text-2xl font-bold text-center mb-4">
           Bienvenido de nuevo
-        </h2>        
-        
+        </h2>
+
         <InputAuth
           Icon={FaUser}
           name="username"

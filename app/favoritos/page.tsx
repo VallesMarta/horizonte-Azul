@@ -1,36 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useAuth from "@/hooks/useAuth";
 import Destino from "@/components/cards/Destino";
-import { Viaje } from "@/models/types";
-import { FaPlane } from "react-icons/fa";
+import { ViajeGrid, WishlistViaje } from "@/models/types";
+import { FaPlane, FaHeart } from "react-icons/fa";
+import Cookies from "js-cookie";
+import Link from "next/link";
+import { useWishlist } from "@/context/WishlistContext";
 
 export default function MisFavoritosPage() {
   const { usuarioLoggeado } = useAuth();
-  const [favoritos, setFavoritos] = useState<Viaje[]>([]);
+  const { wishlistIds } = useWishlist();
+  const [favoritos, setFavoritos] = useState<WishlistViaje[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    cargarFavoritos();
-  }, [usuarioLoggeado]);
-
-  const cargarFavoritos = () => {
-    if (usuarioLoggeado?.id) {
-      fetch(`/api/wishlist/${usuarioLoggeado.id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.ok) {
-            setFavoritos(data.resultado);
-          }
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error cargando favoritos:", err);
-          setLoading(false);
-        });
+  const cargarFavoritos = useCallback(async () => {
+    if (!usuarioLoggeado?.id) {
+      setLoading(false);
+      return;
     }
-  };
+    try {
+      const token = Cookies.get("token");
+      const res = await fetch(`/api/wishlist/${usuarioLoggeado.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.ok) setFavoritos(data.resultado || []);
+    } catch (err) {
+      console.error("Error cargando favoritos:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [usuarioLoggeado?.id]);
+
+  useEffect(() => { cargarFavoritos(); }, [cargarFavoritos]);
+
+  // Filtra en tiempo real según el contexto — si deseleccionas uno desaparece al instante
+  const favoritosFiltrados = favoritos.filter(v =>
+    wishlistIds.has(Number(v.viaje_id)),
+  );
 
   if (loading) {
     return (
@@ -41,46 +50,62 @@ export default function MisFavoritosPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 py-10 min-h-screen bg-fondo">
-      
-      {/* HEADER */}
-      <div className="mb-10 flex justify-between items-center border-b-2 border-primario/20 pb-6">
-        <div>
-          <h1 className="text-3xl font-black text-titulo-resaltado uppercase tracking-tighter flex items-center gap-3">
-            Mis Favoritos
-          </h1>
-        </div>
-      </div>
-
-      {/* CONTENIDO PRINCIPAL */}
-      {favoritos.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {favoritos.map((viaje) => (
-            <div key={viaje.id} className="transition-all duration-300 hover:-translate-y-2">
-               <Destino viaje={viaje} />
-            </div>
-          ))}
-        </div>
-      ) : (
-        /* ESTADO VACÍO - Adaptado a Modo Oscuro/Claro */
-        <div className="bg-fondo rounded-[3rem] p-16 text-center shadow-sm border border-gris-borde-suave">
-          <div className="bg-gris-clarito w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-gris-borde-suave">
-            <FaPlane className="text-texto/20 text-3xl" />
+    <div className="flex flex-col items-center pt-6 mb-6">
+      <div className="w-full max-w-7xl px-6">
+        {/* HEADER */}
+        <div className="mb-10 flex items-center gap-3 border-b border-borde pb-6">
+          <div className="bg-rojo/10 p-3 rounded-2xl">
+            <FaHeart className="text-rojo" size={18} />
           </div>
-          <h2 className="text-2xl font-black text-titulo-resaltado uppercase italic leading-none">
-            Tu lista está vacía
-          </h2>
-          <p className="text-sm font-bold text-texto/40 mt-4 uppercase tracking-wide max-w-xs mx-auto">
-            Aún no has marcado ningún destino como favorito. Explora nuestros vuelos y guarda los que más te gusten.
-          </p>
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="mt-10 bg-secundario text-white text-[11px] font-black uppercase tracking-widest px-10 py-4 rounded-2xl hover:bg-primario transition-all shadow-md italic active:scale-95"
-          >
-            Explorar Destinos
-          </button>
+          <div>
+            <h1 className="text-3xl font-black text-titulo-resaltado uppercase tracking-tighter">
+              Mis Favoritos
+            </h1>
+            <p className="text-[10px] font-bold text-gris uppercase tracking-widest mt-0.5">
+              {favoritosFiltrados.length} destino{favoritosFiltrados.length !== 1 ? "s" : ""}
+              guardado{favoritosFiltrados.length !== 1 ? "s" : ""}
+            </p>
+          </div>
         </div>
-      )}
+
+        {/* GRID */}
+        {favoritosFiltrados.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {favoritosFiltrados.map((viaje) => (
+              <Destino
+                key={viaje.viaje_id}
+                viaje={{
+                    ...viaje,
+                    id: viaje.viaje_id,
+                    precio_base: 0,
+                    precio_oferta: viaje.precio_oferta,
+                    tiene_vuelos: true,
+                  } as ViajeGrid}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
+            <div className="bg-gris-clarito/20 border border-borde w-20 h-20 rounded-full flex items-center justify-center">
+              <FaPlane className="text-gris opacity-30" size={28} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-titulo-resaltado uppercase tracking-tighter">
+                Tu lista está vacía
+              </h2>
+              <p className="text-xs font-bold text-gris uppercase tracking-wide mt-3 max-w-xs mx-auto leading-relaxed">
+                Explora nuestros destinos y guarda los que más te gusten pulsando el corazón.
+              </p>
+            </div>
+            <Link
+              href="/"
+              className="bg-secundario text-blanco-fijo text-[11px] font-black uppercase tracking-widest px-8 py-4 rounded-2xl hover:bg-primario transition-all shadow-md"
+            >
+              Explorar destinos
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

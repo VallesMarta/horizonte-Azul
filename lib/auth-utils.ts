@@ -1,12 +1,15 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "clave_super_secreta_horizonte_azul";
+const JWT_SECRET =
+  process.env.JWT_SECRET || "clave_super_secreta_horizonte_azul";
+
+function extraerToken(req: Request): string | null {
+  return req.headers.get("authorization")?.split(" ")[1] ?? null;
+}
 
 export async function validarAdmin(req: Request) {
   try {
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.split(" ")[1];
-
+    const token = extraerToken(req);
     if (!token) {
       return { autorizado: false, error: "No autorizado", status: 401 };
     }
@@ -36,9 +39,7 @@ export async function validarAdmin(req: Request) {
 // Esta función solo extrae los datos
 export async function obtenerSesion(req: Request) {
   try {
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.split(" ")[1];
-
+    const token = extraerToken(req);
     if (!token) return null;
 
     const decoded: any = jwt.verify(token, JWT_SECRET);
