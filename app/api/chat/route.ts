@@ -70,13 +70,11 @@ async function obtenerContextoDB() {
         v."paisDestino",
         v."aeropuertoDestino",
         v."iataDestino",
-        v.precio_base,
         v.descripcion,
         COALESCE(
           (SELECT MIN(precio_ajustado) 
            FROM vuelos 
-           WHERE viaje_id = v.id AND "fecSalida" >= CURRENT_DATE),
-          v.precio_base
+           WHERE viaje_id = v.id AND "fecSalida" >= CURRENT_DATE)
         ) AS precio_oferta,
         (
           SELECT json_agg(json_build_object(
