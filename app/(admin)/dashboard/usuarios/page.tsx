@@ -21,7 +21,14 @@ export default function GestionUsuarios() {
 
   const fetchUsuarios = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/usuarios`);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/usuarios`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await res.json();
       if (data.ok) {
         setUsuarios(data.resultado);
@@ -42,6 +49,9 @@ export default function GestionUsuarios() {
     try {
       const res = await fetch(`${API_URL}/usuarios/${id}`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
       });
       if (res.ok) fetchUsuarios();
     } catch (error) {
@@ -53,7 +63,10 @@ export default function GestionUsuarios() {
     try {
       const res = await fetch(`${API_URL}/usuarios/${tempUser.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify({
           username: tempUser.username,
           email: tempUser.email,
@@ -102,9 +115,9 @@ export default function GestionUsuarios() {
       </header>
 
       {/* Tabla Principal */}
-      <div className="bg-blanco-fijo dark:bg-gris-clarito rounded-[2rem] shadow-xl shadow-secundario/5 border border-gris-borde-suave overflow-hidden">
+      <div className="bg-blanco-fijo dark:bg-gris-clarito rounded-4xl shadow-xl shadow-secundario/5 border border-gris-borde-suave overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse table-fixed min-w-[950px]">
+          <table className="w-full border-collapse table-fixed min-w-237.5">
             <thead>
               <tr className="bg-gris-clarito/50 dark:bg-fondo text-secundario/40 dark:text-texto/40 text-[10px] uppercase tracking-[0.25em] border-b border-gris-borde-suave font-black">
                 <th className="w-24 py-5 text-center">Avatar</th>
