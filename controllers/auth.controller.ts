@@ -63,7 +63,12 @@ export const AuthController = {
       }
 
       const token = jwt.sign(
-        { id: user.id, username: user.username, isAdmin: user.isAdmin },
+        {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        },
         JWT_SECRET,
         { expiresIn: "24h" },
       );
@@ -79,6 +84,7 @@ export const AuthController = {
         usuario: {
           id: user.id,
           username: user.username,
+          email: user.email,
           isAdmin: user.isAdmin,
           fotoperfil: user.fotoPerfil,
         },
@@ -141,26 +147,26 @@ export const AuthController = {
 
       const { passwordActual, nuevaPassword } = await req.json();
       const user = await UsuarioModel.getById(sesion.id);
-      
+
       if (!user) {
         return NextResponse.json(
           { ok: false, error: "Usuario no encontrado" },
           { status: 404 },
         );
       }
-      
+
       const passwordCorrecta = await bcrypt.compare(
         passwordActual,
         user.password,
       );
-      
+
       if (!passwordCorrecta) {
         return NextResponse.json(
           { ok: false, error: "La contraseña actual es incorrecta" },
           { status: 400 },
         );
       }
-      
+
       const hashedNuevaPassword = await bcrypt.hash(nuevaPassword, 10);
 
       await UsuarioModel.update(sesion.id, {
