@@ -137,25 +137,25 @@ export default function PasaporteDigitalPage() {
     : "000000";
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-[calc(100vh-160px)] py-6 px-4">
-      <div className="w-full max-w-3xl space-y-6">
+    <div className="flex flex-col items-center justify-start w-full min-h-full py-6 px-4 md:px-8">
+      <div className="w-full max-w-4xl space-y-6">
         {/* TARJETA PASAPORTE */}
-        <div className="bg-pasaporte-papel rounded-4xl shadow-2xl overflow-hidden relative transition-all duration-500">
+        <div className="bg-pasaporte-papel rounded-4xl shadow-2xl overflow-hidden relative transition-all duration-500 border border-black/5">
           {/* HEADER */}
-          <div className="bg-primario px-8 py-6 text-white flex justify-between items-center relative overflow-hidden">
+          <div className="bg-primario px-6 md:px-8 py-5 text-white flex justify-between items-center relative overflow-hidden">
             <div className="relative z-10">
-              <h1 className="text-2xl font-black italic uppercase tracking-tighter flex items-center gap-3">
+              <h1 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter flex items-center gap-3">
                 <FaPassport className="text-iconos text-xl" /> Pasaporte Digital
               </h1>
             </div>
             <FaGlobeAmericas className="text-7xl absolute -right-4 -bottom-4 text-white/10 rotate-12" />
           </div>
 
-          <div className="p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-6 md:p-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* COLUMNA FOTO */}
             <div className="flex flex-col items-center space-y-4">
               <div className="relative group">
-                <div className="w-40 h-52 bg-white p-2 shadow-xl border border-gris-borde-suave/40 -rotate-4 dark:bg-white/90">
+                <div className="w-36 h-48 md:w-40 md:h-52 bg-white p-2 shadow-xl border border-gris-borde-suave/40 -rotate-2 dark:bg-white/90">
                   <img
                     src={
                       perfil?.fotoPerfil ||
@@ -165,9 +165,9 @@ export default function PasaporteDigitalPage() {
                     alt="Foto Pasaporte"
                   />
                   {editando && (
-                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white">
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white cursor-pointer">
                       <FaCamera className="text-2xl mb-1" />
-                      <span className="text-[8px] font-bold uppercase tracking-tighter">
+                      <span className="text-[8px] font-black uppercase tracking-tighter">
                         Cambiar Foto
                       </span>
                     </div>
@@ -185,23 +185,23 @@ export default function PasaporteDigitalPage() {
                     name="fotoPerfil"
                     value={perfil?.fotoPerfil || ""}
                     onChange={handleChange}
-                    className="w-full text-[10px] bg-primario/5 text-titulo-resaltado border border-pasaporte-borde rounded-xl p-4 text-xs font-bold outline-none focus:border-primario focus:ring-4 focus:ring-primario/5 transition-all text-titulo-resaltadooutline-none"
+                    className="w-full text-[10px] bg-primario/5 border border-pasaporte-borde rounded-xl p-3 font-bold outline-none focus:border-primario transition-all"
+                    placeholder="https://..."
                   />
                 </div>
               )}
 
               <div className="text-center pt-2">
-                <p className="text-[8px] font-black text-gris uppercase tracking-widest">
+                <p className="text-[8px] font-black text-gris/40 uppercase tracking-widest">
                   Nº Expediente
                 </p>
-                <p className="font-mono text-base font-bold text-primario">
+                <p className="font-mono text-base font-bold text-primario tracking-tighter">
                   HA-{String(perfil?.id || 0).padStart(6, "0")}
                 </p>
               </div>
             </div>
 
-            {/* COLUMNA DATOS */}
-            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 md:gap-y-6">
               {editando ? (
                 <>
                   <SecurityInput
@@ -313,42 +313,38 @@ export default function PasaporteDigitalPage() {
           </div>
 
           {/* MRZ ZONE */}
-          <div
-            className="bg-primario/40 p-6 border-t border-dashed border-secundario/40 
-          font-mono text-[10px] md:text-[11px] 
-          text-gris tracking-[0.3em] uppercase leading-relaxed"
-          >
+          <div className="bg-primario/10 p-5 border-t border-dashed border-primario/20 font-mono text-[9px] md:text-[11px] text-gris/70 tracking-wider md:tracking-[0.3em] uppercase leading-relaxed break-all">
             P&lt;ESP{apellidoMRZ}&lt;&lt;{nombreMRZ}
             &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
-            <br />
+            <br className="hidden md:block" />
             {String(perfil?.id || 0).padStart(8, "0")}6ESP{mrzNacimiento}&lt;
             {mrzCaducidad}&lt;&lt;&lt;&lt;01
           </div>
         </div>
 
         {/* ACCIONES */}
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-4 pt-4">
           {!editando ? (
             <button
               onClick={() => setEditando(true)}
-              className="bg-primario text-white px-8 py-3 rounded-xl font-black uppercase text-[9px] tracking-[0.2em] shadow-lg flex items-center gap-3 hover:scale-105 transition-all"
+              className="bg-primario text-white px-8 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:shadow-primario/20 hover:-translate-y-1 transition-all flex items-center gap-3"
             >
-              <FaEdit /> Editar Pasaporte
+              <FaEdit className="text-iconos" /> Editar Pasaporte
             </button>
           ) : (
             <>
               <button
                 onClick={() => setEditando(false)}
-                className="bg-rojo text-white px-6 py-3 rounded-xl font-black uppercase text-[9px] shadow-md hover:scale-105 transition-all"
+                className="bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 px-6 py-3 rounded-xl font-black uppercase text-[10px] hover:bg-rojo hover:text-white transition-all"
               >
-                Cancelar cambios
+                Cancelar
               </button>
               <button
                 onClick={handleGuardar}
                 disabled={saving}
-                className="bg-verde text-white px-8 py-3 rounded-xl font-black uppercase text-[9px] tracking-[0.2em] shadow-lg flex items-center gap-3 hover:scale-105 transition-all"
+                className="bg-verde text-white px-8 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-3 disabled:opacity-50"
               >
-                <FaSave /> {saving ? "Confirmando..." : "Actualizar Pasaporte"}
+                <FaSave /> {saving ? "Guardando..." : "Sellar Documento"}
               </button>
             </>
           )}
