@@ -52,6 +52,7 @@ export async function obtenerSesion(req: Request) {
         decoded.isAdmin === 1 ||
         decoded.role === "admin",
       username: decoded.username,
+      email: decoded.email,
     };
   } catch (error) {
     return null; // Si el token es falso o expiró, devolvemos null
