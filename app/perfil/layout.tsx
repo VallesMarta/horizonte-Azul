@@ -38,9 +38,12 @@ export default function PerfilLayout({
 
   const userMenu = [
     { name: "Mi Pasaporte", icon: <FaUser />, path: "/perfil" },
-    { name: "Mis Tarjetas", icon: <FaCreditCard />, path: "/perfil/pagos" },
-    { name: "Mis Viajes", icon: <FaPlane />, path: "/mis-reservas" },
-    { name: "Mis Favoritos", icon: <FaHeart />, path: "/favoritos" },
+    { name: "Mis Reservas", icon: <FaPlane />, path: "/mis-reservas" },
+    {
+      name: "Mis Tarjetas",
+      icon: <FaCreditCard />,
+      path: "/perfil/mis-tarjetas",
+    },
     { name: "Seguridad", icon: <FaLock />, path: "/perfil/seguridad" },
   ];
 
@@ -48,9 +51,7 @@ export default function PerfilLayout({
     <div className="flex flex-col">
       <div className="flex flex-1">
         <Sidebar menuItems={userMenu} tipo="user" />
-        <main className="flex-1 bg-fondo p-4 lg:p-8">
-          {children}
-        </main>
+        <main className="flex-1 bg-fondo p-4 lg:p-8">{children}</main>
       </div>
     </div>
   );
