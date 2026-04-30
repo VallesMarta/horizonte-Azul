@@ -57,7 +57,8 @@ export const UsuarioModel = {
         "numDocumento",
         "paisEmision",
         "fecCaducidadDocumento",
-        "fotoPerfil"
+        "fotoPerfil",
+        "stripe_customer_id"
       FROM usuarios 
       WHERE id = $1
     `;
@@ -109,8 +110,16 @@ export const UsuarioModel = {
   },
 
   async getByUsername(username: string) {
-    const sql = 'SELECT * FROM usuarios WHERE username = $1';
+    const sql = "SELECT * FROM usuarios WHERE username = $1";
     const rows = await query(sql, [username]);
     return rows[0];
+  },
+
+  // VINCULAR CUSTOMER ID DE STRIPE AL USUARIO
+  async actualizarStripeCustomerId(id: string | number, customerId: string) {
+    return await query(
+      `UPDATE usuarios SET "stripe_customer_id" = $2 WHERE id = $1`,
+      [id, customerId],
+    );
   },
 };
