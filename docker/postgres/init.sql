@@ -45,6 +45,9 @@ BEGIN
             'cancelado'
         );
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_vuelo_enum') THEN
+        CREATE TYPE tipo_vuelo_enum AS ENUM ('ida', 'vuelta', 'ambos');
+    END IF;
 END $$;
 
 -- ============================
@@ -65,6 +68,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     "paisEmision" VARCHAR(100),
     "fecCaducidadDocumento" DATE,
     "fotoPerfil" TEXT DEFAULT 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+    stripe_customer_id VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -167,8 +171,15 @@ EXECUTE FUNCTION marcar_vuelos_completados();
 CREATE TABLE IF NOT EXISTS servicios (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) UNIQUE, 
-    tipo_control tipo_control_enum NOT NULL DEFAULT 'texto'
+    tipo_control tipo_control_enum NOT NULL DEFAULT 'texto',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+DROP TRIGGER IF EXISTS tr_servicios_updated_at ON servicios;
+CREATE TRIGGER tr_servicios_updated_at 
+BEFORE UPDATE ON servicios 
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================
 -- RELACIÓN: VIAJE_SERVICIO
@@ -180,21 +191,39 @@ CREATE TABLE IF NOT EXISTS viaje_servicio (
     valor VARCHAR(255),    
     precio_extra DECIMAL(10, 2) DEFAULT 0.00,
     incluido BOOLEAN DEFAULT FALSE,
-    cantidad_incluida INT DEFAULT 0
+    cantidad_incluida INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+DROP TRIGGER IF EXISTS tr_viaje_servicio_updated_at ON viaje_servicio;
+CREATE TRIGGER tr_viaje_servicio_updated_at 
+BEFORE UPDATE ON viaje_servicio 
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================
 -- TABLA: RESERVAS
 -- ============================
 CREATE TABLE IF NOT EXISTS reservas (
     id SERIAL PRIMARY KEY,
+    localizador VARCHAR(12),
     usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
     vuelo_id INT NOT NULL REFERENCES vuelos(id) ON DELETE CASCADE,
+    codigo_reserva_grupo UUID DEFAULT uuid_generate_v4(), -- Agrupador para cuando se compra Ida+Vuelta en una misma sesión. Así el usuario ve una "compra" aunque sean dos registros de vuelo
+    precio_vuelo_historico DECIMAL(10,2) NOT NULL,
+    total_extras_historico DECIMAL(10,2) DEFAULT 0.00,
+    "precioTotal" DECIMAL(10,2),
     "fecCompra" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     pasajeros INT DEFAULT 1 CHECK (pasajeros >= 1),
-    "precioTotal" DECIMAL(10,2),
-    estado estado_reserva_enum DEFAULT 'pendiente'
+    estado estado_reserva_enum DEFAULT 'pendiente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+DROP TRIGGER IF EXISTS tr_reservas_updated_at ON reservas;
+CREATE TRIGGER tr_reservas_updated_at 
+BEFORE UPDATE ON reservas 
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS tr_reservas_insert ON reservas;
 CREATE TRIGGER tr_reservas_insert
@@ -214,6 +243,40 @@ AFTER DELETE ON reservas
 FOR EACH ROW
 EXECUTE FUNCTION actualizar_plazas_disponibles();
 
+-- Trigger para auto-generar localizador en nuevas reservas
+CREATE OR REPLACE FUNCTION generar_localizador()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.localizador IS NULL THEN
+    NEW.localizador := 'HA-' || UPPER(SUBSTRING(REPLACE(NEW.codigo_reserva_grupo::text, '-', ''), 1, 6));
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tr_generar_localizador ON reservas;
+CREATE TRIGGER tr_generar_localizador
+BEFORE INSERT ON reservas
+FOR EACH ROW
+EXECUTE FUNCTION generar_localizador();
+
+
+-- ============================
+-- TABLA: RESERVA_SERVICIOS (Desglose de extras)
+-- ============================
+CREATE TABLE IF NOT EXISTS reserva_servicios (
+    id SERIAL PRIMARY KEY,
+    reserva_id INT NOT NULL REFERENCES reservas(id) ON DELETE CASCADE,
+    servicio_id INT NOT NULL REFERENCES servicios(id),
+    nombre_servicio VARCHAR(100), -- Copiamos el nombre por si el servicio cambia o se borra
+    valor_seleccionado VARCHAR(255),
+    cantidad INT DEFAULT 1,
+    precio_unitario_pagado DECIMAL(10,2) NOT NULL, -- El precio en el momento de la compra
+    total_linea DECIMAL(10,2) GENERATED ALWAYS AS (cantidad * precio_unitario_pagado) STORED,
+    tipo_vuelo tipo_vuelo_enum NOT NULL DEFAULT 'ambos',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ============================
 -- TABLA: WISHLIST
 -- ============================
@@ -224,31 +287,28 @@ CREATE TABLE IF NOT EXISTS wishlist (
 );
 
 -- ============================
--- TABLA: METODOS_PAGO
+-- TABLA: TAREJTAS DE LOS USUARIOS
 -- ============================
-CREATE TABLE IF NOT EXISTS metodos_pago (
+
+CREATE TABLE IF NOT EXISTS tarjetas_usuario (
     id SERIAL PRIMARY KEY,
-    usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    usuario_id INT NOT NULL,
+    nombre_titular VARCHAR(255),
+    stripe_payment_method_id VARCHAR(255) NOT NULL UNIQUE,
     last4 VARCHAR(4) NOT NULL,
-    marca VARCHAR(20), 
-    token_simulado VARCHAR(255), 
-    fecha_guardado TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    brand VARCHAR(50),
+    es_predeterminada BOOLEAN DEFAULT false,
+    exp_month INT,
+    exp_year INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================
--- TABLA: PAGOS
--- ============================
-CREATE TABLE IF NOT EXISTS pagos (
-    id SERIAL PRIMARY KEY,
-    reserva_id INT NOT NULL REFERENCES reservas(id) ON DELETE CASCADE,
-    usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-    metodo_pago_id INT NULL REFERENCES metodos_pago(id) ON DELETE SET NULL,
-    monto DECIMAL(10,2) NOT NULL,
-    metodo metodo_enum DEFAULT 'tarjeta',
-    tipo_tarjeta VARCHAR(20) NULL,
-    estado estado_pago_enum DEFAULT 'exitoso',
-    fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Trigger para updated_at (siguiendo tu estándar)
+DROP TRIGGER IF EXISTS tr_tarjetas_usuario_updated_at ON tarjetas_usuario;
+CREATE TRIGGER tr_tarjetas_usuario_updated_at 
+BEFORE UPDATE ON tarjetas_usuario 
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================
 -- TABLA: PASAJEROS
@@ -260,6 +320,8 @@ CREATE TABLE IF NOT EXISTS pasajeros (
     apellidos VARCHAR(100) NOT NULL,
     "tipoDocumento" tipo_documento_enum DEFAULT 'DNI',
     "numDocumento" VARCHAR(25),
+    "fecCaducidadDocumento" DATE,
+    "fecNacimiento" DATE,
     "esAdulto" BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
