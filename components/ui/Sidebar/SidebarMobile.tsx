@@ -9,6 +9,11 @@ export default function SidebarMobile({ menuItems, title }: any) {
   const pathname = usePathname();
   const [ocultarPorHeader, setOcultarPorHeader] = useState(false);
 
+  const checkIsActive = (path: string) =>
+    path === "/dashboard" || path === "/perfil" || path === "/seguridad"
+      ? pathname === path
+      : pathname.startsWith(path);
+
   useEffect(() => {
     document.body.style.overflow = abierto ? "hidden" : "auto";
     return () => {
@@ -92,7 +97,7 @@ export default function SidebarMobile({ menuItems, title }: any) {
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-secundario custom-scrollbar pb-10">
           {menuItems.map((item: any) => {
-            const activo = pathname.startsWith(item.path);
+            const activo = checkIsActive(item.path);
             return (
               <Link
                 key={item.path}

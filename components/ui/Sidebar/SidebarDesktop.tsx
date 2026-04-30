@@ -15,7 +15,7 @@ export default function SidebarDesktop({ menuItems, title, subtitle }: any) {
 
   return (
     <aside
-      className={`bg-secundario sticky top-[104px] z-40 flex flex-col h-[calc(100vh-104px)] transition-all duration-500 ease-in-out ${
+      className={`bg-secundario sticky top-26 z-40 flex flex-col h-[calc(100vh-104px)] transition-all duration-500 ease-in-out ${
         abierto ? "w-64 border-r border-white/5" : "w-0 border-none"
       }`}
     >

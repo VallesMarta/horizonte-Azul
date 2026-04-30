@@ -7,7 +7,6 @@ import {
   FaUser,
   FaLock,
   FaCreditCard,
-  FaHeart,
   FaPlane,
   FaSpinner,
 } from "react-icons/fa";
