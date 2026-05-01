@@ -73,10 +73,10 @@ export const ServiciosExtra = ({
           <div /> {/* spacer nombre */}
           <div className="grid grid-cols-2 gap-2 w-30">
             <p className="text-[8px] font-black text-primario uppercase tracking-widest text-center">
-              ✈ Ida
+              Ida
             </p>
             <p className="text-[8px] font-black text-secundario uppercase tracking-widest text-center">
-              ↩ Vta
+              Vuelta
             </p>
           </div>
         </div>
