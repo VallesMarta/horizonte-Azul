@@ -37,7 +37,7 @@ export default function PerfilLayout({
 
   const userMenu = [
     { name: "Mi Pasaporte", icon: <FaUser />, path: "/perfil" },
-    { name: "Mis Reservas", icon: <FaPlane />, path: "/mis-reservas" },
+    { name: "Mis Reservas", icon: <FaPlane />, path: "/perfil/mis-reservas" },
     {
       name: "Mis Tarjetas",
       icon: <FaCreditCard />,
