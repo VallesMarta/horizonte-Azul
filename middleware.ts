@@ -1,8 +1,14 @@
-import { NextResponse } from "next/server"; 
+import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Definimos qué rutas queremos proteger
-const rutasProtegidas = ["/dashboard", "/mis-reservas", "/favoritos", "/perfil"];
+const rutasProtegidas = [
+  "/dashboard",
+  "/favoritos",
+  "/perfil",
+  "/perfil/mis-reservas",
+  "/perfil/mis-tarjetas",
+];
 const rutasSoloInvitados = ["/login", "/registro", "/sobre-nosotros"];
 
 export function middleware(request: NextRequest) {

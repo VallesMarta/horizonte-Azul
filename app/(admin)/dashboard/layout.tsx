@@ -26,7 +26,6 @@ export default function DashboardLayout({
   const [verificando, setVerificando] = useState(true);
 
   useEffect(() => {
-    // Esperamos a que useAuth determine si hay sesión o no
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -35,11 +34,9 @@ export default function DashboardLayout({
     }
 
     if (usuarioLoggeado !== null) {
-      // Comprobamos si el usuario logeado es administrador
       if (!isAdmin) {
         router.replace("/");
       } else {
-        // Si es admin, dejamos de mostrar el spinner
         setVerificando(false);
       }
     }
@@ -55,6 +52,7 @@ export default function DashboardLayout({
       </div>
     );
   }
+
   const adminMenu = [
     { name: "Dashboard", icon: <FaChartPie />, path: "/dashboard" },
     {
@@ -77,9 +75,7 @@ export default function DashboardLayout({
     <div className="flex flex-col">
       <div className="flex flex-1">
         <Sidebar menuItems={adminMenu} tipo="admin" />
-        <main className="flex-1 bg-fondo p-4 m-6">
-          {children}
-        </main>
+        <main className="flex-1 bg-fondo p-4 m-6">{children}</main>
       </div>
     </div>
   );
