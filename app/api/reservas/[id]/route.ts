@@ -4,70 +4,149 @@ import { ReservaController } from "@/controllers/reserva.controller";
  * @swagger
  * /api/reservas/{id}:
  *   get:
- *     summary: "Obtener detalle de reserva"
+ *     summary: Obtener detalle completo de una reserva
  *     tags: [Reservas]
- *     security: [{ BearerAuth: [] }]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema: { type: integer }
+ *         schema:
+ *           type: integer
+ *         description: ID de la reserva
  *     responses:
- *       200: { description: "Detalles obtenidos" }
- *       403: { description: "Acceso denegado: No es tu reserva" }
- *       404: { description: "No encontrada" }
- *
- *   put:
- *     summary: "Modificar reserva"
- *     description: "Permite modificar viaje, fecha, pasajeros y estado."
- *     tags: [Reservas]
- *     security: [{ BearerAuth: [] }]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: integer }
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               viaje_id: { type: integer, example: 5 }
- *               fecSalida: { type: string, format: date, example: "2024-10-15" }
- *               pasajeros: { type: integer, example: 3 }
- *               estado: { type: string, enum: [pendiente, confirmada, realizada, cancelada] }
- *     responses:
- *       200: { description: "Reserva actualizada correctamente" }
- *       401: { description: "Token inválido o expirado" }
- *       403: { description: "Acceso denegado: No tienes permiso" }
- *       404: { description: "Reserva no encontrada" }
- *
- *   delete:
- *     summary: "Eliminar reserva"
- *     tags: [Reservas]
- *     security: [{ BearerAuth: [] }]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: integer }
- *     responses:
- *       200: { description: "Reserva eliminada de la base de datos" }
- *       403: { description: "Acceso denegado: No eres admin" }
+ *       200:
+ *         description: Detalle completo de la reserva
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                 resultado:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     localizador:
+ *                       type: string
+ *                     codigo_reserva_grupo:
+ *                       type: string
+ *                       format: uuid
+ *                     fecCompra:
+ *                       type: string
+ *                       format: date-time
+ *                     pasajeros:
+ *                       type: integer
+ *                     precioTotal:
+ *                       type: number
+ *                     precio_vuelo_historico:
+ *                       type: number
+ *                     total_extras_historico:
+ *                       type: number
+ *                     estado:
+ *                       type: string
+ *                       enum: [pendiente, confirmada, realizada, cancelada]
+ *                     paisOrigen:
+ *                       type: string
+ *                     aeropuertoOrigen:
+ *                       type: string
+ *                     iataOrigen:
+ *                       type: string
+ *                     paisDestino:
+ *                       type: string
+ *                     aeropuertoDestino:
+ *                       type: string
+ *                     iataDestino:
+ *                       type: string
+ *                     fecSalida:
+ *                       type: string
+ *                       format: date
+ *                     horaSalida:
+ *                       type: string
+ *                     fecLlegada:
+ *                       type: string
+ *                       format: date
+ *                     horaLlegada:
+ *                       type: string
+ *                     vuelo_tipo:
+ *                       type: string
+ *                       enum: [ida, vuelta]
+ *                     usuario_nombre:
+ *                       type: string
+ *                     usuario_email:
+ *                       type: string
+ *                     pasajeros:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           nombre:
+ *                             type: string
+ *                           apellidos:
+ *                             type: string
+ *                           tipoDocumento:
+ *                             type: string
+ *                             enum: [DNI, NIE, NIF, Pasaporte]
+ *                           numDocumento:
+ *                             type: string
+ *                           fecNacimiento:
+ *                             type: string
+ *                             format: date
+ *                           fecCaducidadDocumento:
+ *                             type: string
+ *                             format: date
+ *                           esAdulto:
+ *                             type: boolean
+ *                     serviciosIncluidos:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           nombre:
+ *                             type: string
+ *                           detalle:
+ *                             type: string
+ *                           cantidad:
+ *                             type: integer
+ *                           precio:
+ *                             type: number
+ *                     extras:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           nombre:
+ *                             type: string
+ *                           detalle:
+ *                             type: string
+ *                           cantidad:
+ *                             type: integer
+ *                           precio:
+ *                             type: number
+ *                           subtotal:
+ *                             type: number
+ *                           tipo_vuelo:
+ *                             type: string
+ *                             enum: [ida, vuelta, ambos]
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Acceso denegado — la reserva no pertenece al usuario
+ *       404:
+ *         description: Reserva no encontrada
  */
+type Params = { params: Promise<{ id: string }> };
 
-export async function GET(req: Request, { params }: any) {
+export async function GET(req: Request, { params }: Params) {
   const { id } = await params;
   return ReservaController.obtenerDetalle(req, id);
-}
-
-export async function PUT(req: Request, { params }: any) {
-  const { id } = await params;
-  return ReservaController.actualizar(req, id);
-}
-
-export async function DELETE(req: Request, { params }: any) {
-  const { id } = await params;
-  return ReservaController.eliminar(req, id);
 }
