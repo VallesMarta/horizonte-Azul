@@ -32,23 +32,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const recuperarSesion = () => {
-      try {
-        const savedUser = localStorage.getItem("user");
-        const token = Cookies.get("token");
+      const token = Cookies.get("token");
+      const savedUser = localStorage.getItem("user");
 
-        if (savedUser && token) {
+      if (token && savedUser) {
+        try {
           setUser(JSON.parse(savedUser));
-        } else {
-          limpiarDatosLocales();
+        } catch {
+          limpiarDatosLocales(); // Si el JSON está mal, limpiamos todo
         }
-      } catch (error) {
-        console.error("Error al restaurar la sesión:", error);
+      } else {
+        // Si falta alguno de los dos, la sesión no es válida
         limpiarDatosLocales();
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
-
     recuperarSesion();
   }, []);
 
@@ -83,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>      
+    <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
