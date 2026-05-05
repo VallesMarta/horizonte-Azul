@@ -59,11 +59,20 @@ export const UsuarioController = {
     try {
       const sesion = await obtenerSesion(req);
       if (!sesion)
-        return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
+        return NextResponse.json(
+          { ok: false, error: "No autorizado" },
+          { status: 401 },
+        );
 
       const esElPropietario = String(sesion.id) === String(id);
       if (!sesion.isAdmin && !esElPropietario)
-        return NextResponse.json({ ok: false, error: "No tienes permiso para actualizar este usuario" }, { status: 403 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "No tienes permiso para actualizar este usuario",
+          },
+          { status: 403 },
+        );
 
       const body = await req.json();
       const actual = await UsuarioModel.getById(id);
@@ -80,19 +89,22 @@ export const UsuarioController = {
         nombre: body.nombre ?? actual.nombre,
         apellidos: body.apellidos ?? actual.apellidos,
         email: body.email ?? actual.email,
-        isAdmin: actual.isAdmin, // Protegemos el campo isAdmin para que no se autopromuevan
+        isAdmin: sesion.isAdmin
+          ? (body.isAdmin ?? actual.isAdmin)
+          : actual.isAdmin, // Protegemos el campo isAdmin
         password: actual.password,
         telefono: body.telefono ?? actual.telefono,
         fecNacimiento: body.fecNacimiento ?? actual.fecNacimiento,
         tipoDocumento: body.tipoDocumento ?? actual.tipoDocumento,
         numDocumento: body.numDocumento ?? actual.numDocumento,
         paisEmision: body.paisEmision ?? actual.paisEmision,
-        fecCaducidadDocumento: body.fecCaducidadDocumento ?? actual.fecCaducidadDocumento,
+        fecCaducidadDocumento:
+          body.fecCaducidadDocumento ?? actual.fecCaducidadDocumento,
         fotoPerfil: body.fotoPerfil ?? actual.fotoPerfil,
       };
 
       await UsuarioModel.update(id, dataUpdate);
-      
+
       return NextResponse.json({
         ok: true,
         mensaje: "Datos actualizados correctamente",
@@ -116,7 +128,10 @@ export const UsuarioController = {
     }
     try {
       await UsuarioModel.delete(id);
-      return NextResponse.json({ ok: true, mensaje: "Usuario eliminado correctamente" });
+      return NextResponse.json({
+        ok: true,
+        mensaje: "Usuario eliminado correctamente",
+      });
     } catch (err) {
       return NextResponse.json(
         { ok: false, error: "Error al eliminar" },
