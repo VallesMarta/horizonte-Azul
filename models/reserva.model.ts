@@ -1,140 +1,122 @@
 import { query } from "@/config/db.config";
+import { ReservaServicioInput, ReservaCreateInput } from "@/models/types";
 
 export const ReservaModel = {
-  // Transacciones
-  async startTransaction() {
-    return await query("START TRANSACTION", []);
-  },
-  async commit() {
-    return await query("COMMIT", []);
-  },
-  async rollback() {
-    return await query("ROLLBACK", []);
-  },
-
-  // Crear Reserva (Estado inicial: confirmada porque ya pasó por checkout)
-  async createReserva(data: {
-    usuario_id: string | number;
-    viaje_id: number;
-    fecSalida: string;
-    pasajeros: number;
-  }) {
-    const sql = `
-      INSERT INTO reservas (usuario_id, viaje_id, fecSalida, pasajeros, estado)
-      VALUES (?, ?, ?, ?, 'confirmada')
-    `;
-    return (await query(sql, [
-      data.usuario_id,
-      data.viaje_id,
-      data.fecSalida,
-      data.pasajeros,
-    ])) as any;
-  },
-
-  // Guardar Tarjeta
-  async saveMetodoPago(usuario_id: number, last4: string, brand: string) {
-    const token = `tok_sim_${Math.random().toString(36).substr(2, 9)}`;
-    const sql = `INSERT INTO metodos_pago (usuario_id, last4, marca, token_simulado) VALUES (?, ?, ?, ?)`;
-    return (await query(sql, [usuario_id, last4, brand, token])) as any;
-  },
-
-  // Registrar Pago
-  async registrarPago(data: any) {
-    const sql = `
-      INSERT INTO pagos (reserva_id, usuario_id, metodo_pago_id, monto, metodo, estado, tipo_tarjeta)
-      VALUES (?, ?, ?, ?, 'tarjeta', 'exitoso', ?)
-    `;
-    return await query(sql, [
-      data.reservaId,
-      data.usuario_id,
-      data.metodoPagoId,
-      data.total,
-      data.brand,
-    ]);
-  },
-  // Obtener todas las reservas (Solo para Admin)
-  async getAllAdmin() {
-    const sql = `
-      SELECT r.id AS reserva_id, r.usuario_id, u.username, v.paisDestino, 
-             v.aeropuertoDestino, r.estado, r.fecCompra, r.fecSalida, 
-             r.pasajeros, p.monto AS total_pagado
-      FROM reservas r
-      JOIN usuarios u ON r.usuario_id = u.id
-      JOIN viajes v ON r.viaje_id = v.id
-      LEFT JOIN pagos p ON r.id = p.reserva_id
-      ORDER BY r.fecCompra DESC
-    `;
-    return (await query(sql, [])) as any[];
-  },
-  // Historial por Usuario
-  async getByUsuarioId(usuarioId: string | number) {
-    const sql = `
-      SELECT r.id AS reserva_id, v.paisOrigen, v.aeropuertoOrigen, v.paisDestino, v.aeropuertoDestino,
-             v.img, r.estado, p.monto AS total_pagado, r.fecSalida, r.pasajeros, p.tipo_tarjeta
-      FROM reservas r
-      JOIN viajes v ON r.viaje_id = v.id
-      LEFT JOIN pagos p ON r.id = p.reserva_id
-      WHERE r.usuario_id = ?
-      ORDER BY r.fecCompra DESC
-    `;
-    return (await query(sql, [usuarioId])) as any[];
-  },
-
-  // Detalle para Voucher (incluye servicios)
-  async getVoucherDetalle(reservaId: string | number) {
-    const sql = `
-      SELECT r.id as reserva_id, r.usuario_id, r.estado, r.pasajeros, r.fecSalida,
-             v.paisOrigen, v.aeropuertoOrigen, v.horaSalida,
-             v.paisDestino, v.aeropuertoDestino, v.horaLlegada,
-             s.nombre AS servicioNombre, vs.valor AS servicioValor, vs.precio_extra
-      FROM reservas r
-      JOIN viajes v ON r.viaje_id = v.id
-      LEFT JOIN viaje_servicio vs ON v.id = vs.viaje_id
-      LEFT JOIN servicios s ON vs.servicio_id = s.id
-      WHERE r.id = ?
-    `;
-    return (await query(sql, [reservaId])) as any[];
-  },
-
-  async getById(id: string | number) {
-    const sql = "SELECT * FROM reservas WHERE id = ?";
-    const rows = (await query(sql, [id])) as any[];
+  // 1. MÉTODO PARA INSERTAR LA CABECERA DE LA RESERVA
+  async crear(data: ReservaCreateInput) {
+    const rows = await query(
+      `
+        INSERT INTO reservas (
+          usuario_id, vuelo_id, codigo_reserva_grupo,
+          precio_vuelo_historico, total_extras_historico,
+          "precioTotal", pasajeros, estado
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *
+      `,
+      [
+        data.usuario_id,
+        data.vuelo_id,
+        data.codigo_reserva_grupo,
+        data.precio_vuelo_historico,
+        data.total_extras_historico,
+        data.precioTotal,
+        data.pasajeros,
+        data.estado || "confirmada",
+      ],
+    );
     return rows[0];
   },
-  async updateFull(
-    id: string | number,
-    data: {
-      estado: string;
-      pasajeros: number;
-      fecSalida: string;
-      viaje_id: number;
-    },
-  ) {
+
+  // 2. AÑADIR SERVICIO
+  async añadirServicioExtra(data: ReservaServicioInput) {
     const sql = `
-      UPDATE reservas 
-      SET estado = ?, pasajeros = ?, fecSalida = ?, viaje_id = ?
-      WHERE id = ?
+      INSERT INTO reserva_servicios (
+        reserva_id, servicio_id, nombre_servicio, 
+        valor_seleccionado, cantidad, precio_unitario_pagado, tipo_vuelo
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
-    return await query(sql, [
-      data.estado,
-      data.pasajeros,
-      data.fecSalida,
-      data.viaje_id,
-      id,
+    await query(sql, [
+      data.reserva_id,
+      data.servicio_id,
+      data.nombre_servicio,
+      data.valor_seleccionado,
+      data.cantidad,
+      data.precio_unitario_pagado,
+      data.tipo_vuelo,
     ]);
   },
-  async updateEstado(id: string | number, nuevoEstado: string) {
-    const sql = "UPDATE reservas SET estado = ? WHERE id = ?";
-    return (await query(sql, [nuevoEstado, id])) as any;
+
+  async getServiciosByReservaId(reservaId: number | string) {
+    return await query(
+      `SELECT 
+        id, servicio_id, nombre_servicio AS nombre, 
+        valor_seleccionado AS detalle, cantidad, 
+        precio_unitario_pagado AS precio, tipo_vuelo,
+        (cantidad * precio_unitario_pagado) AS subtotal
+       FROM reserva_servicios 
+       WHERE reserva_id = $1`,
+      [reservaId],
+    );
   },
 
-  async updateAdmin(id: string | number, estado: string, pasajeros: number) {
-    const sql = "UPDATE reservas SET estado = ?, pasajeros = ? WHERE id = ?";
-    return (await query(sql, [estado, pasajeros, id])) as any;
+  async getById(id: number | string) {
+    const rows = await query(
+      `SELECT r.*, vu.viaje_id, v."paisOrigen", v."aeropuertoOrigen", v."iataOrigen",
+        v."paisDestino", v."aeropuertoDestino", v."iataDestino",
+        vu."fecSalida", vu."horaSalida", vu."fecLlegada", vu."horaLlegada",
+        vu.tipo AS vuelo_tipo, vu.precio_ajustado,
+        u.nombre AS usuario_nombre, u.email AS usuario_email
+      FROM reservas r
+      JOIN vuelos vu ON vu.id = r.vuelo_id
+      JOIN viajes v  ON v.id  = vu.viaje_id
+      JOIN usuarios u ON u.id = r.usuario_id
+      WHERE r.id = $1`,
+      [id],
+    );
+    return rows[0] || null;
   },
 
-  async delete(id: string | number) {
-    const sql = "DELETE FROM reservas WHERE id = ?";
-    return (await query(sql, [id])) as any;
+  async getByUsuarioId(usuarioId: number | string) {
+    return await query(
+      `SELECT r.*, v."paisOrigen", v."aeropuertoOrigen", v."iataOrigen",
+        v."paisDestino", v."aeropuertoDestino", v."iataDestino", v.img,
+        vu."fecSalida", vu."horaSalida", vu."fecLlegada", vu."horaLlegada",
+        vu.tipo AS vuelo_tipo, vu.precio_ajustado,
+        COALESCE((
+          SELECT SUM(rs.precio_unitario_pagado * rs.cantidad)
+          FROM reserva_servicios rs
+          WHERE rs.reserva_id = r.id
+        ), 0) AS total_extras_calculado
+      FROM reservas r
+      JOIN vuelos vu ON vu.id = r.vuelo_id
+      JOIN viajes v  ON v.id  = vu.viaje_id
+      WHERE r.usuario_id = $1
+      ORDER BY r."fecCompra" DESC`,
+      [usuarioId],
+    );
+  },
+
+  async getAll() {
+    return await query(`
+      SELECT r.*, v."paisOrigen", v."aeropuertoOrigen", v."paisDestino", v."aeropuertoDestino",
+        vu."fecSalida", vu.tipo AS vuelo_tipo, u.nombre AS usuario_nombre, u.email AS usuario_email
+      FROM reservas r
+      JOIN vuelos vu ON vu.id = r.vuelo_id
+      JOIN viajes v  ON v.id  = vu.viaje_id
+      JOIN usuarios u ON u.id = r.usuario_id
+      ORDER BY r."fecCompra" DESC
+    `);
+  },
+
+  async actualizarEstado(id: number | string, estado: string) {
+    const rows = await query(
+      `UPDATE reservas SET estado = $1 WHERE id = $2 RETURNING *`,
+      [estado, id],
+    );
+    return rows[0];
+  },
+
+  async eliminar(id: number | string) {
+    return await query(`DELETE FROM reservas WHERE id = $1 RETURNING id`, [id]);
   },
 };

@@ -59,17 +59,43 @@ export const VueloModel = {
   async getById(id: string | number) {
     const rows = await query(
       `
-      SELECT 
-        v.*, 
-        vi."paisOrigen", vi."aeropuertoOrigen", vi."iataOrigen",
-        vi."paisDestino", vi."aeropuertoDestino", vi."iataDestino"
-      FROM vuelos v
-      JOIN viajes vi ON vi.id = v.viaje_id
-      WHERE v.id = $1
-    `,
+    SELECT 
+      v.*, 
+      vi."paisOrigen", vi."aeropuertoOrigen", vi."iataOrigen",
+      vi."paisDestino", vi."aeropuertoDestino", vi."iataDestino"
+    FROM vuelos v
+    JOIN viajes vi ON vi.id = v.viaje_id
+    WHERE v.id = $1
+  `,
       [id],
     );
-    return rows[0] || null;
+
+    const vuelo = rows[0] || null;
+
+    if (vuelo) {
+      try {
+        // Hacemos JOIN con la tabla 'servicios' para sacar el nombre
+        const servicios = await query(
+          `SELECT s.nombre, vs.precio_extra as precio, vs.valor
+         FROM viaje_servicio vs
+         JOIN servicios s ON vs.servicio_id = s.id
+         WHERE vs.viaje_id = $1 AND vs.incluido = true`,
+          [vuelo.viaje_id],
+        );
+
+        vuelo.serviciosBase = servicios.map((s) => ({
+          nombre: s.nombre,
+          valor: s.valor,
+          incluido: true,
+          cantidad: 1,
+        }));
+      } catch (dbError) {
+        console.error("Error al cargar servicios incluidos:", dbError);
+        vuelo.serviciosBase = []; // Evitamos que la API devuelva 500
+      }
+    }
+
+    return vuelo;
   },
 
   async create(data: {
