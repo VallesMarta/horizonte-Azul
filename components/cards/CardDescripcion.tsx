@@ -1,33 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-interface CardDescripcionProps {
+export default function CardDescripcion({
+  descripcion,
+}: {
   descripcion: string;
-}
-
-export default function CardDescripcion({ descripcion }: CardDescripcionProps) {
-  const [mostrarMas, setMostrarMas] = useState(false);
-
-  // Umbral de caracteres para decidir si mostrar el botón 
-  const esLarga = descripcion.length > 150;
+}) {
+  const [expandida, setExpandida] = useState(false);
+  const esLarga = descripcion.length > 180;
 
   return (
-    <div className="flex flex-col">
+    <div className="bg-card border border-card-borde rounded-3xl p-4 sm:p-6 space-y-3 transition-all duration-300">
       <p
-        className={`text-sm text-texto text-justify leading-relaxed transition-all duration-500 ease-in-out ${
-          !mostrarMas ? "line-clamp-3" : "line-clamp-none"
-        }`}
+        className={`
+        text-sm leading-relaxed text-texto
+        transition-all duration-300
+        ${!expandida && esLarga ? "line-clamp-3" : ""}
+      `}
       >
         {descripcion}
       </p>
-      
       {esLarga && (
         <button
-          onClick={() => setMostrarMas(!mostrarMas)}
-          className="mt-2 text-primario font-bold text-xs w-fit hover:underline transition-all active:scale-95"
+          onClick={() => setExpandida((e) => !e)}
+          className="
+            flex items-center gap-1.5
+            text-primario hover:text-secundario
+            font-black text-[10px] uppercase tracking-widest
+            transition-colors duration-200
+          "
         >
-          {mostrarMas ? "Ver menos ▲" : "Ver más ▼"}
+          {expandida ? (
+            <>
+              <FaChevronUp size={9} /> Ver menos
+            </>
+          ) : (
+            <>
+              <FaChevronDown size={9} /> Leer más
+            </>
+          )}
         </button>
       )}
     </div>
