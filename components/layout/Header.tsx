@@ -93,7 +93,7 @@ export default function Header() {
                   />
                 ) : (
                   <NavEnlace
-                    irA="/mis-reservas"
+                    irA="/perfil/mis-reservas"
                     textoAMostrar="Mis Reservas"
                     icono="FaPlaneDeparture"
                   />
@@ -168,7 +168,10 @@ export default function Header() {
                 <NavEnlace irA="/" textoAMostrar="Inicio" />
                 {!user ? (
                   <>
-                    <NavEnlace irA="/sobre-nosotros" textoAMostrar="Conócenos" />
+                    <NavEnlace
+                      irA="/sobre-nosotros"
+                      textoAMostrar="Conócenos"
+                    />
                     <NavEnlace irA="/contact" textoAMostrar="Contacto" />
                   </>
                 ) : (
@@ -186,7 +189,7 @@ export default function Header() {
                       />
                     ) : (
                       <NavEnlace
-                        irA="/mis-reservas"
+                        irA="/perfil/mis-reservas"
                         textoAMostrar="Mis Reservas"
                         icono="FaPlaneDeparture"
                       />
