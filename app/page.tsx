@@ -14,9 +14,9 @@ export default function Inicio() {
          - Usamos aspect-[5/1] para mantener la proporción de 1920x384px.
          - En móviles muy pequeños, esto hará que el banner sea bajito pero completo.
       */}
-      <div className="relative w-full aspect-[5/1] mb-10 overflow-hidden shadow-sm">
+      <div className="relative w-full aspect-5/1  mb-10 overflow-hidden shadow-sm">
         <Banner images={images} />
-      </div>      
+      </div>
       <GridDestinos />
     </div>
   );

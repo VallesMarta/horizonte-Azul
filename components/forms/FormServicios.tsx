@@ -107,7 +107,7 @@ const FormServicios = ({ setMostrarModalServicios }: ServiciosProps) => {
       </form>
 
       {/* Lista de Servicios */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-75 overflow-y-auto pr-2">
         {servicios.map((servicio) => (
           <div
             key={servicio.id}
