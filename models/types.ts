@@ -93,6 +93,11 @@ export interface Pasajero {
   tipo: "Adulto" | "Menor"; // Calculado a partir de esAdulto
 }
 
+export interface Servicio {
+  id: number;
+  nombre: string;
+  tipo_control: TipoControl;
+}
 export interface ViajeServicio {
   id: number;
   viaje_id: number;
