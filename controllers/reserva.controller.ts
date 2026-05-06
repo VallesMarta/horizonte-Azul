@@ -6,6 +6,7 @@ import { VueloModel } from "@/models/vuelo.model";
 import { UsuarioModel } from "@/models/usuario.model";
 import { ViajeServicioModel } from "@/models/viaje-servicio.model";
 import { obtenerSesion, validarAdmin } from "@/lib/auth-utils";
+import { emailReservaConfirmada } from "@/lib/email/emailActions";
 import { v4 as uuidv4 } from "uuid";
 import Stripe from "stripe";
 import {
@@ -142,6 +143,7 @@ export const ReservaController = {
 
       // 4. Crear las Reservas y desgloses
       const reservasCreadas = [];
+      const usuarioBD = await UsuarioModel.getById(usuarioId);
 
       for (const item of vuelosIds) {
         const vueloData = await VueloModel.getById(item.vuelo_id);
@@ -200,6 +202,30 @@ export const ReservaController = {
         }
 
         reservasCreadas.push(reserva);
+
+        // ── Email de confirmación por vuelo ────────────────────────────────
+        // Fire & forget — no bloquea la respuesta si falla el email
+        emailReservaConfirmada({
+          to: usuarioBD.email,
+          nombre: usuarioBD.nombre || usuarioBD.username,
+          localizador: reserva.localizador,
+          tipoVuelo: item.tipo as "ida" | "vuelta",
+          aeropuertoOrigen: vueloData.aeropuertoOrigen ?? "",
+          aeropuertoDestino: vueloData.aeropuertoDestino ?? "",
+          fecSalida: vueloData.fecSalida ?? "",
+          horaSalida: vueloData.horaSalida ?? "",
+          fecLlegada: vueloData.fecLlegada ?? "",
+          horaLlegada: vueloData.horaLlegada ?? "",
+          // Nombres de pasajeros separados por "||"
+          pasajeros: pasajeros
+            .map((p: any) => `${p.nombre} ${p.apellidos}`)
+            .join("||"),
+        }).catch((err) =>
+          console.error(
+            `❌ Error enviando email reserva ${reserva.localizador}:`,
+            err,
+          ),
+        );
       }
 
       return NextResponse.json(

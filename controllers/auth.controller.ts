@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { UsuarioModel } from "@/models/usuario.model";
 import { AuthModel } from "@/models/auth.model";
 import { obtenerSesion } from "@/lib/auth-utils";
+import { emailBienvenida } from "@/lib/email/emailActions";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -29,6 +30,15 @@ export const AuthController = {
         nombre,
         email,
       });
+
+      // Email de bienvenida
+      emailBienvenida({
+        to: email,
+        nombre: nombre || username,
+        urlAcceso: `${process.env.NEXT_PUBLIC_APP_URL}/perfil`,
+      }).catch((err) =>
+        console.error("❌ Error enviando email de bienvenida:", err),
+      );
 
       return NextResponse.json({
         ok: true,
