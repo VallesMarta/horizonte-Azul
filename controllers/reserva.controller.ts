@@ -272,7 +272,7 @@ export const ReservaController = {
       );
     }
   },
-  
+
   async obtenerDetalle(req: Request, id: string) {
     const sesion = await obtenerSesion(req);
     if (!sesion)
@@ -317,6 +317,43 @@ export const ReservaController = {
           servicios: todosLosServicios,
         },
       });
+    } catch (err: any) {
+      return NextResponse.json(
+        { ok: false, error: err.message },
+        { status: 500 },
+      );
+    }
+  },
+
+  // PATCH /api/reservas/[id]/cancelar — cancelar reserva (propietario o admin)
+  async cancelar(req: Request, id: string) {
+    const sesion = await obtenerSesion(req);
+    if (!sesion)
+      return NextResponse.json(
+        { ok: false, error: "No autorizado" },
+        { status: 401 },
+      );
+
+    try {
+      const reserva = await ReservaModel.getById(id);
+      if (!reserva)
+        return NextResponse.json(
+          { ok: false, error: "Reserva no encontrada" },
+          { status: 404 },
+        );
+
+      if (!sesion.isAdmin && String(reserva.usuario_id) !== sesion.id) {
+        return NextResponse.json(
+          { ok: false, error: "No puedes cancelar esta reserva" },
+          { status: 403 },
+        );
+      }
+
+      const reservaActualizada = await ReservaModel.actualizarEstado(
+        id,
+        "cancelada",
+      );
+      return NextResponse.json({ ok: true, resultado: reservaActualizada });
     } catch (err: any) {
       return NextResponse.json(
         { ok: false, error: err.message },

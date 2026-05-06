@@ -4,7 +4,7 @@ import { ReservaController } from "@/controllers/reserva.controller";
  * @swagger
  * /api/reservas/{id}/cancelar:
  *   patch:
- *     summary: Cancelar una reserva (solo Admin)
+ *     summary: Cancelar una reserva (propietario o admin)
  *     tags: [Reservas]
  *     security:
  *       - BearerAuth: []
@@ -36,16 +36,11 @@ import { ReservaController } from "@/controllers/reserva.controller";
  *       401:
  *         description: No autorizado
  *       403:
- *         description: Solo administradores pueden cancelar reservas
+ *         description: No puedes cancelar esta reserva
  */
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: Request, { params }: RouteParams) {
   const { id } = await params;
-  const cancelReq = new Request(req.url, {
-    method: "PATCH",
-    headers: req.headers,
-    body: JSON.stringify({ estado: "cancelada" }),
-  });
-  return ReservaController.actualizar(cancelReq, id);
+  return ReservaController.cancelar(req, id);
 }
