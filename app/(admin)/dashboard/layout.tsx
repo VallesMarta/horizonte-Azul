@@ -65,7 +65,6 @@ export default function DashboardLayout({
       icon: <FaConciergeBell />,
       path: "/dashboard/servicios",
     },
-    { name: "Vuelos", icon: <FaPlane />, path: "/dashboard/vuelos" },
     { name: "Usuarios", icon: <FaUsers />, path: "/dashboard/usuarios" },
     { name: "Banners", icon: <MdViewCarousel />, path: "/dashboard/banners" },
     { name: "Ajustes", icon: <FaCog />, path: "/dashboard/ajustes" },
