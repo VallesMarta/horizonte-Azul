@@ -1,15 +1,15 @@
 /**
  * emailService.ts
- * Servicio central de envío de emails usando Nodemailer + Gmail.
+ * Servicio central de envío de emails usando Nodemailer + Gmail OAuth2.
+ * Compatible con Vercel (no usa sockets SMTP directos).
  *
- * Variables de entorno necesarias (.env.local):
- *   EMAIL_FROM=info.horizonteazul@gmail.com
- *   EMAIL_GMAIL_PASS=xxxx xxxx xxxx xxxx   ← contraseña de aplicación Gmail
+ * Variables de entorno necesarias (.env.local y Vercel → Environment Variables):
+ *   GMAIL_CLIENT_ID=
+ *   GMAIL_CLIENT_SECRET=
+ *   GMAIL_REFRESH_TOKEN=
+ *   EMAIL_FROM=
  *   NEXT_PUBLIC_APP_NAME=Horizonte Azul
- *   NEXT_PUBLIC_APP_URL=https://tudominio.com
- *
- * Cómo obtener la contraseña de aplicación:
- *   myaccount.google.com → Seguridad → Verificación en 2 pasos → Contraseñas de aplicaciones
+ *   NEXT_PUBLIC_APP_URL=
  */
 
 import nodemailer from "nodemailer";
@@ -26,19 +26,12 @@ export type EmailPlantilla =
   | "custom";
 
 export interface EnviarEmailParams {
-  /** Destinatario(s) */
   to: string | string[];
-  /** Asunto del correo */
   subject: string;
-  /** Plantilla predefinida */
   plantilla: EmailPlantilla;
-  /** Datos para rellenar la plantilla */
   datos?: Record<string, string | number | boolean>;
-  /** HTML personalizado (solo si plantilla === 'custom') */
   htmlCustom?: string;
-  /** CC opcional */
   cc?: string | string[];
-  /** Reply-To opcional */
   replyTo?: string;
 }
 
@@ -49,27 +42,30 @@ export interface EmailResult {
 }
 
 // ------------------------------------------------------------------
-// Transporter Nodemailer (singleton)
+// Transporter OAuth2 (se crea en cada llamada — obligatorio en serverless)
 // ------------------------------------------------------------------
-let transporter: nodemailer.Transporter | null = null;
+function crearTransporter() {
+  const clientId = process.env.GMAIL_CLIENT_ID;
+  const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+  const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
+  const user = process.env.EMAIL_FROM;
 
-function getTransporter(): nodemailer.Transporter {
-  if (!transporter) {
-    const user = process.env.EMAIL_FROM;
-    const pass = process.env.EMAIL_GMAIL_PASS;
-
-    if (!user || !pass) {
-      throw new Error(
-        "Faltan EMAIL_FROM o EMAIL_GMAIL_PASS en las variables de entorno.",
-      );
-    }
-
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
+  if (!clientId || !clientSecret || !refreshToken || !user) {
+    throw new Error(
+      "Faltan variables de entorno: GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN o EMAIL_FROM.",
+    );
   }
-  return transporter;
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      type: "OAuth2",
+      user,
+      clientId,
+      clientSecret,
+      refreshToken,
+    },
+  });
 }
 
 // ------------------------------------------------------------------
@@ -88,7 +84,9 @@ export async function enviarEmail(
     replyTo,
   } = params;
 
-  const from = `"${process.env.NEXT_PUBLIC_APP_NAME ?? "Horizonte Azul"}" <${process.env.EMAIL_FROM}>`;
+  const fromName = process.env.NEXT_PUBLIC_APP_NAME ?? "Horizonte Azul";
+  const fromEmail = process.env.EMAIL_FROM ?? "";
+  const from = `"${fromName}" <${fromEmail}>`;
 
   let html: string;
 
@@ -101,12 +99,14 @@ export async function enviarEmail(
     }
     html = htmlCustom;
   } else {
-    const { generarPlantilla } = await import("@/lib/email/plantillas");
+    const { generarPlantilla } = await import("./plantillas");
     html = generarPlantilla(plantilla, datos);
   }
 
   try {
-    const info = await getTransporter().sendMail({
+    const transporter = crearTransporter();
+
+    const info = await transporter.sendMail({
       from,
       to: Array.isArray(to) ? to.join(", ") : to,
       subject,
@@ -119,7 +119,7 @@ export async function enviarEmail(
     return { ok: true, id: info.messageId };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Error desconocido";
-    console.error("[emailService] Error Nodemailer:", msg);
+    console.error("[emailService] Error OAuth2:", msg);
     return { ok: false, error: msg };
   }
 }
