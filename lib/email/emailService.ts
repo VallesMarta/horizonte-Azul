@@ -44,7 +44,11 @@ export interface EmailResult {
 // ------------------------------------------------------------------
 // Transporter OAuth2 (se crea en cada llamada — obligatorio en serverless)
 // ------------------------------------------------------------------
+let transporter: nodemailer.Transporter | null = null;
+
 function crearTransporter() {
+  if (transporter) return transporter; // Reutilizar si ya existe
+
   const clientId = process.env.GMAIL_CLIENT_ID;
   const clientSecret = process.env.GMAIL_CLIENT_SECRET;
   const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
@@ -55,9 +59,11 @@ function crearTransporter() {
       "Faltan variables de entorno: GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN o EMAIL_FROM.",
     );
   }
-
-  return nodemailer.createTransport({
+  transporter = nodemailer.createTransport({
     service: "gmail",
+    pool: true, // RECOMENDADO: Mantiene conexiones abiertas para reutilizarlas
+    maxConnections: 3,
+    maxMessages: 100,
     auth: {
       type: "OAuth2",
       user,
@@ -65,7 +71,13 @@ function crearTransporter() {
       clientSecret,
       refreshToken,
     },
+    // Añadimos tiempos de espera para que no se cuelgue el socket
+    connectionTimeout: 10000, // 10 segundos
+    greetingTimeout: 5000,
+    socketTimeout: 15000,
   });
+  
+  return transporter;
 }
 
 // ------------------------------------------------------------------

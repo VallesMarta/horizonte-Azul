@@ -205,27 +205,30 @@ export const ReservaController = {
 
         // ── Email de confirmación por vuelo ────────────────────────────────
         // Fire & forget — no bloquea la respuesta si falla el email
-        emailReservaConfirmada({
-          to: usuarioBD.email,
-          nombre: usuarioBD.nombre || usuarioBD.username,
-          localizador: reserva.localizador,
-          tipoVuelo: item.tipo as "ida" | "vuelta",
-          aeropuertoOrigen: vueloData.aeropuertoOrigen ?? "",
-          aeropuertoDestino: vueloData.aeropuertoDestino ?? "",
-          fecSalida: vueloData.fecSalida ?? "",
-          horaSalida: vueloData.horaSalida ?? "",
-          fecLlegada: vueloData.fecLlegada ?? "",
-          horaLlegada: vueloData.horaLlegada ?? "",
-          // Nombres de pasajeros separados por "||"
-          pasajeros: pasajeros
-            .map((p: any) => `${p.nombre} ${p.apellidos}`)
-            .join("||"),
-        }).catch((err) =>
+        try {
+          await emailReservaConfirmada({
+            to: usuarioBD.email,
+            nombre: usuarioBD.nombre || usuarioBD.username,
+            localizador: reserva.localizador,
+            tipoVuelo: item.tipo as "ida" | "vuelta",
+            aeropuertoOrigen: vueloData.aeropuertoOrigen ?? "",
+            aeropuertoDestino: vueloData.aeropuertoDestino ?? "",
+            fecSalida: vueloData.fecSalida ?? "",
+            horaSalida: vueloData.horaSalida ?? "",
+            fecLlegada: vueloData.fecLlegada ?? "",
+            horaLlegada: vueloData.horaLlegada ?? "",
+            pasajeros: pasajeros
+              .map((p: any) => `${p.nombre} ${p.apellidos}`)
+              .join("||"),
+          });
+          console.log(`✅ Email enviado para reserva: ${reserva.localizador}`);
+        } catch (err) {
+          // Solo logueamos el error para que la reserva no falle si falla el mail
           console.error(
             `❌ Error enviando email reserva ${reserva.localizador}:`,
             err,
-          ),
-        );
+          );
+        }
       }
 
       return NextResponse.json(
