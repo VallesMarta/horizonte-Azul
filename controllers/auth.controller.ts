@@ -32,13 +32,16 @@ export const AuthController = {
       });
 
       // Email de bienvenida
-      emailBienvenida({
-        to: email,
-        nombre: nombre || username,
-        urlAcceso: `${process.env.NEXT_PUBLIC_APP_URL}/perfil`,
-      }).catch((err) =>
-        console.error("❌ Error enviando email de bienvenida:", err),
-      );
+      try {
+        await emailBienvenida({
+          to: email,
+          nombre: nombre || username,
+          urlAcceso: `${process.env.NEXT_PUBLIC_APP_URL}/perfil`,
+        });
+      } catch (err) {
+        // Solo logueamos, no bloqueamos el registro si el email falla
+        console.error("❌ Error enviando email de bienvenida:", err);
+      }
 
       return NextResponse.json({
         ok: true,
