@@ -4,6 +4,8 @@ import {
   CardExpiryElement,
   CardCvcElement,
 } from "@stripe/react-stripe-js";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface Props {
   metodo: "tarjeta" | "transferencia" | "paypal";
@@ -19,13 +21,6 @@ interface Props {
   onPagar: () => void;
 }
 
-const STRIPE_BASE = {
-  fontSize: "15px",
-  fontFamily: "Lato, sans-serif",
-  color: "#1f2937",
-  "::placeholder": { color: "#7082a0" },
-};
-
 export function PasoPago({
   metodo,
   setMetodo,
@@ -39,6 +34,35 @@ export function PasoPago({
   onVolver,
   onPagar,
 }: Props) {
+  
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Evitamos errores de hidratación
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Definimos si es dark basándonos en next-themes
+  const isDark = resolvedTheme === "dark";
+
+  const STRIPE_STYLE = {
+    base: {
+      fontSize: "15px",
+      fontFamily: "Lato, sans-serif",
+      color: isDark ? "#f4f5fa" : "#1f2937",
+      "::placeholder": {
+        color: isDark ? "#5a6a82" : "#7082a0",
+      },
+    },
+    invalid: {
+      color: "#d13264",
+    },
+  };
+
+  // Si no está montado, puedes devolver un skeleton o el contenedor vacío
+  if (!mounted) return <div className="h-40 animate-pulse bg-bg rounded-3xl" />;
+
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       <h2 className="text-lg font-black text-titulo-resaltado uppercase tracking-tighter flex items-center gap-2">
@@ -131,7 +155,8 @@ export function PasoPago({
                 </label>
                 <div className="bg-fondo border border-borde rounded-xl p-3 focus-within:border-primario transition-colors">
                   <CardNumberElement
-                    options={{ style: { base: STRIPE_BASE }, showIcon: true }}
+                    key={`num-${resolvedTheme}`}
+                    options={{ style: STRIPE_STYLE, showIcon: true }}
                   />
                 </div>
               </div>
@@ -144,7 +169,8 @@ export function PasoPago({
                   </label>
                   <div className="bg-fondo border border-borde rounded-xl p-3 focus-within:border-primario transition-colors">
                     <CardExpiryElement
-                      options={{ style: { base: STRIPE_BASE } }}
+                      key={`exp-${resolvedTheme}`}
+                      options={{ style: STRIPE_STYLE }}
                     />
                   </div>
                 </div>
@@ -154,7 +180,8 @@ export function PasoPago({
                   </label>
                   <div className="bg-fondo border border-borde rounded-xl p-3 focus-within:border-primario transition-colors">
                     <CardCvcElement
-                      options={{ style: { base: STRIPE_BASE } }}
+                      key={`cvc-${resolvedTheme}`}
+                      options={{ style: STRIPE_STYLE }}
                     />
                   </div>
                 </div>
