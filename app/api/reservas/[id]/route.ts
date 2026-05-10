@@ -38,8 +38,6 @@ import { ReservaController } from "@/controllers/reserva.controller";
  *                     fecCompra:
  *                       type: string
  *                       format: date-time
- *                     pasajeros:
- *                       type: integer
  *                     precioTotal:
  *                       type: number
  *                     precio_vuelo_historico:
