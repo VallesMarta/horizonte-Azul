@@ -8,10 +8,10 @@ import {
   FaPlane,
   FaInstagram,
   FaFacebook,
-  FaTwitter,
   FaShieldAlt,
   FaInfoCircle,
   FaBars,
+  FaUsers,
   FaTimes,
   FaCheckCircle,
   FaLock,
@@ -23,11 +23,14 @@ import {
   FaIdBadge,
   FaArrowRight,
   FaPlus,
+  FaPlusCircle,
   FaConciergeBell,
   FaChartPie,
   FaCog,
   FaChevronLeft,
   FaChevronRight,
+  FaChevronDown,
+  FaChevronUp,
   FaSuitcase,
   FaPaperPlane,
   FaMapMarkerAlt,
@@ -36,14 +39,29 @@ import {
   FaSpinner,
   FaEdit,
   FaTrash,
+  FaTrashAlt,
   FaSearch,
   FaGlobeAmericas,
   FaHashtag,
   FaFont,
   FaCheck,
   FaToggleOn,
+  FaBell,
+  FaBellSlash,
+  FaHeart,
+  FaShoppingCart,
+  FaCreditCard,
+  FaCalendarAlt,
+  FaEye,
+  FaEyeSlash,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
-import { GrConfigure } from "react-icons/gr";
+import { GrConfigure, GrDocumentConfig } from "react-icons/gr";
+import { HiArrowLongLeft } from "react-icons/hi2";
+import { MdFlightTakeoff, MdFlightLand, MdViewCarousel } from "react-icons/md";
+import { RiEditBoxFill } from "react-icons/ri";
+import { FaArrowRightLong } from "react-icons/fa6";
 import {
   SiVisa,
   SiMastercard,
@@ -52,7 +70,9 @@ import {
   SiApplepay,
   SiGooglepay,
 } from "react-icons/si";
-import { ImCross } from "react-icons/im";
+import { ImCross, ImHeart } from "react-icons/im";
+import { BsTwitterX } from "react-icons/bs";
+import { SlHeart } from "react-icons/sl";
 
 export default function IconosResumen() {
   const categorias = [
@@ -65,9 +85,12 @@ export default function IconosResumen() {
         { I: FaChevronLeft, n: "FaChevronLeft" },
         { I: FaChevronRight, n: "FaChevronRight" },
         { I: FaArrowRight, n: "FaArrowRight" },
+        { I: FaArrowRightLong, n: "FaArrowRightLong" },
+        { I: HiArrowLongLeft, n: "HiArrowLongLeft" },
+        { I: FaChevronDown, n: "FaChevronDown" },
+        { I: FaChevronUp, n: "FaChevronUp" },
         { I: FaSearch, n: "FaSearch" },
         { I: FaSpinner, n: "FaSpinner" },
-        { I: FaSignOutAlt, n: "FaSignOutAlt" },
       ],
     },
     {
@@ -76,6 +99,8 @@ export default function IconosResumen() {
         { I: FaPlane, n: "FaPlane" },
         { I: FaPlaneDeparture, n: "FaPlaneDeparture" },
         { I: FaPlaneArrival, n: "FaPlaneArrival" },
+        { I: MdFlightTakeoff, n: "MdFlightTakeoff" },
+        { I: MdFlightLand, n: "MdFlightLand" },
         { I: FaGlobe, n: "FaGlobe" },
         { I: FaGlobeAmericas, n: "FaGlobeAmericas" },
         { I: FaMapMarkerAlt, n: "FaMapMarkerAlt" },
@@ -84,19 +109,23 @@ export default function IconosResumen() {
       ],
     },
     {
-      titulo: "Usuarios",
+      titulo: "Usuario y Cuenta",
       icons: [
         { I: FaUser, n: "FaUser" },
+        { I: FaUsers, n: "FaUsers" },
         { I: FaUserCircle, n: "FaUserCircle" },
         { I: FaIdBadge, n: "FaIdBadge" },
         { I: FaEnvelope, n: "FaEnvelope" },
         { I: FaKey, n: "FaKey" },
         { I: FaLock, n: "FaLock" },
         { I: FaShieldAlt, n: "FaShieldAlt" },
+        { I: FaSignOutAlt, n: "FaSignOutAlt" },
+        { I: FaEye, n: "FaEye" },
+        { I: FaEyeSlash, n: "FaEyeSlash" },
       ],
     },
     {
-      titulo: "Pagos y Finanzas",
+      titulo: "Pagos y Reservas",
       icons: [
         { I: SiVisa, n: "SiVisa" },
         { I: SiMastercard, n: "SiMastercard" },
@@ -104,39 +133,58 @@ export default function IconosResumen() {
         { I: SiPaypal, n: "SiPaypal" },
         { I: SiApplepay, n: "SiApplepay" },
         { I: SiGooglepay, n: "SiGooglepay" },
+        { I: FaCreditCard, n: "FaCreditCard" },
+        { I: FaEuroSign, n: "FaEuroSign" },
+        { I: FaShoppingCart, n: "FaShoppingCart" },
+        { I: FaCalendarAlt, n: "FaCalendarAlt" },
+      ],
+    },
+    {
+      titulo: "Gestión y Dashboard",
+      icons: [
+        { I: FaChartPie, n: "FaChartPie" },
+        { I: FaPlus, n: "FaPlus" },
+        { I: FaPlusCircle, n: "FaPlusCircle" },
+        { I: FaEdit, n: "FaEdit" },
+        { I: FaTrash, n: "FaTrash" },
+        { I: FaTrashAlt, n: "FaTrashAlt" },
+        { I: FaCog, n: "FaCog" },
+        { I: GrConfigure, n: "GrConfigure" },
+        { I: GrDocumentConfig, n: "GrDocumentConfig" },
+        { I: RiEditBoxFill, n: "RiEditBoxFill" },
+        { I: FaFont, n: "FaFont" },
+        { I: FaHashtag, n: "FaHashtag" },
+        { I: FaToggleOn, n: "FaToggleOn" },
         { I: FaCheckCircle, n: "FaCheckCircle" },
         { I: FaCheck, n: "FaCheck" },
       ],
     },
     {
-      titulo: "Gestión y Edición (Dashboard)",
+      titulo: "Notificaciones y Social",
       icons: [
-        { I: FaPlus, n: "FaPlus" },
-        { I: FaEdit, n: "FaEdit" },
-        { I: FaTrash, n: "FaTrash" },
-        { I: FaCog, n: "FaCog" },
-        { I: GrConfigure, n: "GrConfigure" },
-        { I: FaEuroSign, n: "FaEuroSign" },
-        { I: FaChartPie, n: "FaChartPie" },
-        { I: FaConciergeBell, n: "FaConciergeBell" },
-        { I: FaFont, n: "FaFont" },
-        { I: FaHashtag, n: "FaHashtag" },
-        { I: FaToggleOn, n: "FaToggleOn" },
-      ],
-    },
-    {
-      titulo: "Otros y Social",
-      icons: [
+        { I: FaBell, n: "FaBell" },
+        { I: FaBellSlash, n: "FaBellSlash" },
         { I: FaInstagram, n: "FaInstagram" },
         { I: FaFacebook, n: "FaFacebook" },
-        { I: FaTwitter, n: "FaTwitter" },
+        { I: BsTwitterX, n: "BsTwitterX" },
         { I: FaPhoneAlt, n: "FaPhoneAlt" },
         { I: FaPaperPlane, n: "FaPaperPlane" },
         { I: FaInfoCircle, n: "FaInfoCircle" },
+        { I: FaSun, n: "FaSun" },
+        { I: FaMoon, n: "FaMoon" },
+      ],
+    },
+    {
+      titulo: "Favoritos y Estados",
+      icons: [
+        { I: FaHeart, n: "FaHeart" },
+        { I: SlHeart, n: "SlHeart" },
+        { I: ImHeart, n: "ImHeart" },
+        { I: FaConciergeBell, n: "FaConciergeBell" },
       ],
     },
   ];
- return (
+  return (
     <div className="min-h-screen bg-fondo p-8 md:p-16 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         <header className="mb-16">
@@ -144,7 +192,7 @@ export default function IconosResumen() {
             Iconos HA
           </h1>
           <p className="text-gris font-bold uppercase text-xs tracking-[0.3em] mt-4">
-            Catálogo completo de iconos
+            Catálogo de iconos usados en el proyecto
           </p>
         </header>
 
@@ -158,7 +206,7 @@ export default function IconosResumen() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
                 {cat.icons.map((icon, idx) => (
                   <div key={idx} className="group flex flex-col items-center">
-                    <div className="w-20 h-20 bg-gris-clarito rounded-[2rem] flex items-center justify-center group-hover:bg-primario/10 group-hover:scale-110 transition-all duration-300 border border-gris-borde-suave shadow-sm">
+                    <div className="w-20 h-20 bg-card rounded-4xl flex items-center justify-center group-hover:bg-primario/10 group-hover:scale-110 transition-all duration-300 border border-gris-borde-suave shadow-sm">
                       <icon.I className="text-primario" size={28} />
                     </div>
                     <span className="mt-4 text-[10px] font-black text-secundario uppercase tracking-tighter opacity-60 group-hover:opacity-100 transition-opacity">
