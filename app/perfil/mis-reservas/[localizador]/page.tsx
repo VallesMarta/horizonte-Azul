@@ -385,7 +385,7 @@ export default function LocalizadorReservaPage() {
               Reserva guardada
             </p>
             <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mt-4">
-              {grupo[0].paisOrigen} <span className="text-primario">→</span>{" "}
+              {grupo[0].paisOrigen} <span className="text-primario"> - </span>{" "}
               {grupo[0].paisDestino}
             </h1>
             <p className="text-sm text-blanco-fijo/70 mt-4 max-w-2xl">
@@ -410,7 +410,7 @@ export default function LocalizadorReservaPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="space-y-6">
-          <div className="bg-bg border border-borde rounded-3xl p-6 shadow-sm">
+          <div className="bg-card border border-card-borde rounded-3xl p-6 shadow-sm">
             <div className="mb-5">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-primario">
@@ -437,7 +437,7 @@ export default function LocalizadorReservaPage() {
                 .map((reserva, index) => (
                   <div
                     key={reserva.reserva_id}
-                    className="rounded-3xl border border-borde p-5 bg-white/80"
+                    className="rounded-3xl border border-card-borde p-5 bg-card"
                   >
                     <div className="flex items-start gap-4">
                       <div className="shrink-0 mt-1 text-primario">
@@ -454,8 +454,19 @@ export default function LocalizadorReservaPage() {
                             : "Vuelo ida"}
                         </p>
                         <p className="text-lg font-black text-titulo-resaltado truncate">
-                          {reserva.aeropuertoOrigen} →{" "}
-                          {reserva.aeropuertoDestino}
+                          {reserva.vuelo_tipo === "ida" ? (
+                            <>
+                              {reserva.aeropuertoOrigen}
+                              {" - "}
+                              {reserva.aeropuertoDestino}
+                            </>
+                          ) : (
+                            <>
+                              {reserva.aeropuertoDestino}
+                              {" - "}
+                              {reserva.aeropuertoOrigen}
+                            </>
+                          )}
                         </p>
                         <p className="text-sm text-gris mt-2">
                           {fmtFecha(reserva.fecSalida, {
@@ -464,15 +475,7 @@ export default function LocalizadorReservaPage() {
                             month: "short",
                           })}{" "}
                           · {fmt(reserva.horaSalida)}
-                        </p>
-                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                          <div className="rounded-3xl bg-primary/5 p-3 text-sm font-black uppercase tracking-widest text-primario">
-                            {reserva.iataOrigen || "---"}
-                          </div>
-                          <div className="rounded-3xl bg-primary/5 p-3 text-sm font-black uppercase tracking-widest text-primario">
-                            {reserva.iataDestino || "---"}
-                          </div>
-                        </div>
+                        </p>                        
                       </div>
                     </div>
                   </div>
@@ -480,7 +483,7 @@ export default function LocalizadorReservaPage() {
             </div>
           </div>
 
-          <div className="bg-bg border border-borde rounded-3xl p-6 shadow-sm">
+          <div className="bg-card border border-card-borde rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-primario">
@@ -498,7 +501,7 @@ export default function LocalizadorReservaPage() {
               {detalles?.pasajeros.map((p, index) => (
                 <div
                   key={index}
-                  className="rounded-3xl border border-borde p-4 bg-white/80"
+                  className="rounded-3xl border border-card-borde p-4 bg-card"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-black text-titulo-resaltado uppercase truncate">
@@ -519,7 +522,7 @@ export default function LocalizadorReservaPage() {
 
           {(serviciosIncluidos.length > 0 ||
             serviciosAdicionales.length > 0) && (
-            <div className="bg-bg border border-borde rounded-3xl p-6 shadow-sm">
+            <div className="bg-card border border-card-borde rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between gap-4 mb-5">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-primario">
@@ -618,7 +621,7 @@ export default function LocalizadorReservaPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-bg border border-borde rounded-3xl p-6 shadow-sm">
+          <div className="bg-card border border-card-borde rounded-3xl p-6 shadow-sm">
             <p className="text-[10px] font-black uppercase tracking-widest text-primario mb-4">
               Resumen de pago
             </p>
@@ -646,7 +649,7 @@ export default function LocalizadorReservaPage() {
             </div>
           </div>
 
-          <div className="bg-bg border border-borde rounded-3xl p-6 shadow-sm">
+          <div className="bg-card border border-card-borde rounded-3xl p-6 shadow-sm">
             <p className="text-[10px] font-black uppercase tracking-widest text-primario mb-4">
               Descargar resumen
             </p>
