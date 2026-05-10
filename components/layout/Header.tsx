@@ -65,7 +65,7 @@ export default function Header() {
               <>
                 <NavEnlace irA="/" textoAMostrar="Inicio" />
                 <NavEnlace irA="/sobre-nosotros" textoAMostrar="Conócenos" />
-                <NavEnlace irA="/contact" textoAMostrar="Contacto" />
+                <NavEnlace irA="/contacto" textoAMostrar="Contacto" />
                 <NavButton
                   irA="/registro"
                   textoAMostrar="Crear cuenta"
@@ -172,7 +172,7 @@ export default function Header() {
                       irA="/sobre-nosotros"
                       textoAMostrar="Conócenos"
                     />
-                    <NavEnlace irA="/contact" textoAMostrar="Contacto" />
+                    <NavEnlace irA="/contacto" textoAMostrar="Contacto" />
                   </>
                 ) : (
                   <>

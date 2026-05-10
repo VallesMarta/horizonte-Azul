@@ -9,6 +9,7 @@ import {
   FaCreditCard,
   FaPlane,
   FaSpinner,
+  FaEnvelope,
 } from "react-icons/fa";
 import Sidebar from "@/components/ui/Sidebar/index";
 
@@ -42,6 +43,11 @@ export default function PerfilLayout({
       name: "Mis Tarjetas",
       icon: <FaCreditCard />,
       path: "/perfil/mis-tarjetas",
+    },
+    {
+      name: "Mis Consultas",
+      icon: <FaEnvelope />,
+      path: "/perfil/mis-consultas",
     },
     { name: "Seguridad", icon: <FaLock />, path: "/perfil/seguridad" },
   ];
