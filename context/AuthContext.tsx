@@ -13,9 +13,10 @@ interface User {
   username: string;
   id: number;
   isAdmin: boolean;
+  nombre?: string;
+  email?: string;
   fotoperfil?: string;
 }
-
 interface AuthContextType {
   user: User | null;
   login: (token: string, userData: User) => void;
