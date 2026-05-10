@@ -23,6 +23,7 @@ export type EmailPlantilla =
   | "confirmacion"
   | "notificacion"
   | "reservaConfirmada"
+  | "respuestaContacto"
   | "custom";
 
 export interface EnviarEmailParams {

@@ -534,6 +534,64 @@ function plantillaReservaConfirmada(
   return layoutBase(contenido);
 }
 
+// ─── Añadir la función antes de generarPlantilla ──────────────────────────────
+function plantillaRespuestaContacto(
+  datos: Record<string, string | number | boolean>,
+): string {
+  const nombre = String(datos.nombre ?? "Usuario");
+  const asunto = String(datos.asuntoOriginal ?? "tu consulta");
+  const respuesta = String(datos.respuesta ?? "");
+  const urlContacto = String(datos.urlContacto ?? BRAND.url);
+
+  const contenido = `
+    <h1 style="margin:0 0 8px; font-size:24px; font-weight:800; color:${BRAND.secundario};">
+      Hemos respondido a tu consulta
+    </h1>
+    <p style="margin:0 0 20px; font-size:15px; color:${BRAND.gris}; line-height:1.6;">
+      Hola <strong>${nombre}</strong>, el equipo de <strong>${BRAND.nombre}</strong>
+      ha dado respuesta a tu mensaje sobre <em>"${asunto}"</em>.
+    </p>
+
+    ${divider}
+
+    <!-- Bloque de respuesta -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="border-left:4px solid ${BRAND.primario}; border-radius:0 8px 8px 0;
+             background-color:${BRAND.fondo}; margin-bottom:24px;">
+      <tr>
+        <td style="padding:20px 24px;">
+          <p style="margin:0 0 8px; font-size:11px; font-weight:700;
+                    color:${BRAND.primario}; text-transform:uppercase; letter-spacing:1px;">
+            Respuesta del equipo
+          </p>
+          <p style="margin:0; font-size:15px; color:${BRAND.texto}; line-height:1.7;
+                    white-space:pre-wrap;">
+            ${respuesta}
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    ${divider}
+
+    <p style="margin:0 0 12px; font-size:14px; color:${BRAND.texto}; line-height:1.7;">
+      Si necesitas más información o tienes alguna pregunta adicional,
+      no dudes en escribirnos de nuevo.
+    </p>
+
+    ${botonCTA("Contactar de nuevo", urlContacto)}
+
+    ${divider}
+
+    <p style="margin:0; font-size:12px; color:${BRAND.gris}; line-height:1.6;">
+      Este correo es una respuesta directa a tu consulta en ${BRAND.nombre}.
+      Si no reconoces este mensaje, puedes ignorarlo.
+    </p>
+  `;
+
+  return layoutBase(contenido);
+}
+
 // ------------------------------------------------------------------
 // Exportación principal
 // ------------------------------------------------------------------
@@ -552,6 +610,8 @@ export function generarPlantilla(
       return plantillaNotificacion(datos);
     case "reservaConfirmada":
       return plantillaReservaConfirmada(datos);
+    case "respuestaContacto":
+      return plantillaRespuestaContacto(datos);
     default:
       throw new Error(`Plantilla desconocida: ${tipo}`);
   }

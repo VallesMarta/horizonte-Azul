@@ -131,3 +131,23 @@ export async function emailReservaConfirmada(params: {
     },
   });
 }
+
+// ─── Respuesta a mensaje de contacto ─────────────────────────────────────────
+export async function emailRespuestaContacto(params: {
+  to: string;
+  nombre: string;
+  asuntoOriginal: string;
+  respuesta: string;
+}): Promise<EmailResult> {
+  return enviarEmail({
+    to: params.to,
+    subject: `Re: ${params.asuntoOriginal} — ${APP_NAME}`,
+    plantilla: "respuestaContacto",
+    datos: {
+      nombre: params.nombre,
+      asuntoOriginal: params.asuntoOriginal,
+      respuesta: params.respuesta,
+      urlContacto: `${APP_URL}/contacto`,
+    },
+  });
+}
