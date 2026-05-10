@@ -39,7 +39,7 @@ export default function DashboardPage() {
         Error al cargar estadísticas: {error}
       </div>
     );
-
+    
   if (!data) return null;
 
   const { totales, top_destinos, top_wishlist, estados, ultimas_reservas } =
@@ -47,8 +47,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-titulo-resaltado uppercase tracking-tighter">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-black text-titulo-resaltado uppercase tracking-tighter">
           Panel de administración
         </h1>
         <p className="text-gris-claro text-sm mt-1">
@@ -56,9 +56,9 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <StatCard
             label="Usuarios"
             value={totales.usuarios.toLocaleString("es-ES")}
@@ -88,17 +88,20 @@ export default function DashboardPage() {
             color="morado"
             sub="mes actual"
           />
-          <StatCard
-            label="Vuelos activos"
-            value={totales.vuelos_activos.toLocaleString("es-ES")}
-            icon="✈️"
-            color="azul"
-            sub="próximos y operativos"
-          />
+          {/* La 5ª tarjeta ocupa el ancho completo en la fila de 2 cols, centrada en sm (3 cols) */}
+          <div className="col-span-2 sm:col-span-1">
+            <StatCard
+              label="Vuelos activos"
+              value={totales.vuelos_activos.toLocaleString("es-ES")}
+              icon="✈️"
+              color="azul"
+              sub="próximos y operativos"
+            />
+          </div>
         </div>
 
         {/* Tablas + gráfico */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
           <TopDestinosTable destinos={top_destinos} />
           <TopWishlistTable wishlist={top_wishlist} />
           <EstadosReservaChart estados={estados} />
