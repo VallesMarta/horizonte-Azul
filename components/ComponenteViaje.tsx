@@ -53,10 +53,10 @@ const Viaje = ({ viaje, onEditar, refrescarViajes }: ViajeProps) => {
   };
 
   return (
-    <div className="group w-full max-w-[300px] bg-white rounded-[2rem] p-4 border border-gray-100 shadow-xl shadow-secundario/5 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col">
+    <div className="group w-full max-w-75 bg-white rounded-4xl p-4 border border-gray-100 shadow-xl shadow-secundario/5 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col">
       
       {/* IMAGEN CON PRECIO FLOTANTE */}
-      <div className="relative h-44 w-full overflow-hidden rounded-[1.5rem] mb-4">
+      <div className="relative h-44 w-full overflow-hidden rounded-3xl mb-4">
         <img
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           src={imageSrc}
@@ -68,7 +68,7 @@ const Viaje = ({ viaje, onEditar, refrescarViajes }: ViajeProps) => {
       </div>
 
       {/* DETALLES DEL VIAJE */}
-      <div className="px-1 flex flex-col flex-grow">
+      <div className="px-1 flex flex-col grow">
         <div className="flex items-center gap-2 mb-1">
           <FaPlane size={10} className="text-primario rotate-45" />
           <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">

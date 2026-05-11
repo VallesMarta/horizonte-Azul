@@ -83,7 +83,7 @@ export default function FormCrearViaje({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         {/* ORIGEN */}
-        <div className="space-y-4 bg-gray-50/50 p-5 rounded-[2rem] border border-gray-100">
+        <div className="space-y-4 bg-gray-50/50 p-5 rounded-4xl border border-gray-100">
           <p className="text-[10px] font-black text-primario uppercase tracking-widest ml-2">Salida</p>
           <InputLabel label="País Origen" icon={<FaPlaneDeparture />} value={paisOrigen} onChange={setPaisOrigen} placeholder="Ej: España" />
           <InputLabel label="Aeropuerto" icon={<FaPlaneDeparture />} value={aeropuertoOrigen} onChange={setAeropuertoOrigen} placeholder="Ej: Madrid (MAD)" />
@@ -91,7 +91,7 @@ export default function FormCrearViaje({
         </div>
 
         {/* DESTINO */}
-        <div className="space-y-4 bg-gray-50/50 p-5 rounded-[2rem] border border-gray-100">
+        <div className="space-y-4 bg-gray-50/50 p-5 rounded-4xl border border-gray-100">
           <p className="text-[10px] font-black text-secundario uppercase tracking-widest ml-2">Llegada</p>
           <InputLabel label="País Destino" icon={<FaPlaneArrival />} value={paisDestino} onChange={setPaisDestino} placeholder="Ej: Irlanda" />
           <InputLabel label="Aeropuerto" icon={<FaPlaneArrival />} value={aeropuertoDestino} onChange={setAeropuertoDestino} placeholder="Ej: Dublín (DUB)" />
@@ -128,7 +128,7 @@ export default function FormCrearViaje({
         </button>
         <button 
           type="submit" 
-          className="bg-secundario text-white px-10 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-secundario/20 hover:bg-primario transition-all active:scale-95"
+          className="bg-secundario text-white px-10 py-4 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-secundario/20 hover:bg-primario transition-all active:scale-95"
         >
           {esEditar ? "Actualizar Vuelo" : "Publicar Vuelo"}
         </button>
