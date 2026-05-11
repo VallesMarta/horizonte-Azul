@@ -46,6 +46,86 @@ export async function getMensajes(req: NextRequest) {
   }
 }
 
+export async function getHilo(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await validarAdmin(req as any);
+  if (!auth.autorizado) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  const { id } = await params;
+  const contacto_id = parseInt(id);
+  const mensaje = await MensajeContactoModel.getById(contacto_id);
+  if (!mensaje) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+
+  const hilo = await MensajeContactoModel.getHilo(contacto_id);
+  return NextResponse.json(hilo);
+}
+
+export async function responderHilo(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await validarAdmin(req as any);
+  if (!auth.autorizado) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  try {
+    const { id } = await params;
+    const contacto_id = parseInt(id);
+    const { contenido } = await req.json();
+
+    if (!contenido?.trim()) {
+      return NextResponse.json({ error: "Contenido vacío" }, { status: 400 });
+    }
+
+    const mensaje = await MensajeContactoModel.getById(contacto_id);
+    if (!mensaje) {
+      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    }
+
+    const nuevoMensaje = await MensajeContactoModel.añadirAlHilo(
+      contacto_id,
+      "admin",
+      contenido,
+    );
+
+    await MensajeContactoModel.responder(contacto_id);
+
+    try {
+      await emailRespuestaContacto({
+        to: mensaje.email,
+        nombre: mensaje.nombre,
+        asuntoOriginal: mensaje.asunto,
+        respuesta: contenido,
+      });
+    } catch (emailErr) {
+      console.error("Error email (no crítico):", emailErr);
+    }
+
+    if (mensaje.usuario_id) {
+      await NotificacionModel.crear({
+        usuario_id: mensaje.usuario_id,
+        tipo: "respuesta_contacto",
+        titulo: `Nueva respuesta: ${mensaje.asunto}`,
+        cuerpo: contenido,
+        enlace: "/perfil/mis-consultas",
+        mensaje_contacto_id: contacto_id,
+      });
+    }
+
+    return NextResponse.json(nuevoMensaje);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Error del servidor" }, { status: 500 });
+  }
+}
+
 export async function getMensaje(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
