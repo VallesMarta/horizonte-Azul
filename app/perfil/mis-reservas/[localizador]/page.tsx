@@ -475,7 +475,7 @@ export default function LocalizadorReservaPage() {
                             month: "short",
                           })}{" "}
                           · {fmt(reserva.horaSalida)}
-                        </p>                        
+                        </p>
                       </div>
                     </div>
                   </div>

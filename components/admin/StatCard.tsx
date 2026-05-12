@@ -31,10 +31,10 @@ export default function StatCard({
 }: StatCardProps) {
   return (
     <div
-      className={`rounded-2xl border p-5 bg-card flex items-center gap-4 shadow-sm ${colorMap[color]}`}
+      className={`rounded-2xl border p-4 sm:p-5 bg-card flex items-center gap-3 sm:gap-4 shadow-sm h-full ${colorMap[color]}`}
     >
       <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl text-white shrink-0 ${iconBg[color]}`}
+        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl text-white shrink-0 ${iconBg[color]}`}
       >
         {icon}
       </div>
@@ -42,7 +42,9 @@ export default function StatCard({
         <p className="text-xs font-semibold uppercase tracking-wide text-gris-claro truncate">
           {label}
         </p>
-        <p className="text-2xl font-black text-texto leading-tight">{value}</p>
+        <p className="text-xl sm:text-2xl font-black text-texto leading-tight">
+          {value}
+        </p>
         {sub && <p className="text-xs text-gris-claro mt-0.5">{sub}</p>}
       </div>
     </div>
