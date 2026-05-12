@@ -13,6 +13,7 @@ import {
   FaPlane,
   FaUsers,
   FaCog,
+  FaEnvelope,
 } from "react-icons/fa";
 import { MdViewCarousel } from "react-icons/md";
 
@@ -66,6 +67,7 @@ export default function DashboardLayout({
       path: "/dashboard/servicios",
     },
     { name: "Usuarios", icon: <FaUsers />, path: "/dashboard/usuarios" },
+    { name: "Mensajes", icon: <FaEnvelope />, path: "/dashboard/mensajes" },
     { name: "Banners", icon: <MdViewCarousel />, path: "/dashboard/banners" },
     { name: "Ajustes", icon: <FaCog />, path: "/dashboard/ajustes" },
   ];
