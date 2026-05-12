@@ -358,6 +358,62 @@ FOR EACH STATEMENT
 EXECUTE FUNCTION limpiar_tokens_caducados();
 
 -- ============================
+-- TABLA: MENSAJES_CONTACTO
+-- ============================
+CREATE TABLE IF NOT EXISTS mensajes_contacto (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    asunto VARCHAR(200) NOT NULL,
+    usuario_id INT REFERENCES usuarios(id) ON DELETE SET NULL,
+    leido BOOLEAN DEFAULT FALSE,
+    respondido BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TRIGGER IF EXISTS tr_mensajes_contacto_updated_at ON mensajes_contacto;
+CREATE TRIGGER tr_mensajes_contacto_updated_at
+BEFORE UPDATE ON mensajes_contacto
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS contacto_mensajes (
+    id SERIAL PRIMARY KEY,
+    contacto_id INT NOT NULL REFERENCES mensajes_contacto(id) ON DELETE CASCADE,
+    autor VARCHAR(10) NOT NULL CHECK (autor IN ('usuario', 'admin')),
+    contenido TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================
+-- TABLA: NOTIFICACIONES
+-- ============================
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_notificacion_enum') THEN
+        CREATE TYPE tipo_notificacion_enum AS ENUM (
+            'respuesta_contacto',
+            'reserva_confirmada',
+            'reserva_cancelada',
+            'sistema'
+        );
+    END IF;
+END $$;
+
+
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    tipo tipo_notificacion_enum NOT NULL DEFAULT 'sistema',
+    titulo VARCHAR(200) NOT NULL,
+    cuerpo TEXT NOT NULL,
+    leida BOOLEAN DEFAULT FALSE,
+    enlace VARCHAR(300),
+    mensaje_contacto_id INT REFERENCES mensajes_contacto(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================
 -- INSERTS DATOS
 -- ============================
 -- USUARIOS
