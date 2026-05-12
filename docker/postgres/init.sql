@@ -395,6 +395,7 @@ BEGIN
             'respuesta_contacto',
             'reserva_confirmada',
             'reserva_cancelada',
+            'reserva_pendiente',
             'sistema'
         );
     END IF;
