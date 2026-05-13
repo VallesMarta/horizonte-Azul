@@ -3,20 +3,24 @@
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import NotificacionesCampana from "@/components/ui/NotificacionesCampana";
 
 export default function NavPerfil() {
-  // Extraemos 'user' y 'logout' directamente del contexto
   const { user, logout } = useAuth();
   const fotoUrl = user?.fotoperfil;
 
   return (
-    <div className="flex items-center gap-4 pl-4 border-l border-white/20">
+    <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-4 lg:pl-4 lg:border-l lg:border-white/20 w-full lg:w-auto">
+      <div className="order-2 lg:order-1">
+        <NotificacionesCampana />
+      </div>
+
       <Link
         href="/perfil"
-        className="flex items-center gap-4 group cursor-pointer transition-all active:scale-95"
+        className="order-1 lg:order-2 flex items-center gap-4 group cursor-pointer transition-all active:scale-95"
       >
         {/* Información del Usuario */}
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-center lg:items-end">
           <span className="text-[10px] uppercase tracking-widest text-white/50">
             Perfil
           </span>
@@ -42,7 +46,7 @@ export default function NavPerfil() {
             </div>
           ) : (
             /* SI NO HAY FOTO: Mantenemos el icono actual */
-        <FaUserCircle className="text-4xl text-white/80 transition-transform hover:scale-110 cursor-pointer" />
+            <FaUserCircle className="text-4xl text-white/80 transition-transform hover:scale-110 cursor-pointer" />
           )}
         </div>
       </Link>
@@ -51,10 +55,10 @@ export default function NavPerfil() {
       <button
         onClick={logout}
         title="Cerrar Sesión"
-        className="flex items-center gap-2 bg-rojo text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-red-900/20 cursor-pointer transition-all duration-300 ease-out hover:scale-110 hover:shadow-red-900/40 active:scale-95"
+        className="order-3 flex items-center gap-2 bg-rojo text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-red-900/20 cursor-pointer transition-all duration-300 ease-out hover:scale-110 hover:shadow-red-900/40 active:scale-95"
       >
         <FaSignOutAlt className="text-lg" />
-        <span className="hidden lg:block">SALIR</span>
+        <span className="lg:block">SALIR</span>
       </button>
     </div>
   );

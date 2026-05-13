@@ -139,14 +139,18 @@ export default function Header() {
             </div>
 
             <nav className="flex flex-col items-center w-full">
+              {/* Contenedor de Perfil en Móvil: Importante stopPropagation para no cerrar el sidebar al tocar la campana */}
               <div
                 className="w-full flex flex-col items-center pb-8 border-b border-white/10"
-                onClick={() => setMenuAbierto(false)}
+                onClick={(e) => e.stopPropagation()}
               >
                 {user ? (
                   <NavPerfil />
                 ) : (
-                  <div className="flex flex-col items-center gap-4 w-full">
+                  <div
+                    className="flex flex-col items-center gap-4 w-full"
+                    onClick={() => setMenuAbierto(false)}
+                  >
                     <NavButton
                       irA="/login"
                       textoAMostrar="Iniciar Sesión"
