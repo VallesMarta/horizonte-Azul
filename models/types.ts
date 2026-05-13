@@ -46,6 +46,9 @@ export interface Viaje {
   paisDestino: string;
   aeropuertoDestino: string;
   iataDestino?: string;
+  precio?: number;
+  horaSalida?: string;
+  horaLlegada?: string;
   img: string;
   descripcion: string;
   created_at: string;
@@ -139,6 +142,28 @@ export type ViajeCompleto = Viaje &
     vuelo_id: number;
     precio_final: number;
   };
+
+// Tipo para mostrar viajes en grid/cards
+export type ViajeGrid = Viaje & {
+  precio: number;
+  precio_oferta: number;
+  plazasDisponibles?: number;
+  fecSalida?: string;
+  horaSalida?: string;
+  tiene_vuelos?: boolean;
+  precio_base?: number;
+};
+
+// Tipo para viajes en wishlist
+export type WishlistViaje = Viaje & {
+  viaje_id: number;
+  precio: number;
+  precio_oferta: number;
+  plazasDisponibles?: number;
+  fecSalida?: string;
+  horaSalida?: string;
+  fecha_agregado?: string;
+};
 
 // GET /api/reservas/usuario/[id] → Reserva + Viaje + Vuelo
 export type ReservaDetallada = Reserva &
