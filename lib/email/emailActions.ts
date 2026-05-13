@@ -132,6 +132,84 @@ export async function emailReservaConfirmada(params: {
   });
 }
 
+// ─── Reserva pendiente de pago ────────────────────────────────────────────────
+export async function emailReservaPendiente(params: {
+  to: string;
+  nombre: string;
+  localizador: string;
+  tipoVuelo: "ida" | "vuelta";
+  aeropuertoOrigen: string;
+  aeropuertoDestino: string;
+  fecSalida: string;
+  horaSalida: string;
+  fecLlegada: string;
+  horaLlegada: string;
+  pasajeros: string;
+  metodo: string;
+}): Promise<EmailResult> {
+  const tipoLabel = params.tipoVuelo === "vuelta" ? "vuelta" : "ida";
+  const ruta =
+    tipoLabel === "ida"
+      ? `${params.aeropuertoOrigen} → ${params.aeropuertoDestino}`
+      : `${params.aeropuertoDestino} → ${params.aeropuertoOrigen}`;
+
+  return enviarEmail({
+    to: params.to,
+    subject: `⏳ Reserva pendiente de pago — ${ruta} [${params.localizador}]`,
+    plantilla: "reservaPendiente",
+    datos: {
+      nombre: params.nombre,
+      localizador: params.localizador,
+      tipoVuelo: params.tipoVuelo,
+      aeropuertoOrigen: params.aeropuertoOrigen,
+      aeropuertoDestino: params.aeropuertoDestino,
+      fecSalida: params.fecSalida,
+      horaSalida: params.horaSalida,
+      fecLlegada: params.fecLlegada,
+      horaLlegada: params.horaLlegada,
+      pasajeros: params.pasajeros,
+      metodo: params.metodo,
+      urlReservas: `${APP_URL}/perfil/mis-reservas`,
+      emailContacto: process.env.EMAIL_FROM ?? "",
+    },
+  });
+}
+
+// ─── Reserva cancelada ────────────────────────────────────────────────────────
+export async function emailReservaCancelada(params: {
+  to: string;
+  nombre: string;
+  localizador: string;
+  tipoVuelo: "ida" | "vuelta";
+  aeropuertoOrigen: string;
+  aeropuertoDestino: string;
+  fecSalida: string;
+  canceladaPor?: "usuario" | "admin";
+}): Promise<EmailResult> {
+  const tipoLabel = params.tipoVuelo === "vuelta" ? "vuelta" : "ida";
+  const ruta =
+    tipoLabel === "ida"
+      ? `${params.aeropuertoOrigen} → ${params.aeropuertoDestino}`
+      : `${params.aeropuertoDestino} → ${params.aeropuertoOrigen}`;
+
+  return enviarEmail({
+    to: params.to,
+    subject: `❌ Reserva cancelada — ${ruta} [${params.localizador}]`,
+    plantilla: "reservaCancelada",
+    datos: {
+      nombre: params.nombre,
+      localizador: params.localizador,
+      tipoVuelo: params.tipoVuelo,
+      aeropuertoOrigen: params.aeropuertoOrigen,
+      aeropuertoDestino: params.aeropuertoDestino,
+      fecSalida: params.fecSalida,
+      canceladaPor: params.canceladaPor ?? "usuario",
+      urlContacto: `${APP_URL}/contacto`,
+      urlReservas: `${APP_URL}/perfil/mis-reservas`,
+    },
+  });
+}
+
 // ─── Respuesta a mensaje de contacto ─────────────────────────────────────────
 export async function emailRespuestaContacto(params: {
   to: string;

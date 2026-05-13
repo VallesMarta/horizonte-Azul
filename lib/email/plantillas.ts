@@ -534,6 +534,346 @@ function plantillaReservaConfirmada(
   return layoutBase(contenido);
 }
 
+function plantillaReservaPendiente(
+  datos: Record<string, string | number | boolean>,
+): string {
+  const nombre = String(datos.nombre ?? "Viajero");
+  const localizador = String(datos.localizador ?? "");
+  const tipo = String(datos.tipoVuelo ?? "").toLowerCase();
+  const tipoLabel =
+    tipo === "vuelta" ? "✈️ Vuelo de vuelta" : "✈️ Vuelo de ida";
+  const Origen = String(datos.aeropuertoOrigen ?? "");
+  const Destino = String(datos.aeropuertoDestino ?? "");
+  const fecSalida = String(datos.fecSalida ?? "");
+  const horaSalida = String(datos.horaSalida ?? "");
+  const fecLlegada = String(datos.fecLlegada ?? "");
+  const horaLlegada = String(datos.horaLlegada ?? "");
+  const pasajeros = String(datos.pasajeros ?? "");
+  const metodo = String(datos.metodo ?? "transferencia");
+  const urlReservas = String(datos.urlReservas ?? BRAND.url);
+  const emailContacto = String(datos.emailContacto ?? "");
+
+  const instrucciones: Record<string, string> = {
+    transferencia: `Realiza una transferencia bancaria por el importe total indicado en tu reserva. Incluye el localizador <strong>${localizador}</strong> en el concepto para que podamos identificarla.`,
+    paypal: `Completa el pago a través de PayPal usando el email de contacto. Incluye el localizador <strong>${localizador}</strong> en el mensaje.`,
+    default: `Completa el pago por el método seleccionado e incluye el localizador <strong>${localizador}</strong> como referencia.`,
+  };
+  const instruccion = instrucciones[metodo] ?? instrucciones.default;
+
+  const formatearFecha = (fecha: string) => {
+    if (!fecha) return "";
+    try {
+      return new Date(fecha).toLocaleDateString("es-ES", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    } catch {
+      return fecha;
+    }
+  };
+
+  const contenido = `
+    <!-- Cabecera pendiente -->
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="
+        display:inline-block;
+        background-color:${BRAND.naranja};
+        border-radius:50%;
+        width:68px; height:68px;
+        line-height:68px;
+        font-size:32px;
+        color:${BRAND.blanco};
+        text-align:center;
+      ">⏳</div>
+      <h1 style="margin:16px 0 4px; font-size:24px; font-weight:800; color:${BRAND.secundario};">
+        Reserva pendiente de pago
+      </h1>
+      <p style="margin:0; font-size:14px; color:${BRAND.gris};">
+        Hola <strong>${nombre}</strong>, tu reserva ha sido registrada pero está pendiente de confirmación de pago.
+      </p>
+    </div>
+
+    <!-- Localizador -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="background-color:${BRAND.fondo}; border-radius:10px; margin-bottom:24px;">
+      <tr>
+        <td style="padding:16px 20px; text-align:center;">
+          <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:${BRAND.gris}; text-transform:uppercase; letter-spacing:1px;">
+            Código de reserva
+          </p>
+          <p style="margin:0; font-size:26px; font-weight:900; color:${BRAND.secundario}; letter-spacing:3px;">
+            ${localizador}
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Info del vuelo -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="border:1px solid ${BRAND.borde}; border-radius:10px; margin-bottom:24px; overflow:hidden;">
+      <tr>
+        <td style="background-color:${BRAND.primario}; padding:12px 20px;">
+          <p style="margin:0; font-size:13px; font-weight:700; color:${BRAND.blanco};">
+            ${tipoLabel}
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:20px;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+              <td style="text-align:center; width:38%;">
+                <p style="margin:0 0 4px; font-size:28px; font-weight:900; color:${BRAND.secundario};">
+                  ${tipo === "ida" ? Origen : Destino}
+                </p>
+                <p style="margin:0 0 2px; font-size:12px; color:${BRAND.gris};">Salida</p>
+                <p style="margin:0; font-size:13px; font-weight:700; color:${BRAND.texto};">
+                  ${tipo === "ida" ? formatearFecha(fecSalida) : formatearFecha(fecLlegada)}
+                </p>
+                <p style="margin:2px 0 0; font-size:15px; font-weight:800; color:${BRAND.primario};">
+                  ${tipo === "ida" ? horaSalida : horaLlegada}
+                </p>
+              </td>
+              <td style="text-align:center; width:24%;">
+                <p style="margin:0; font-size:22px; color:${BRAND.gris};">→</p>
+              </td>
+              <td style="text-align:center; width:38%;">
+                <p style="margin:0 0 4px; font-size:28px; font-weight:900; color:${BRAND.secundario};">
+                  ${tipo === "ida" ? Destino : Origen}
+                </p>
+                <p style="margin:0 0 2px; font-size:12px; color:${BRAND.gris};">Llegada</p>
+                <p style="margin:0; font-size:13px; font-weight:700; color:${BRAND.texto};">
+                  ${tipo === "ida" ? formatearFecha(fecLlegada) : formatearFecha(fecSalida)}
+                </p>
+                <p style="margin:2px 0 0; font-size:15px; font-weight:800; color:${BRAND.primario};">
+                  ${tipo === "ida" ? horaLlegada : horaSalida}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Pasajeros -->
+    ${
+      pasajeros
+        ? `
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="margin-bottom:24px;">
+      <tr>
+        <td>
+          <p style="margin:0 0 10px; font-size:12px; font-weight:700; color:${BRAND.gris}; text-transform:uppercase; letter-spacing:1px;">
+            Pasajeros
+          </p>
+          ${pasajeros
+            .split("||")
+            .map(
+              (p: string) => `
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+            style="background-color:${BRAND.fondo}; border-radius:8px; margin-bottom:8px;">
+            <tr>
+              <td style="padding:12px 16px;">
+                <p style="margin:0; font-size:14px; color:${BRAND.texto};">
+                  👤 <strong>${p.trim()}</strong>
+                </p>
+              </td>
+            </tr>
+          </table>`,
+            )
+            .join("")}
+        </td>
+      </tr>
+    </table>`
+        : ""
+    }
+
+    ${divider}
+
+    <!-- Estado pendiente -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="background-color:${BRAND.naranja}15; border:1px solid ${BRAND.naranja}40; border-radius:8px; margin-bottom:20px;">
+      <tr>
+        <td style="padding:14px 20px; text-align:center;">
+          <p style="margin:0; font-size:14px; font-weight:700; color:${BRAND.naranja};">
+            ⏳ Estado: PENDIENTE DE PAGO
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Instrucciones de pago -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="border-left:4px solid ${BRAND.naranja}; background-color:${BRAND.fondo}; border-radius:0 8px 8px 0; margin-bottom:24px;">
+      <tr>
+        <td style="padding:16px 20px;">
+          <p style="margin:0 0 6px; font-size:11px; font-weight:700; color:${BRAND.naranja}; text-transform:uppercase; letter-spacing:1px;">
+            Instrucciones de pago
+          </p>
+          <p style="margin:0; font-size:14px; color:${BRAND.texto}; line-height:1.7;">
+            ${instruccion}
+          </p>
+          ${
+            emailContacto
+              ? `
+          <p style="margin:8px 0 0; font-size:13px; color:${BRAND.gris};">
+            Una vez realizado el pago, contacta con nosotros en
+            <a href="mailto:${emailContacto}" style="color:${BRAND.primario};">${emailContacto}</a>
+            para confirmar tu reserva.
+          </p>`
+              : ""
+          }
+        </td>
+      </tr>
+    </table>
+
+    ${botonCTA("Ver mi reserva", urlReservas, BRAND.naranja)}
+
+    ${divider}
+
+    <p style="margin:0; font-size:12px; color:${BRAND.gris}; text-align:center; line-height:1.7;">
+      Tu plaza quedará reservada durante 48 horas mientras esperamos la confirmación del pago.<br/>
+      Si tienes alguna pregunta, no dudes en contactarnos.
+    </p>
+  `;
+
+  return layoutBase(contenido);
+}
+
+function plantillaReservaCancelada(
+  datos: Record<string, string | number | boolean>,
+): string {
+  const nombre = String(datos.nombre ?? "Viajero");
+  const localizador = String(datos.localizador ?? "");
+  const tipo = String(datos.tipoVuelo ?? "").toLowerCase();
+  const tipoLabel =
+    tipo === "vuelta" ? "✈️ Vuelo de vuelta" : "✈️ Vuelo de ida";
+  const Origen = String(datos.aeropuertoOrigen ?? "");
+  const Destino = String(datos.aeropuertoDestino ?? "");
+  const fecSalida = String(datos.fecSalida ?? "");
+  const canceladaPor = String(datos.canceladaPor ?? "usuario");
+  const urlContacto = String(datos.urlContacto ?? BRAND.url);
+  const urlReservas = String(datos.urlReservas ?? BRAND.url);
+
+  const ruta =
+    tipo === "ida" ? `${Origen} → ${Destino}` : `${Destino} → ${Origen}`;
+
+  const formatearFecha = (fecha: string) => {
+    if (!fecha) return "";
+    try {
+      return new Date(fecha).toLocaleDateString("es-ES", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    } catch {
+      return fecha;
+    }
+  };
+
+  const mensajeCancelacion =
+    canceladaPor === "admin"
+      ? `Tu reserva ha sido cancelada por el equipo de ${BRAND.nombre}. Si crees que esto es un error o necesitas más información, no dudes en contactarnos.`
+      : `Has cancelado tu reserva correctamente. Si cambias de opinión, puedes realizar una nueva reserva en cualquier momento.`;
+
+  const contenido = `
+    <!-- Cabecera cancelada -->
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="
+        display:inline-block;
+        background-color:${BRAND.rojo};
+        border-radius:50%;
+        width:68px; height:68px;
+        line-height:68px;
+        font-size:32px;
+        color:${BRAND.blanco};
+        text-align:center;
+      ">✕</div>
+      <h1 style="margin:16px 0 4px; font-size:24px; font-weight:800; color:${BRAND.secundario};">
+        Reserva cancelada
+      </h1>
+      <p style="margin:0; font-size:14px; color:${BRAND.gris};">
+        Hola <strong>${nombre}</strong>, ${mensajeCancelacion}
+      </p>
+    </div>
+
+    <!-- Localizador -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="background-color:${BRAND.fondo}; border-radius:10px; margin-bottom:24px;">
+      <tr>
+        <td style="padding:16px 20px; text-align:center;">
+          <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:${BRAND.gris}; text-transform:uppercase; letter-spacing:1px;">
+            Código de reserva cancelada
+          </p>
+          <p style="margin:0; font-size:26px; font-weight:900; color:${BRAND.gris}; letter-spacing:3px; text-decoration:line-through;">
+            ${localizador}
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Resumen vuelo cancelado -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="border:1px solid ${BRAND.borde}; border-radius:10px; margin-bottom:24px; overflow:hidden; opacity:0.7;">
+      <tr>
+        <td style="background-color:${BRAND.gris}; padding:12px 20px;">
+          <p style="margin:0; font-size:13px; font-weight:700; color:${BRAND.blanco};">
+            ${tipoLabel} — ${ruta}
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px 20px; text-align:center;">
+          <p style="margin:0; font-size:14px; color:${BRAND.gris};">
+            Fecha prevista: <strong>${formatearFecha(fecSalida)}</strong>
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Estado cancelada -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+      style="background-color:${BRAND.rojo}15; border:1px solid ${BRAND.rojo}40; border-radius:8px; margin-bottom:24px;">
+      <tr>
+        <td style="padding:14px 20px; text-align:center;">
+          <p style="margin:0; font-size:14px; font-weight:700; color:${BRAND.rojo};">
+            ❌ Estado: CANCELADA
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    ${divider}
+
+    <p style="margin:0 0 20px; font-size:14px; color:${BRAND.texto}; line-height:1.7; text-align:center;">
+      ¿Quieres reservar otro vuelo o tienes alguna duda?
+    </p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;">
+      <tr>
+        <td style="padding-right:8px;">
+          ${botonCTA("Ver mis reservas", urlReservas, BRAND.secundario)}
+        </td>
+        <td style="padding-left:8px;">
+          ${botonCTA("Contactar", urlContacto, BRAND.gris)}
+        </td>
+      </tr>
+    </table>
+
+    ${divider}
+
+    <p style="margin:0; font-size:12px; color:${BRAND.gris}; text-align:center; line-height:1.7;">
+      Si tienes dudas sobre reembolsos o políticas de cancelación,<br/>
+      no dudes en ponerte en contacto con nuestro equipo.
+    </p>
+  `;
+
+  return layoutBase(contenido);
+}
+
 // ─── Añadir la función antes de generarPlantilla ──────────────────────────────
 function plantillaRespuestaContacto(
   datos: Record<string, string | number | boolean>,
@@ -610,6 +950,10 @@ export function generarPlantilla(
       return plantillaNotificacion(datos);
     case "reservaConfirmada":
       return plantillaReservaConfirmada(datos);
+    case "reservaPendiente":
+      return plantillaReservaPendiente(datos);
+    case "reservaCancelada":
+      return plantillaReservaCancelada(datos);
     case "respuestaContacto":
       return plantillaRespuestaContacto(datos);
     default:

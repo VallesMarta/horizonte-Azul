@@ -23,6 +23,8 @@ export type EmailPlantilla =
   | "confirmacion"
   | "notificacion"
   | "reservaConfirmada"
+  | "reservaPendiente"
+  | "reservaCancelada"
   | "respuestaContacto"
   | "custom";
 
@@ -77,7 +79,7 @@ function crearTransporter() {
     greetingTimeout: 5000,
     socketTimeout: 15000,
   });
-  
+
   return transporter;
 }
 
