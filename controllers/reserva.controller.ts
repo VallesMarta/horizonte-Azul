@@ -6,7 +6,11 @@ import { VueloModel } from "@/models/vuelo.model";
 import { UsuarioModel } from "@/models/usuario.model";
 import { ViajeServicioModel } from "@/models/viaje-servicio.model";
 import { obtenerSesion, validarAdmin } from "@/lib/auth-utils";
-import { emailReservaConfirmada } from "@/lib/email/emailActions";
+import {
+  emailReservaConfirmada,
+  emailReservaPendiente,
+  emailReservaCancelada,
+} from "@/lib/email/emailActions";
 import { v4 as uuidv4 } from "uuid";
 import Stripe from "stripe";
 import {
@@ -14,6 +18,7 @@ import {
   ReservaServicioInput,
   ReservaCreateInput,
 } from "@/models/types";
+import { NotificacionModel } from "@/models/notificacion.model";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_dummy_key");
 
@@ -144,6 +149,7 @@ export const ReservaController = {
       // 4. Crear las Reservas y desgloses
       const reservasCreadas = [];
       const usuarioBD = await UsuarioModel.getById(usuarioId);
+      const estadoReserva = metodo === "tarjeta" ? "confirmada" : "pendiente";
 
       for (const item of vuelosIds) {
         const vueloData = await VueloModel.getById(item.vuelo_id);
@@ -158,7 +164,7 @@ export const ReservaController = {
           total_extras_historico: 0, // Se puede calcular sumando los extras abajo
           precioTotal: precioPorVuelo,
           pasajeros: numPasajeros,
-          estado: "confirmada",
+          estado: estadoReserva,
         } as ReservaCreateInput);
 
         // B. Insertar Pasajeros
@@ -203,41 +209,98 @@ export const ReservaController = {
 
         reservasCreadas.push(reserva);
 
-        // ── Email de confirmación por vuelo ────────────────────────────────
-        // Fire & forget — no bloquea la respuesta si falla el email
+        // ── Email según estado ─────────────────────────────────────────────
         try {
-          await emailReservaConfirmada({
-            to: usuarioBD.email,
-            nombre: usuarioBD.nombre || usuarioBD.username,
-            localizador: reserva.localizador,
-            tipoVuelo: item.tipo as "ida" | "vuelta",
-            aeropuertoOrigen: vueloData.aeropuertoOrigen ?? "",
-            aeropuertoDestino: vueloData.aeropuertoDestino ?? "",
-            fecSalida: vueloData.fecSalida ?? "",
-            horaSalida: vueloData.horaSalida ?? "",
-            fecLlegada: vueloData.fecLlegada ?? "",
-            horaLlegada: vueloData.horaLlegada ?? "",
-            pasajeros: pasajeros
-              .map((p: any) => `${p.nombre} ${p.apellidos}`)
-              .join("||"),
-          });
-          console.log(`✅ Email enviado para reserva: ${reserva.localizador}`);
+          if (estadoReserva === "confirmada") {
+            await emailReservaConfirmada({
+              to: usuarioBD.email,
+              nombre: usuarioBD.nombre || usuarioBD.username,
+              localizador: reserva.localizador,
+              tipoVuelo: item.tipo as "ida" | "vuelta",
+              aeropuertoOrigen: vueloData.aeropuertoOrigen ?? "",
+              aeropuertoDestino: vueloData.aeropuertoDestino ?? "",
+              fecSalida: vueloData.fecSalida ?? "",
+              horaSalida: vueloData.horaSalida ?? "",
+              fecLlegada: vueloData.fecLlegada ?? "",
+              horaLlegada: vueloData.horaLlegada ?? "",
+              pasajeros: pasajeros
+                .map((p: any) => `${p.nombre} ${p.apellidos}`)
+                .join("||"),
+            });
+            console.log(
+              `✅ Email enviado para reserva: ${reserva.localizador}`,
+            );
+          } else {
+            await emailReservaPendiente({
+              to: usuarioBD.email,
+              nombre: usuarioBD.nombre || usuarioBD.username,
+              localizador: reserva.localizador,
+              tipoVuelo: item.tipo as "ida" | "vuelta",
+              aeropuertoOrigen: vueloData.aeropuertoOrigen ?? "",
+              aeropuertoDestino: vueloData.aeropuertoDestino ?? "",
+              fecSalida: vueloData.fecSalida ?? "",
+              horaSalida: vueloData.horaSalida ?? "",
+              fecLlegada: vueloData.fecLlegada ?? "",
+              horaLlegada: vueloData.horaLlegada ?? "",
+              pasajeros: pasajeros
+                .map((p: any) => `${p.nombre} ${p.apellidos}`)
+                .join("||"),
+              metodo,
+            });
+            console.log(
+              `✅ Email enviado para reserva: ${reserva.localizador}`,
+            );
+          }
         } catch (err) {
-          // Solo logueamos el error para que la reserva no falle si falla el mail
           console.error(
             `❌ Error enviando email reserva ${reserva.localizador}:`,
             err,
           );
+        }
+
+        // ── Notificación interna reserva confirmada ────────────────────────
+        try {
+          const origen = vueloData.aeropuertoOrigen ?? "";
+          const destino = vueloData.aeropuertoDestino ?? "";
+          const ruta =
+            item.tipo === "vuelta"
+              ? `${destino} → ${origen}`
+              : `${origen} → ${destino}`;
+
+          if (estadoReserva === "confirmada") {
+            await NotificacionModel.crear({
+              usuario_id: usuarioId,
+              tipo: "reserva_confirmada",
+              titulo: `Reserva confirmada — ${ruta}`,
+              cuerpo: `Tu vuelo de ${item.tipo} (${ruta}) ha sido confirmado. Localizador: ${reserva.localizador}`,
+              enlace: "/perfil/mis-reservas",
+            });
+          } else {
+            // Pendiente — pago por transferencia u otro método
+            await NotificacionModel.crear({
+              usuario_id: usuarioId,
+              tipo: "reserva_pendiente",
+              titulo: `Reserva pendiente de pago — ${ruta}`,
+              cuerpo: `Tu reserva (${ruta}) está pendiente de confirmación. Localizador: ${reserva.localizador}. Realiza la transferencia y el equipo la confirmará en breve.`,
+              enlace: "/perfil/mis-reservas",
+            });
+          }
+        } catch (err) {
+          console.error("Error creando notificación reserva:", err);
         }
       }
 
       return NextResponse.json(
         {
           ok: true,
-          mensaje: "Reserva confirmada",
+          mensaje:
+            estadoReserva === "confirmada"
+              ? "Reserva confirmada"
+              : "Reserva registrada — pendiente de confirmación de pago",
           resultado: {
             codigoGrupo,
             total: precioTotal,
+            estado: estadoReserva,
             reservas: reservasCreadas.map((r) => ({
               id: r.id,
               localizador: r.localizador,
@@ -382,6 +445,43 @@ export const ReservaController = {
         id,
         "cancelada",
       );
+
+      // ── Notificación interna reserva cancelada ─────────────────────────
+      try {
+        await NotificacionModel.crear({
+          usuario_id: Number(reserva.usuario_id),
+          tipo: "reserva_cancelada",
+          titulo: `Reserva cancelada — ${reserva.localizador}`,
+          cuerpo: `Tu reserva con localizador ${reserva.localizador} ha sido cancelada.${
+            sesion.isAdmin ? " Si tienes dudas, contacta con nosotros." : ""
+          }`,
+          enlace: "/perfil/mis-reservas",
+        });
+      } catch (err) {
+        console.error("Error creando notificación cancelación:", err);
+      }
+
+      // ── Email cancelación ──────────────────────────────────────────────
+      try {
+        const usuarioBD = await UsuarioModel.getById(
+          Number(reserva.usuario_id),
+        );
+        const vueloData = await VueloModel.getById(String(reserva.vuelo_id));
+
+        await emailReservaCancelada({
+          to: usuarioBD.email,
+          nombre: usuarioBD.nombre || usuarioBD.username,
+          localizador: reserva.localizador,
+          tipoVuelo: (reserva.tipo ?? "ida") as "ida" | "vuelta",
+          aeropuertoOrigen: vueloData?.aeropuertoOrigen ?? "",
+          aeropuertoDestino: vueloData?.aeropuertoDestino ?? "",
+          fecSalida: vueloData?.fecSalida ?? "",
+          canceladaPor: sesion.isAdmin ? "admin" : "usuario",
+        });
+      } catch (err) {
+        console.error("Error enviando email cancelación:", err);
+      }
+
       return NextResponse.json({ ok: true, resultado: reservaActualizada });
     } catch (err: any) {
       return NextResponse.json(
@@ -403,6 +503,37 @@ export const ReservaController = {
     try {
       const { estado } = await req.json();
       const reserva = await ReservaModel.actualizarEstado(id, estado);
+
+      // ── Notificación cuando admin cambia estado ────────────────────────
+      const tipoNotif =
+        estado === "cancelada"
+          ? "reserva_cancelada"
+          : estado === "confirmada"
+            ? "reserva_confirmada"
+            : null;
+
+      if (tipoNotif && reserva?.usuario_id) {
+        try {
+          const mensajes: Record<string, string> = {
+            confirmada: `Tu reserva ${reserva.localizador} ha sido confirmada.`,
+            cancelada: `Tu reserva ${reserva.localizador} ha sido cancelada por el equipo. Contacta con nosotros si tienes dudas.`,
+            realizada: `Tu vuelo con localizador ${reserva.localizador} ha sido completado. ¡Esperamos que hayas tenido un buen viaje!`,
+          };
+
+          await NotificacionModel.crear({
+            usuario_id: Number(reserva.usuario_id),
+            tipo: tipoNotif,
+            titulo: `Reserva ${estado} — ${reserva.localizador}`,
+            cuerpo:
+              mensajes[estado] ??
+              `El estado de tu reserva ${reserva.localizador} ha cambiado a ${estado}.`,
+            enlace: "/perfil/mis-reservas",
+          });
+        } catch (err) {
+          console.error("Error creando notificación cambio estado:", err);
+        }
+      }
+
       return NextResponse.json({ ok: true, resultado: reserva });
     } catch (err: any) {
       return NextResponse.json(
