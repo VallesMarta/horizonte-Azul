@@ -292,7 +292,7 @@ CREATE TABLE IF NOT EXISTS wishlist (
 
 CREATE TABLE IF NOT EXISTS tarjetas_usuario (
     id SERIAL PRIMARY KEY,
-    usuario_id INT NOT NULL,
+    usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
     nombre_titular VARCHAR(255),
     stripe_payment_method_id VARCHAR(255) NOT NULL UNIQUE,
     last4 VARCHAR(4) NOT NULL,
