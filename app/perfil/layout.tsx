@@ -56,7 +56,9 @@ export default function PerfilLayout({
     <div className="flex flex-col">
       <div className="flex flex-1">
         <Sidebar menuItems={userMenu} tipo="user" />
-        <main className="flex-1 bg-fondo p-4 lg:p-8">{children}</main>
+        <main className="flex-1 min-w-0 overflow-hidden bg-fondo p-4 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );

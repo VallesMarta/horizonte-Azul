@@ -117,13 +117,13 @@ export default function GestionUsuarios() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-20">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
+      {/* HEADER */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1">
         <div>
-          <h2 className="text-3xl font-black text-titulo-resaltado uppercase tracking-tighter">
+          <h1 className="text-3xl font-black text-titulo-resaltado uppercase tracking-tighter">
             Panel de Usuarios
-          </h2>
+          </h1>
           <p className="text-xs font-bold text-gris-claro tracking-widest uppercase mt-1">
             {usuariosFiltrados.length} usuarios registrados
           </p>

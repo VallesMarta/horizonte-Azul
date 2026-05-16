@@ -66,12 +66,12 @@ export default function GestionViajes() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500">
+    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
       {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1">
         <div>
           <h1 className="text-3xl font-black text-titulo-resaltado uppercase tracking-tighter">
-            Destinos
+            Panel de viajes
           </h1>
           <p className="text-[10px] font-bold text-gris tracking-widest uppercase mt-0.5">
             {viajesFiltrados.length} destino
