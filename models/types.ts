@@ -204,6 +204,7 @@ export interface AdminStats {
     ingresos: number;
     reservas_mes: number;
     vuelos_activos: number;
+    total_favoritos: number;
   };
   top_destinos: {
     paisDestino: string;
@@ -233,7 +234,10 @@ export interface AdminStats {
     usuario_nombre: string;
     paisDestino: string;
     iataDestino: string;
+    created_at: string;
   }[];
+  reservas_mes_historico: { mes: string; total: number }[];
+  ingresos_mes_historico: { mes: string; total: number }[];
 }
 
 // ==========================================

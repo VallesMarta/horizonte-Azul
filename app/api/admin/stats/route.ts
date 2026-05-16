@@ -7,7 +7,7 @@ import { validarAdmin } from "@/lib/auth-utils";
  * /api/admin/stats:
  *   get:
  *     summary: Estadísticas generales del panel de administración
- *     description: Devuelve KPIs globales, top destinos, top wishlist, distribución de reservas por estado y las últimas reservas. Solo accesible para administradores.
+ *     description: Devuelve KPIs globales, top destinos, top wishlist, distribución de reservas por estado, últimas reservas e histórico mensual. Solo accesible para administradores.
  *     tags: [Admin]
  *     security:
  *       - BearerAuth: []
@@ -44,6 +44,10 @@ import { validarAdmin } from "@/lib/auth-utils";
  *                           type: integer
  *                           description: Reservas no canceladas creadas en el mes actual
  *                           example: 24
+ *                         total_favoritos:
+ *                           type: integer
+ *                           description: Total de entradas en la tabla wishlist
+ *                           example: 87
  *                         vuelos_activos:
  *                           type: integer
  *                           description: Vuelos con fecSalida >= hoy y estado distinto de completado/cancelado
@@ -92,7 +96,7 @@ import { validarAdmin } from "@/lib/auth-utils";
  *                             example: 34
  *                     estados:
  *                       type: array
- *                       description: Conteo de reservas agrupadas por estado
+ *                       description: Conteo de reservas agrupadas por estado (incluye canceladas)
  *                       items:
  *                         type: object
  *                         properties:
@@ -105,7 +109,7 @@ import { validarAdmin } from "@/lib/auth-utils";
  *                             example: 210
  *                     ultimas_reservas:
  *                       type: array
- *                       description: Las 5 reservas más recientes
+ *                       description: Las 5 reservas más recientes ordenadas por fecha de compra
  *                       items:
  *                         type: object
  *                         properties:
@@ -138,6 +142,33 @@ import { validarAdmin } from "@/lib/auth-utils";
  *                           iataDestino:
  *                             type: string
  *                             example: "TYO"
+ *                     reservas_mes_historico:
+ *                       type: array
+ *                       description: Número de reservas no canceladas agrupadas por mes en los últimos 6 meses
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           mes:
+ *                             type: string
+ *                             description: Abreviatura del mes en inglés (Mon)
+ *                             example: "Apr"
+ *                           total:
+ *                             type: integer
+ *                             example: 42
+ *                     ingresos_mes_historico:
+ *                       type: array
+ *                       description: Suma de ingresos de reservas confirmadas agrupadas por mes en los últimos 6 meses
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           mes:
+ *                             type: string
+ *                             description: Abreviatura del mes en inglés (Mon)
+ *                             example: "Apr"
+ *                           total:
+ *                             type: number
+ *                             format: float
+ *                             example: 8750.25
  *       401:
  *         description: No autorizado — falta o es inválido el token
  *       403:
@@ -176,8 +207,11 @@ export async function GET(req: Request) {
       WHERE DATE_TRUNC('month', "fecCompra") = DATE_TRUNC('month', CURRENT_DATE)
         AND estado != 'cancelada'
     `);
-
-    // 4. Top 5 destinos más reservados
+    // 4. Total favoritos
+    const [{ total_favoritos }] = await query(
+      `SELECT COUNT(*) AS total_favoritos FROM wishlist`,
+    );
+    // 5. Top 5 destinos más reservados
     const top_destinos = await query(`
       SELECT 
         v."paisDestino",
@@ -195,7 +229,7 @@ export async function GET(req: Request) {
       LIMIT 5
     `);
 
-    // 5. Top 5 viajes más guardados en wishlist
+    // 6. Top 5 viajes más guardados en wishlist
     const top_wishlist = await query(`
       SELECT 
         v."paisDestino",
@@ -209,14 +243,14 @@ export async function GET(req: Request) {
       LIMIT 5
     `);
 
-    // 6. Reservas por estado
+    // 7. Reservas por estado
     const estados = await query(`
       SELECT estado, COUNT(*) AS total
       FROM reservas
       GROUP BY estado
     `);
 
-    // 7. Últimas 5 reservas
+    // 8. Últimas 5 reservas
     const ultimas_reservas = await query(`
       SELECT 
         r.id,
@@ -236,12 +270,36 @@ export async function GET(req: Request) {
       LIMIT 5
     `);
 
-    // 8. Vuelos activos hoy
+    // 9. Vuelos activos hoy
     const [{ vuelos_activos }] = await query(`
       SELECT COUNT(*) AS vuelos_activos 
       FROM vuelos 
       WHERE "fecSalida" >= CURRENT_DATE 
         AND estado NOT IN ('completado', 'cancelado')
+    `);
+
+    // 10. Reservas por mes (últimos 6 meses)
+    const reservas_mes_historico = await query(`
+      SELECT 
+        TO_CHAR(DATE_TRUNC('month', "fecCompra"), 'Mon') AS mes,
+        COUNT(*)::int AS total
+      FROM reservas
+      WHERE "fecCompra" >= NOW() - INTERVAL '6 months'
+        AND estado != 'cancelada'
+      GROUP BY DATE_TRUNC('month', "fecCompra")
+      ORDER BY DATE_TRUNC('month', "fecCompra") ASC
+    `);
+
+    // 11. Ingresos por mes (últimos 6 meses)
+    const ingresos_mes_historico = await query(`
+      SELECT 
+        TO_CHAR(DATE_TRUNC('month', "fecCompra"), 'Mon') AS mes,
+        COALESCE(SUM("precioTotal"), 0)::float AS total
+      FROM reservas
+      WHERE "fecCompra" >= NOW() - INTERVAL '6 months'
+        AND estado = 'confirmada'
+      GROUP BY DATE_TRUNC('month', "fecCompra")
+      ORDER BY DATE_TRUNC('month', "fecCompra") ASC
     `);
 
     return NextResponse.json({
@@ -252,12 +310,15 @@ export async function GET(req: Request) {
           reservas: Number(reservas.total_reservas),
           ingresos: Number(reservas.ingresos_totales),
           reservas_mes: Number(reservas_mes),
+          total_favoritos: Number(total_favoritos),
           vuelos_activos: Number(vuelos_activos),
         },
         top_destinos,
         top_wishlist,
         estados,
         ultimas_reservas,
+        reservas_mes_historico,
+        ingresos_mes_historico,
       },
     });
   } catch (err: any) {

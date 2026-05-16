@@ -2,7 +2,7 @@ interface StatCardProps {
   label: string;
   value: string | number;
   icon: string;
-  color: "primario" | "verde" | "naranja" | "morado" | "azul";
+  color: "primario" | "verde" | "naranja" | "morado" | "azul" | "rojo";
   sub?: string;
 }
 
@@ -11,7 +11,8 @@ const colorMap = {
   verde: "bg-verde/10 text-verde border-verde/20",
   naranja: "bg-naranja/10 text-naranja border-naranja/20",
   morado: "bg-morado/10 text-morado border-morado/20",
-  azul: "bg-azul/10 text-azul border-azul/20",
+  azul: "bg-otro/10 text-otro border-otro/20",
+  rojo: "bg-rojo/10 text-rojo border-rojo/20",
 };
 
 const iconBg = {
@@ -19,7 +20,8 @@ const iconBg = {
   verde: "bg-verde",
   naranja: "bg-naranja",
   morado: "bg-morado",
-  azul: "bg-azul",
+  azul: "bg-otro",
+  rojo: "bg-rojo/50",
 };
 
 export default function StatCard({
