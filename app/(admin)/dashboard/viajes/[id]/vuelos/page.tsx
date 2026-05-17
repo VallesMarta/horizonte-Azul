@@ -74,6 +74,8 @@ export default function GestionVuelos() {
 
   useEffect(() => {
     cargar();
+    const interval = setInterval(cargar, 60000); // Refrescar cada minuto
+    return () => clearInterval(interval);
   }, [cargar]);
 
   const handleCrear = async (data: FormVueloData) => {

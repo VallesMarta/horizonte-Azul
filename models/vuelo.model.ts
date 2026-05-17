@@ -10,33 +10,18 @@ export type EstadoVuelo =
 export const VueloModel = {
   // Para el usuario — solo vuelos futuros y operativos
   async getByViajeId(viajeId: string | number) {
-    return await query(
-      `
-      SELECT 
-        id, viaje_id, tipo, estado,
-        "fecSalida", "horaSalida", "fecLlegada", "horaLlegada",
-        "plazasTotales", "plazasDisponibles", precio_ajustado,
-        created_at, updated_at
-      FROM vuelos 
-      WHERE viaje_id = $1 
-        AND "fecSalida" >= CURRENT_DATE
-        AND estado NOT IN ('completado', 'cancelado')
-      ORDER BY "fecSalida" ASC, tipo ASC
-    `,
-      [viajeId],
-    );
-  },
-
-  // Para el admin — todos los vuelos incluidos completados
-  async getByViajeIdAdmin(viajeId: string | number) {
-    // Marcar como completados los vuelos pasados automáticamente
     await query(
       `
-    UPDATE vuelos
-    SET estado = 'completado'
-    WHERE viaje_id = $1
-      AND "fecSalida" < CURRENT_DATE
-      AND estado NOT IN ('completado', 'cancelado')
+      UPDATE vuelos
+      SET estado = (CASE 
+        WHEN estado = 'cancelado' THEN 'cancelado'
+        WHEN (NOW() AT TIME ZONE 'Europe/Madrid') >= ("fecLlegada" + "horaLlegada"::time) THEN 'completado'
+        WHEN (NOW() AT TIME ZONE 'Europe/Madrid') >= ("fecSalida" + "horaSalida"::time) THEN 'en_vuelo'
+        WHEN (NOW() AT TIME ZONE 'Europe/Madrid') >= (("fecSalida" + "horaSalida"::time) - INTERVAL '45 minutes') THEN 'abordando'
+        ELSE 'programado'
+      END)::estado_vuelo_enum
+      WHERE viaje_id = $1
+        AND estado != 'cancelado'
   `,
       [viajeId],
     );
@@ -50,8 +35,44 @@ export const VueloModel = {
       created_at, updated_at
     FROM vuelos 
     WHERE viaje_id = $1 
-    ORDER BY "fecSalida" DESC, tipo ASC
+      AND ("fecLlegada" + "horaLlegada"::time) > (NOW() - INTERVAL '1 hour')
+      AND estado != 'cancelado'
+    ORDER BY "fecSalida" DESC, "horaSalida" ASC
+    `,
+      [viajeId],
+    );
+  },
+
+  // Para el admin — todos los vuelos incluidos completados
+  async getByViajeIdAdmin(viajeId: string | number) {
+    // Sincronizamos el estado real ANTES de leer
+    await query(
+      `
+      UPDATE vuelos
+      SET estado = (CASE 
+        WHEN estado = 'cancelado' THEN 'cancelado'
+        WHEN (NOW() AT TIME ZONE 'Europe/Madrid') >= ("fecLlegada" + "horaLlegada"::time) THEN 'completado'
+        WHEN (NOW() AT TIME ZONE 'Europe/Madrid') >= ("fecSalida" + "horaSalida"::time) THEN 'en_vuelo'
+        WHEN (NOW() AT TIME ZONE 'Europe/Madrid') >= (("fecSalida" + "horaSalida"::time) - INTERVAL '45 minutes') THEN 'abordando'
+        ELSE 'programado'
+      END)::estado_vuelo_enum
+      WHERE viaje_id = $1
+        AND estado != 'cancelado' 
   `,
+      [viajeId],
+    );
+
+    return await query(
+      `
+    SELECT 
+      id, viaje_id, tipo, estado,
+      "fecSalida", "horaSalida", "fecLlegada", "horaLlegada",
+      "plazasTotales", "plazasDisponibles", precio_ajustado,
+      created_at, updated_at
+    FROM vuelos 
+    WHERE viaje_id = $1 
+    ORDER BY "fecSalida" DESC, "horaSalida" ASC
+    `,
       [viajeId],
     );
   },

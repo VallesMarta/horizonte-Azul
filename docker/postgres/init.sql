@@ -150,40 +150,34 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION calcular_estado_vuelo_tiempo_real()
 RETURNS TRIGGER AS $$
 DECLARE
-    momento_actual TIMESTAMP;
+    momento_actual TIMESTAMP := NOW() AT TIME ZONE 'Europe/Madrid';
     momento_salida TIMESTAMP;
     momento_llegada TIMESTAMP;
 BEGIN
-    -- Obtenemos el tiempo real del sistema
-    momento_actual := NOW();    
-    -- Unimos DATE y TIME en un formato TIMESTAMP para cálculos matemáticos precisos
     momento_salida  := (NEW."fecSalida" + NEW."horaSalida"::time);
     momento_llegada := (NEW."fecLlegada" + NEW."horaLlegada"::time);
-    -- Si el administrador canceló el vuelo a mano, no dejamos que el tiempo lo altere
-    IF OLD IS NOT NULL AND OLD.estado = 'cancelado' THEN
+
+    IF NEW.estado = 'cancelado' THEN
         RETURN NEW;
     END IF;
-    -- LÓGICA DE TIEMPO REAL
+
     IF momento_actual >= momento_llegada THEN
-        -- Ya ha pasado la hora de llegada
-        NEW.estado := 'completado';        
-    ELSIF momento_actual >= momento_salida AND momento_actual < momento_llegada THEN
-        -- Está entre la hora de salida y llegada
-        NEW.estado := 'en_vuelo';        
-    ELSIF momento_actual >= (momento_salida - INTERVAL '45 minutes') AND momento_actual < momento_salida THEN
-        -- Faltan 45 minutos o menos para despegar
-        NEW.estado := 'abordando';        
-    ELSE        -- Falta más de 45 minutos para el despegue
+        NEW.estado := 'completado';
+    ELSIF momento_actual >= momento_salida THEN
+        NEW.estado := 'en_vuelo';
+    ELSIF momento_actual >= (momento_salida - INTERVAL '45 minutes') THEN
+        NEW.estado := 'abordando';
+    ELSE
         NEW.estado := 'programado';
     END IF;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER tr_vuelos_estado_y_tiempo
+CREATE TRIGGER tr_vuelos_estado_tiempo_real
 BEFORE INSERT OR UPDATE ON vuelos
-FOR EACH ROW
-EXECUTE FUNCTION calcular_estado_vuelo_tiempo_real();
+FOR EACH ROW EXECUTE FUNCTION calcular_estado_vuelo_tiempo_real();
 
 CREATE OR REPLACE FUNCTION actualizar_estado_reservas_por_vuelo()
 RETURNS TRIGGER AS $$
