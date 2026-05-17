@@ -6,7 +6,7 @@ export const UsuarioModel = {
         SELECT 
             id, username, nombre, apellidos, email, "isAdmin", "fotoPerfil", "fecNacimiento",
             (SELECT COUNT(*) FROM reservas WHERE usuario_id = usuarios.id) AS total_reservas
-        FROM usuarios
+        FROM usuarios ORDER BY created_at ASC
     `;
     return await query(sql);
   },
