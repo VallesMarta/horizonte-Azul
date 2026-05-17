@@ -99,7 +99,7 @@ export default function SobreNosotrosPage() {
             {equipo.map((persona, index) => (
               <div
                 key={index}
-                className="group relative bg-borde-fuerte rounded-4xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:z-30"
+                className="group relative bg-bg-suave rounded-4xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:z-30"
               >
                 <div className="relative h-72 w-full">
                   <Image

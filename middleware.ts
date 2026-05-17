@@ -9,7 +9,7 @@ const rutasProtegidas = [
   "/perfil/mis-reservas",
   "/perfil/mis-tarjetas",
 ];
-const rutasSoloInvitados = ["/login", "/registro", "/sobre-nosotros"];
+const rutasSoloInvitados = ["/login", "/registro"];
 
 export function middleware(request: NextRequest) {
   // Buscamos el token en las cookies (que ahora guardamos con js-cookie)
