@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 
 import Chatbot from "@/components/ui/ChatBot/Chatbot";
 import { WishlistProvider } from "@/context/WishlistContext";
+import CookieBanner from "@/components/ui/CookieBanner";
 
 export const metadata = {
   title: "Horizonte Azul",
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </main>
             <Chatbot />
             <Footer />
+            <CookieBanner />
           </ThemeProvider>
         </AuthProvider>
       </body>
