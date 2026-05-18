@@ -30,6 +30,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/postgres/private.sql:/docker-entrypoint-initdb.d/private.sql
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
