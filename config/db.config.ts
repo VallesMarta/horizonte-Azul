@@ -1,44 +1,48 @@
-import { neon, neonConfig } from "@neondatabase/serverless";
-import { types } from 'pg';
+import { Pool, types } from "pg";
 
-// 1. CONFIGURACIÓN DE TIPOS (Type Parser)
-// El ID 1700 corresponde al tipo NUMERIC/DECIMAL en PostgreSQL.
-// Esto hace que "150.00" (string en DB) llegue como 150.0 (number en JS).
+// 1. CONFIGURACIÓN DE TIPOS (Mantiene los precios como números)
 types.setTypeParser(1700, (val) => (val === null ? null : parseFloat(val)));
 
-// Opcional: Recomendado para despliegues en Vercel Edge
-neonConfig.fetchConnectionCache = true;
+// 2. DETECCIÓN DE ENTORNO
+const isNeon = process.env.DATABASE_URL?.includes("neon.tech");
 
-const sql = neon(process.env.DATABASE_URL!);
+// 3. CONFIGURACIÓN DEL POOL
+// Gestiona automáticamente la conexión según el entorno (Cloud vs Local)
+const pool = new Pool({
+  connectionString: isNeon
+    ? process.env.DATABASE_URL
+    : "postgresql://adminha:adminha@postgres:5432/horizonteAzul",
+  ssl: isNeon ? { rejectUnauthorized: false } : false,
+});
 
 export const query = async <T = any>(
   queryText: string,
-  params: any[] = []
+  params: any[] = [],
 ): Promise<T[]> => {
   try {
-    // Nota: El driver serverless de Neon a veces devuelve directamente las filas
-    // o un objeto de resultado dependiendo de cómo se invoque.
-    const result = await sql.query(queryText, params);
+    let finalQuery = queryText;
 
-    /**
-     * BLINDAJE ANTI-ERROR:
-     * Si 'result' tiene una propiedad 'rows', devolvemos esa.
-     * Si 'result' ya es un array, lo devolvemos tal cual.
-     * Si no hay nada, devolvemos un array vacío.
-     */
-    if (result && (result as any).rows) {
-      return (result as any).rows as T[];
+    // 4. PARCHE DE COMPATIBILIDAD (Solo para Docker)
+    // Si no es Neon, arreglamos el COALESCE de un solo argumento al vuelo
+    if (!isNeon) {
+      finalQuery = queryText.replace(
+        /COALESCE\s*\(\s*\(([\s\S]*?)\)\s*\)/g,
+        "COALESCE(($1), 0)",
+      );
     }
 
-    if (Array.isArray(result)) {
-      return result as T[];
-    }
+    const result = await pool.query(finalQuery, params);
 
-    return [] as T[];
-    
+    // 5. RETORNO SEGURO DE FILAS
+    return result && result.rows ? (result.rows as T[]) : [];
   } catch (error: any) {
+    // LOG DETALLADO PARA EMERGENCIAS
     console.error("❌ ERROR DB:", error.message);
-    console.error("SQL:", queryText);
+    if (error.code === "ECONNREFUSED") {
+      console.error(
+        "👉 Error de conexión: Revisa que el servicio en docker-compose se llame 'postgres'",
+      );
+    }
     throw error;
   }
 };
