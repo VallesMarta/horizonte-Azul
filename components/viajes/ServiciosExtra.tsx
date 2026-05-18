@@ -84,7 +84,7 @@ export const ServiciosExtra = ({
 
       {/* Lista servicios */}
       <ul className="px-5 pb-5 space-y-2">
-        {servicios.map((s) => {
+        {servicios.map((s, i) => {
           const e = extrasState[s.servicio_id] ?? { ida: 0, vuelta: 0 };
           const esNumero = s.tipo_control === "numero";
           const qtyIda = e.ida;
@@ -95,7 +95,7 @@ export const ServiciosExtra = ({
 
           return (
             <li
-              key={s.servicio_id}
+              key={`${s.servicio_id}-${i}`}
               className={`
                 flex items-center gap-3 rounded-2xl border px-3 py-3
                 transition-all duration-200

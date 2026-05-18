@@ -40,7 +40,7 @@ export const ServiciosIncluidos = ({ servicios }: Props) => {
       <ul className="px-5 pt-4 pb-5 space-y-2">
         {servicios.map((s, i) => (
           <li
-            key={i}
+            key={`incluido-${s.nombre}-${i}`}
             className="flex items-center justify-between gap-3 py-2.5 px-3 rounded-2xl bg-verde/8 border border-verde/10 group hover:bg-verde/12 transition-colors duration-200"
           >
             <div className="flex items-center gap-2.5 min-w-0">
