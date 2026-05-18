@@ -48,21 +48,36 @@ import {
  *         description: No autorizado
  *       404:
  *         description: Notificación no encontrada o no pertenece al usuario
- *  delete:
- *    summary: Eliminar una notificación
- *    description: Elimina una notificación específica para el usuario autenticado.
+ *   delete:
+ *     summary: Eliminar una notificación
+ *     description: Elimina una notificación específica para el usuario autenticado.
  *     tags:
  *       - Notificaciones
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID de la notificación a eliminar
  *     responses:
  *       200:
- *         description: Notificación eliminada
+ *         description: Notificación eliminada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *       401:
+ *         description: No autorizado
+ *       404:
+ *         description: Notificación no encontrada o no pertenece al usuario
  */
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
