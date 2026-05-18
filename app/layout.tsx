@@ -20,7 +20,17 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className="flex flex-col min-h-screen">
+      <body
+        className="flex flex-col min-h-screen"
+        style={
+          process.env.NEXT_PUBLIC_APP_ENV === "develop"
+            ? ({
+                "--color-primario": "#10b981", // Verde Esmeralda (Principal)
+                "--color-secundario": "#065f46", // Verde Bosque (Oscuro para contraste)
+              } as React.CSSProperties)
+            : {}
+        }
+      >
         <AuthProvider>
           <ThemeProvider
             attribute="class"
