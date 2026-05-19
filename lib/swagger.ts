@@ -5,7 +5,7 @@ export const getApiDocs = async () => {
     definition: {
       openapi: "3.0.0",
       info: {
-        title: "Mi API Next.js 15",
+        title: "Mi API Next.js 16",
         version: "1.0.0",
       },
       components: {
