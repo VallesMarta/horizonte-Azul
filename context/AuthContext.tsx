@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (token: string, userData: User) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
-    Cookies.set("token", token, { expires: 7, path: "/" });
+    Cookies.set("token", token, { expires: 1, path: "/" });
     setUser(userData);
   };
 
