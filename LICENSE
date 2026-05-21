@@ -1,21 +1,41 @@
-MIT License
+Copyright (c) 2026 Marta Vallés Terol. Todos los derechos reservados.
 
-Copyright (c) 2026 Horizonte Azul Team
+LICENCIA DE USO RESTRINGIDO — HORIZONTE AZUL
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Este software y su código fuente están protegidos por derechos de autor.
+Se concede permiso limitado a terceros únicamente para los siguientes usos:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. VISUALIZACIÓN Y ESTUDIO: Puedes leer y estudiar el código fuente
+   con fines educativos o de revisión académica.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. PRUEBAS LOCALES: Puedes clonar el repositorio y ejecutarlo en un
+   entorno local estrictamente privado para comprobar su funcionamiento.
+
+3. SUGERENCIAS Y CORRECCIONES: Puedes proponer correcciones de errores
+   o mejoras menores mediante Issues o Pull Requests, que serán evaluadas
+   y aceptadas o rechazadas por la autora a su criterio.
+
+Queda expresamente PROHIBIDO, sin autorización escrita previa de la autora:
+
+- Usar este software o cualquier parte de él en proyectos propios,
+  comerciales o académicos.
+- Distribuir, publicar, sublicenciar o vender el código, total o
+  parcialmente, en cualquier formato.
+- Modificar el código y presentarlo o desplegarlo como trabajo propio.
+- Utilizar el nombre "Horizonte Azul", su diseño, su identidad visual
+  o cualquier activo del proyecto con fines distintos a la revisión.
+- Hacer ingeniería inversa con el propósito de replicar la funcionalidad
+  del sistema en otro producto.
+
+AUSENCIA DE GARANTÍA
+
+Este software se proporciona "tal cual", sin garantía de ningún tipo.
+La autora no se hace responsable de ningún daño derivado del uso no
+autorizado de este software.
+
+Para cualquier solicitud de uso no contemplada aquí, contacta con la autora
+directamente antes de proceder.
+
+---
+
+Proyecto Final DAW · Marta Vallés Terol - Curs 2025-2026
